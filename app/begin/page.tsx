@@ -528,6 +528,15 @@ export default function BeginPage() {
               <i className="ti ti-pencil" style={{ color: 'var(--g)' }} /> The chapter can be edited
               any time. Never changed without your permission.
             </div>
+            <div
+              className="ibox"
+              style={{ cursor: 'pointer' }}
+              onClick={() => router.push('/profile')}
+            >
+              <i className="ti ti-layout-grid" /> See six versions of {firstName}&apos;s story — a
+              short bio, the full chapter, a premium emotional version, a timeline, a children&apos;s
+              version, and a first-person legacy letter. →
+            </div>
             <div className="brow">
               <button className="bb" onClick={() => setStep('story')}>
                 Edit answers

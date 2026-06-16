@@ -69,7 +69,7 @@ export default function FamilyTree({
         const r = n.featured ? 24 : 16;
         if (n.featured && n.photo) {
           return (
-            <g key={i} onClick={() => router.push('/archive')} style={{ cursor: 'pointer' }}>
+            <g key={i} onClick={() => router.push('/profile')} style={{ cursor: 'pointer' }}>
               <defs>
                 <clipPath id={`c${i}`}>
                   <circle cx={n.x} cy={n.y} r={r} />
@@ -94,7 +94,7 @@ export default function FamilyTree({
         }
         if (n.featured) {
           return (
-            <g key={i} onClick={() => router.push('/archive')} style={{ cursor: 'pointer' }}>
+            <g key={i} onClick={() => router.push('/profile')} style={{ cursor: 'pointer' }}>
               <circle cx={n.x} cy={n.y} r={r} fill="var(--g)" stroke="var(--g3)" strokeWidth={2} />
               <text x={n.x} y={n.y + 4} textAnchor="middle" fontSize={11} fill="var(--w)" fontWeight={500}>
                 {n.ini}

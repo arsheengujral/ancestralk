@@ -76,3 +76,279 @@ body {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * Component styles — ported verbatim from ancestralk_final.html (the visual
+ * spec) so the React UI matches the prototype pixel-for-pixel. The only changes
+ * are theme-correctness fixes (translucent surfaces use color-mix on the paper
+ * token instead of a hardcoded light rgba, so Midnight renders correctly).
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+input[type=file] { display: none; }
+
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
+.nav { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; background:color-mix(in srgb, var(--paper) 95%, transparent); backdrop-filter:blur(12px); border-bottom:1px solid var(--paper3); position:sticky; top:0; z-index:300; flex-wrap:wrap; gap:8px }
+.logo { font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:20px; font-weight:500; letter-spacing:2.5px; color:var(--ink); display:flex; align-items:center; gap:8px; cursor:pointer }
+.logo-mark { width:22px; height:22px; border:1.5px solid var(--g); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--g) }
+.nav-r { display:flex; gap:6px; align-items:center; flex-wrap:wrap }
+.nb { padding:7px 14px; border-radius:8px; font-size:12px; font-family:var(--font-jost),'Jost',sans-serif; cursor:pointer; transition:all .2s; border:none }
+.nb.ghost { background:transparent; color:var(--ink3); border:1px solid var(--paper3) }
+.nb.ghost:hover { border-color:var(--g2); color:var(--ink) }
+.nb.gold { background:var(--g); color:var(--w); font-weight:500 }
+.nb.gold:hover { background:var(--g3) }
+.lang-sel { padding:6px 10px; border:1px solid var(--paper3); border-radius:7px; font-size:12px; font-family:var(--font-jost),'Jost',sans-serif; color:var(--ink3); background:var(--w); cursor:pointer }
+
+/* ── Hero / home ─────────────────────────────────────────────────────────── */
+.hero { min-height:88vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:70px 24px 50px; position:relative }
+.hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse 70% 50% at 50% 20%, color-mix(in srgb, var(--g) 9%, transparent), transparent 70%); pointer-events:none }
+.eyebrow { font-size:11px; letter-spacing:3.5px; color:var(--g); margin-bottom:20px; font-weight:500 }
+.hero h1 { font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:clamp(40px,6.5vw,68px); font-weight:300; line-height:1.1; margin-bottom:22px; max-width:700px }
+.hero h1 em { font-style:italic; color:var(--g3) }
+.hero-sub { font-size:16px; color:var(--ink3); line-height:1.75; max-width:470px; margin:0 auto 40px; font-weight:300 }
+.hbtns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap }
+.hb { padding:14px 30px; border-radius:9px; font-size:15px; font-family:var(--font-jost),'Jost',sans-serif; cursor:pointer; transition:all .25s; border:none; font-weight:500 }
+.hb.pri { background:var(--g); color:var(--w) }
+.hb.pri:hover { background:var(--g3); transform:translateY(-2px); box-shadow:0 8px 28px color-mix(in srgb, var(--g) 35%, transparent) }
+.hb.out { background:transparent; color:var(--ink); border:1.5px solid var(--paper3) }
+.hb.out:hover { border-color:var(--g) }
+.feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; max-width:760px; margin:50px auto 0; padding:0 24px }
+.feat { background:var(--w); border-radius:var(--rl); padding:20px; border:1px solid var(--paper3); box-shadow:var(--sh); text-align:left; transition:all .3s }
+.feat:hover { transform:translateY(-3px); box-shadow:var(--sh2) }
+.fi-icon { width:38px; height:38px; border-radius:10px; background:var(--g5); display:flex; align-items:center; justify-content:center; font-size:17px; color:var(--g); margin-bottom:12px; border:1px solid var(--g2) }
+.fi-t { font-size:13px; font-weight:500; margin-bottom:5px }
+.fi-d { font-size:12px; color:var(--ink3); line-height:1.55; font-weight:300 }
+.price-wrap { max-width:760px; margin:60px auto; padding:0 24px; display:grid; grid-template-columns:1fr 1fr; gap:14px }
+.pcard { background:var(--w); border-radius:var(--rl); padding:26px; border:1px solid var(--paper3); box-shadow:var(--sh) }
+.pcard.hot { border:1.5px solid var(--g2); box-shadow:var(--sh2) }
+.pbadge { display:inline-block; background:var(--g); color:var(--w); font-size:10px; font-weight:500; letter-spacing:1.5px; padding:4px 12px; border-radius:20px; margin-bottom:14px }
+.pbadge.free { background:var(--paper2); color:var(--ink3) }
+.pname { font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:26px; margin-bottom:2px }
+.pamt { font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:40px; font-weight:300; color:var(--g3) }
+.pper { font-size:14px; color:var(--ink3); font-weight:300 }
+.pdesc { font-size:12px; color:var(--ink3); margin:10px 0 18px; line-height:1.6 }
+.pf { font-size:12px; color:var(--ink2); display:flex; gap:7px; padding:3px 0; line-height:1.4 }
+.pf i { color:var(--g); flex-shrink:0; margin-top:1px; font-size:13px }
+
+/* ── Onboarding flow / forms ─────────────────────────────────────────────── */
+.prog { display:flex; gap:5px; padding:13px 24px; background:var(--w); border-bottom:1px solid var(--paper3) }
+.pd { flex:1; height:2px; border-radius:1px; background:var(--paper3); transition:all .4s }
+.pd.done { background:var(--g) } .pd.act { background:linear-gradient(90deg,var(--g),var(--g2)) }
+.fw { max-width:560px; margin:0 auto; padding:30px 22px 100px }
+.fey { font-size:11px; letter-spacing:2px; color:var(--g); margin-bottom:9px; font-weight:500 }
+.ftit { font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:32px; font-weight:400; margin-bottom:8px; line-height:1.2 }
+.fsub { font-size:14px; color:var(--ink3); line-height:1.7; margin-bottom:28px; font-weight:300 }
+.fl { display:block; font-size:11px; font-weight:500; letter-spacing:1.2px; color:var(--ink3); text-transform:uppercase; margin-bottom:6px }
+.fi2 { width:100%; padding:12px 14px; border:1.5px solid var(--paper3); border-radius:9px; font-size:14px; font-family:var(--font-jost),'Jost',sans-serif; background:var(--w); transition:border .2s; outline:none; font-weight:300; color:var(--ink) }
+.fi2:focus { border-color:var(--g) }
+.fta { width:100%; padding:12px 14px; border:1.5px solid var(--paper3); border-radius:9px; font-size:14px; font-family:var(--font-jost),'Jost',sans-serif; background:var(--w); outline:none; resize:none; line-height:1.65; font-weight:300; color:var(--ink) }
+.fta:focus { border-color:var(--g) }
+.field { margin-bottom:18px }
+.who-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:26px }
+.wo { padding:16px; border:1.5px solid var(--paper3); border-radius:var(--r); cursor:pointer; transition:all .2s; background:var(--w); position:relative }
+.wo:hover { border-color:var(--g2); background:var(--g5) }
+.wo.sel { border-color:var(--g); background:var(--g5) }
+.wo-ic { font-size:21px; color:var(--g); margin-bottom:8px }
+.wo-t { font-size:13px; font-weight:500; margin-bottom:2px }
+.wo-s { font-size:11px; color:var(--ink3); line-height:1.45; font-weight:300 }
+.wo-c { position:absolute; top:11px; right:11px; width:17px; height:17px; border-radius:50%; background:var(--g); display:none; align-items:center; justify-content:center; font-size:9px; color:var(--w) }
+.wo.sel .wo-c { display:flex }
+
+/* ── Voice ───────────────────────────────────────────────────────────────── */
+.vrow { display:flex; gap:8px; margin-bottom:6px }
+.vbtn { display:flex; align-items:center; gap:6px; padding:9px 13px; border:1.5px solid var(--paper3); border-radius:8px; background:var(--w); cursor:pointer; font-size:12px; font-family:var(--font-jost),'Jost',sans-serif; color:var(--ink3); transition:all .2s; white-space:nowrap }
+.vbtn:hover { border-color:var(--g2); color:var(--ink) }
+.vbtn.rec { border-color:#D0483C; color:#D0483C; background:#FFF8F7; animation:rp 1.2s ease infinite }
+@keyframes rp { 0%,100%{ box-shadow:0 0 0 0 rgba(208,72,60,.15) } 50%{ box-shadow:0 0 0 7px rgba(208,72,60,0) } }
+.vd { width:7px; height:7px; border-radius:50%; background:#D0483C; animation:bl 1s ease infinite; display:none }
+@keyframes bl { 0%,100%{opacity:1} 50%{opacity:.3} }
+.vbtn.rec .vd { display:inline-block }
+.vstat { font-size:12px; color:var(--g3); font-style:italic; min-height:15px; margin-top:2px }
+.vpb { display:none; align-items:center; gap:10px; background:var(--g5); border:1px solid var(--g2); border-radius:8px; padding:9px 13px; margin:6px 0 }
+.vpb.show { display:flex }
+.vp-btn { width:28px; height:28px; border-radius:50%; background:var(--g); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--w); flex-shrink:0 }
+.vp-btn:hover { background:var(--g3) }
+.vwave { flex:1; height:22px; display:flex; align-items:center; gap:2px }
+.vwb { width:3px; border-radius:2px; background:var(--g2) }
+.sug { background:var(--g5); border:1px solid var(--g2); border-radius:9px; padding:10px 13px; margin-top:8px; display:none }
+.sug.show { display:block; animation:rv .25s ease }
+.sug-l { font-size:11px; color:var(--g3); font-weight:500; margin-bottom:7px; display:flex; align-items:center; gap:5px }
+.sug-c { display:flex; flex-wrap:wrap; gap:6px }
+.schip { padding:5px 11px; background:var(--w); border:1px solid var(--g2); border-radius:20px; font-size:11px; color:var(--ink2); cursor:pointer; transition:all .2s; font-family:var(--font-jost),'Jost',sans-serif }
+.schip:hover { border-color:var(--g); color:var(--g3) }
+
+/* ── Floating guide ──────────────────────────────────────────────────────── */
+.guide { position:fixed; bottom:26px; right:22px; z-index:400; display:flex; flex-direction:column; align-items:flex-end; gap:8px }
+.gb { background:var(--dk); color:var(--w); border-radius:14px 14px 4px 14px; padding:11px 15px; font-size:12px; max-width:225px; line-height:1.55; box-shadow:var(--sh2); display:none; font-weight:300 }
+.gb.show { display:block; animation:rv .3s ease }
+.gbtn { width:44px; height:44px; border-radius:50%; background:var(--g); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px color-mix(in srgb, var(--g) 40%, transparent); transition:all .2s; font-size:17px; color:var(--w) }
+.gbtn:hover { transform:scale(1.08); background:var(--g3) }
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.bp { width:100%; padding:13px; background:var(--g); color:var(--w); border:none; border-radius:9px; font-size:14px; font-weight:500; font-family:var(--font-jost),'Jost',sans-serif; cursor:pointer; transition:all .2s }
+.bp:hover { background:var(--g3); transform:translateY(-1px) }
+.bp:disabled { background:var(--paper3); color:var(--ink4); cursor:not-allowed; transform:none }
+.bb { padding:11px 20px; background:transparent; color:var(--ink3); border:1px solid var(--paper3); border-radius:9px; font-size:13px; font-family:var(--font-jost),'Jost',sans-serif; cursor:pointer; font-weight:300 }
+.bb:hover { border-color:var(--ink3) }
+.brow { display:flex; gap:10px; margin-top:14px }
+.brow .bp { flex:1 }
+
+/* ── Photo drop / face / info boxes ──────────────────────────────────────── */
+.pdrop { border:2px dashed var(--paper3); border-radius:var(--r); padding:18px; text-align:center; cursor:pointer; transition:all .2s; background:var(--w) }
+.pdrop:hover { border-color:var(--g2); background:var(--g5) }
+.frec { background:var(--g5); border:1px solid var(--g2); border-radius:8px; padding:9px 12px; font-size:12px; color:var(--g3); margin-top:8px; display:none; align-items:center; gap:8px }
+.frec.show { display:flex }
+.ibox { background:var(--g5); border:1px solid var(--g2); border-radius:9px; padding:10px 13px; font-size:12px; color:var(--g3); line-height:1.6; margin-bottom:16px; display:flex; gap:8px; font-weight:300 }
+.enote { background:var(--paper2); border-radius:8px; padding:8px 12px; font-size:11px; color:var(--ink3); display:flex; align-items:center; gap:7px; margin-top:8px; font-weight:300 }
+
+/* ── Save ceremony overlay ───────────────────────────────────────────────── */
+.sov { position:fixed; inset:0; background:rgba(20,16,9,.65); z-index:600; display:none; align-items:center; justify-content:center; padding:20px }
+.sov.show { display:flex; animation:fi .3s ease }
+@keyframes fi { from{opacity:0} to{opacity:1} }
+.smod { background:var(--w); border-radius:var(--rl); padding:36px 32px; max-width:380px; width:100%; text-align:center; box-shadow:var(--sh2) }
+.ssi { width:25px; height:25px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; flex-shrink:0; transition:all .3s }
+.ssi-p { background:var(--paper2); color:var(--ink4) } .ssi-d { background:var(--g2); color:var(--g3); animation:rp 1s ease infinite } .ssi-ok { background:#D4EDDA; color:#1A6B38 }
+.ssitem { display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid var(--paper3); font-size:12px; color:var(--ink3); text-align:left; font-weight:300 }
+.ssitem:last-child { border-bottom:none }
+
+/* ── Chapter view ────────────────────────────────────────────────────────── */
+.swrap { background:var(--w); border-radius:var(--rl); border:1px solid var(--paper3); overflow:hidden; box-shadow:var(--sh) }
+.shead { display:flex; align-items:center; gap:16px; padding:20px; border-bottom:1px solid var(--paper2) }
+.sav { width:54px; height:54px; border-radius:50%; background:var(--g2); display:flex; align-items:center; justify-content:center; font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:18px; color:var(--g3); font-weight:500; flex-shrink:0; overflow:hidden; border:2px solid var(--g2) }
+.sav img { width:100%; height:100%; object-fit:cover }
+.sname { font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:21px }
+.smeta { font-size:12px; color:var(--ink3); margin-top:2px; font-weight:300 }
+.stabs { display:flex; gap:4px; padding:12px 20px; background:var(--paper2); border-bottom:1px solid var(--paper3) }
+.stab { padding:6px 14px; border-radius:20px; font-size:11px; cursor:pointer; font-family:var(--font-jost),'Jost',sans-serif; border:none; background:transparent; color:var(--ink3); font-weight:300 }
+.stab.on { background:var(--w); color:var(--ink); font-weight:500; box-shadow:0 1px 4px rgba(20,16,9,.08) }
+.sbody { padding:20px; font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:15px; line-height:1.9; color:var(--ink2) }
+.sbody p { margin-bottom:13px }
+.squote { border-left:2px solid var(--g2); padding-left:15px; margin:16px 0; font-style:italic; color:var(--ink3); font-size:14px }
+.sraw { padding:20px; font-size:12px; line-height:1.75; color:var(--ink3); font-family:var(--font-jost),'Jost',sans-serif; white-space:pre-wrap; font-weight:300 }
+.stags { display:flex; flex-wrap:wrap; gap:6px; padding:0 20px 18px }
+.stag { background:var(--paper2); color:var(--g3); font-size:10px; padding:4px 10px; border-radius:20px; font-weight:500 }
+.vbar { background:var(--dk); border-radius:var(--r); padding:14px 16px; display:flex; align-items:center; gap:13px; margin:0 20px 18px }
+.vbp { width:34px; height:34px; border-radius:50%; background:var(--g); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--w); flex-shrink:0 }
+.vbp:hover { background:var(--g3) }
+.vbn { font-size:12px; color:rgba(255,255,255,.9); font-weight:500; margin-bottom:2px }
+.vbd { font-size:10px; color:rgba(255,255,255,.45) }
+.vbw { display:flex; align-items:center; gap:2px; height:26px; flex:1; justify-content:flex-end }
+.vbb { width:3px; border-radius:2px; background:rgba(184,147,90,.5) }
+
+/* ── Dashboard ───────────────────────────────────────────────────────────── */
+.dash { max-width:680px; margin:0 auto; padding:26px 22px 80px }
+.dh { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:10px }
+.dname { font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:32px; font-weight:400; line-height:1.1 }
+.dsub { font-size:12px; color:var(--ink3); margin-top:3px; font-weight:300 }
+.dbadge { background:var(--g); color:var(--w); font-size:10px; padding:5px 12px; border-radius:20px; font-weight:500 }
+.slbl { font-size:11px; font-weight:500; letter-spacing:1.4px; color:var(--ink4); text-transform:uppercase; margin-bottom:10px; margin-top:18px }
+.tout { background:var(--w); border-radius:var(--rl); border:1px solid var(--paper3); overflow:hidden; margin-bottom:14px; box-shadow:var(--sh) }
+.thead { padding:14px 18px; border-bottom:1px solid var(--paper2); display:flex; align-items:center; justify-content:space-between }
+.ttitle { font-size:12px; font-weight:500 }
+.tadd { font-size:11px; color:var(--g); background:transparent; border:1px solid var(--g2); border-radius:7px; padding:5px 11px; cursor:pointer; font-family:var(--font-jost),'Jost',sans-serif }
+.tadd:hover { background:var(--g5) }
+.tsvg-w { overflow-x:auto; padding:14px }
+.rem { background:linear-gradient(135deg,#FEF3E8,var(--w)); border:1px solid #F5D9A8; border-radius:var(--rl); padding:18px; margin-bottom:14px; display:flex; gap:13px }
+.rem-i { font-size:22px; color:var(--g); flex-shrink:0 }
+.rem-t { font-size:13px; font-weight:500; margin-bottom:3px }
+.rem-d { font-size:12px; color:var(--ink3); line-height:1.55; font-weight:300 }
+.rem-b { margin-top:9px; padding:7px 14px; background:var(--g); color:var(--w); border:none; border-radius:7px; font-size:11px; font-family:var(--font-jost),'Jost',sans-serif; cursor:pointer; font-weight:500 }
+.rem-b:hover { background:var(--g3) }
+.yr { background:linear-gradient(135deg,var(--g5),var(--w)); border:1.5px solid var(--g2); border-radius:var(--rl); padding:20px; margin-bottom:14px }
+.yr-t { font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:22px; margin-bottom:4px }
+.yr-s { font-size:12px; color:var(--ink3); margin-bottom:14px; line-height:1.6; font-weight:300 }
+.yr-g { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:14px }
+.yri { background:var(--w); border-radius:var(--r); padding:12px 9px; border:1px solid var(--paper3); text-align:center }
+.yri-i { font-size:18px; color:var(--g); margin-bottom:5px }
+.yri-l { font-size:11px; font-weight:500; margin-bottom:1px }
+.yri-s { font-size:10px; color:var(--ink3); font-weight:300 }
+.acg { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:14px }
+.ac { background:var(--w); border:1px solid var(--paper3); border-radius:var(--r); padding:14px; cursor:pointer; transition:all .2s; box-shadow:var(--sh) }
+.ac:hover { border-color:var(--g2); transform:translateY(-2px); box-shadow:var(--sh2) }
+.ac-i { font-size:18px; color:var(--g); margin-bottom:7px }
+.ac-t { font-size:12px; font-weight:500; margin-bottom:2px }
+.ac-d { font-size:11px; color:var(--ink3); line-height:1.4; font-weight:300 }
+.fmo { background:var(--w); border-radius:var(--rl); border:1px solid var(--paper3); overflow:hidden; margin-bottom:14px; box-shadow:var(--sh) }
+.fmh { background:var(--dk); padding:14px 18px }
+.fmt { font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:16px; color:var(--w) }
+.fms { font-size:11px; color:rgba(255,255,255,.45); margin-top:1px; font-weight:300 }
+.fmi { display:flex; align-items:center; gap:13px; padding:12px 18px; border-bottom:1px solid var(--paper2) }
+.fmi:last-child { border-bottom:none }
+.fseal { width:34px; height:34px; border-radius:8px; background:var(--g2); display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--g3); flex-shrink:0 }
+.fto { font-size:12px; font-weight:500 }
+.fwhen { font-size:11px; color:var(--ink3); font-weight:300 }
+.fst { font-size:10px; background:var(--g5); color:var(--g3); padding:3px 8px; border-radius:20px; font-weight:500; margin-left:auto }
+.fma { display:flex; align-items:center; gap:9px; padding:12px 18px; cursor:pointer; border-top:1px solid var(--paper2); color:var(--g); font-size:12px; font-weight:500 }
+.fma:hover { background:var(--g5) }
+.mrow { display:flex; align-items:center; gap:11px; padding:11px 18px; border-bottom:1px solid var(--paper2) }
+.mrow:last-child { border-bottom:none }
+.mav { width:36px; height:36px; border-radius:50%; background:var(--g2); display:flex; align-items:center; justify-content:center; font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:13px; color:var(--g3); font-weight:500; flex-shrink:0; overflow:hidden }
+.mav img { width:100%; height:100%; object-fit:cover }
+.mn { font-size:12px; font-weight:500 }
+.mr { font-size:11px; color:var(--ink3); font-weight:300 }
+.ms { font-size:10px; padding:3px 8px; border-radius:20px; font-weight:500; margin-left:auto }
+.ms-d { background:#D4EDDA; color:#1A6B38 } .ms-p { background:var(--paper2); color:var(--ink4) } .ms-w { background:var(--g5); color:var(--g3) }
+.irow { display:flex; gap:8px; padding:12px 18px; border-top:1px solid var(--paper2) }
+.iin { flex:1; padding:9px 12px; border:1.5px solid var(--paper3); border-radius:8px; font-size:12px; font-family:var(--font-jost),'Jost',sans-serif; outline:none; background:var(--w); color:var(--ink) }
+.iin:focus { border-color:var(--g) }
+.ibtn { padding:9px 14px; background:var(--g); color:var(--w); border:none; border-radius:8px; font-size:12px; font-family:var(--font-jost),'Jost',sans-serif; cursor:pointer; font-weight:500; white-space:nowrap }
+.ibtn:hover { background:var(--g3) }
+
+/* ── Timeline ────────────────────────────────────────────────────────────── */
+.tl { position:relative; padding-left:24px }
+.tl::before { content:''; position:absolute; left:7px; top:6px; bottom:6px; width:1.5px; background:var(--g2) }
+.tli { position:relative; padding:9px 0 9px 12px }
+.tli::before { content:''; position:absolute; left:-21px; top:14px; width:9px; height:9px; border-radius:50%; background:var(--g); border:2px solid var(--w); box-shadow:0 0 0 1.5px var(--g2) }
+.tly { font-size:11px; color:var(--g3); font-weight:500 }
+.tlt { font-size:13px; font-weight:500; margin:1px 0 }
+.tld { font-size:11px; color:var(--ink3); font-weight:300 }
+
+/* ── Album ───────────────────────────────────────────────────────────────── */
+.ag { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:14px }
+.acell { aspect-ratio:1; border-radius:9px; background:var(--paper2); display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:26px; cursor:pointer; transition:transform .2s; position:relative; overflow:hidden; gap:4px }
+.acell:hover { transform:scale(1.03) }
+.acell img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0 }
+.acell-l { font-size:9px; color:var(--ink3) }
+.aibadge { position:absolute; top:6px; right:6px; background:var(--g); color:var(--w); font-size:8px; padding:2px 6px; border-radius:20px; font-weight:500; z-index:2 }
+.atabs { display:flex; gap:5px; margin-bottom:14px; background:var(--paper2); border-radius:9px; padding:4px; flex-wrap:wrap }
+.atab { flex:1; padding:7px; border:none; background:transparent; border-radius:7px; font-size:11px; font-family:var(--font-jost),'Jost',sans-serif; cursor:pointer; color:var(--ink3); min-width:70px }
+.atab.on { background:var(--w); color:var(--ink); font-weight:500; box-shadow:0 1px 3px rgba(0,0,0,.08) }
+
+/* ── Future messages seal ────────────────────────────────────────────────── */
+.seal-p { background:var(--dk); border-radius:var(--rl); padding:28px; text-align:center; margin-bottom:18px }
+.seal-i { font-size:44px; color:rgba(184,147,90,.4); margin-bottom:10px; transition:all .4s }
+.seal-i.on { color:var(--g); font-size:52px }
+.seal-m { font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:17px; color:rgba(255,255,255,.8); margin-bottom:3px }
+.seal-d { font-size:11px; color:rgba(255,255,255,.35); font-weight:300 }
+
+/* ── Elderly voice-only mode ─────────────────────────────────────────────── */
+.eld { position:fixed; inset:0; background:var(--paper); z-index:500; display:none; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center }
+.eld.on { display:flex }
+.eld-q { font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:clamp(26px,5vw,40px); line-height:1.35; max-width:600px; margin-bottom:36px; color:var(--ink) }
+.eld-mic { width:110px; height:110px; border-radius:50%; background:var(--g); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:42px; color:var(--w); box-shadow:0 8px 40px color-mix(in srgb, var(--g) 40%, transparent); transition:all .3s; margin-bottom:20px }
+.eld-mic:hover { transform:scale(1.05) }
+.eld-mic.rec { background:#D0483C; animation:rp 1.2s ease infinite }
+.eld-hint { font-size:16px; color:var(--ink3); font-weight:300; margin-bottom:30px }
+.eld-trans { font-size:15px; color:var(--g3); font-style:italic; max-width:500px; min-height:40px; line-height:1.6 }
+.eld-x { position:absolute; top:24px; right:24px; background:transparent; border:1px solid var(--paper3); border-radius:50%; width:42px; height:42px; font-size:17px; color:var(--ink3); cursor:pointer }
+
+/* ── Book studio ─────────────────────────────────────────────────────────── */
+.bkp { background:var(--w); border:1px solid var(--paper3); border-radius:var(--rl); padding:18px; display:flex; align-items:center; gap:15px; margin-bottom:12px }
+.bkc { background:var(--g); border-radius:6px 3px 3px 6px; padding:18px 13px; min-width:64px; text-align:center; box-shadow:3px 3px 0 var(--g3) }
+.bkt { font-family:var(--font-cormorant),'Cormorant Garamond',serif; font-size:10px; color:var(--w); letter-spacing:1px }
+
+/* ── Settings ────────────────────────────────────────────────────────────── */
+.set-row { display:flex; align-items:center; justify-content:space-between; padding:13px 18px; border-bottom:1px solid var(--paper2); font-size:13px }
+.set-row:last-child { border-bottom:none }
+.toggle { width:40px; height:22px; border-radius:11px; background:var(--paper3); position:relative; cursor:pointer; transition:background .2s; border:none }
+.toggle.on { background:var(--g) }
+.toggle::after { content:''; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--w); transition:left .2s }
+.toggle.on::after { left:20px }
+
+@media (max-width:640px) {
+  .feat-grid { grid-template-columns:1fr }
+  .price-wrap { grid-template-columns:1fr }
+  .who-grid { grid-template-columns:1fr }
+  .acg { grid-template-columns:1fr 1fr }
+  .yr-g { grid-template-columns:1fr }
+  .ag { grid-template-columns:repeat(2,1fr) }
+}

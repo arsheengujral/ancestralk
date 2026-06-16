@@ -3,6 +3,9 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { cormorant, jost } from '@/lib/fonts';
 import { rtlLocales } from '@/i18n/request';
+import { FlowProvider } from '@/components/FlowProvider';
+import Nav from '@/components/Nav';
+import FloatingGuide from '@/components/FloatingGuide';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -41,7 +44,11 @@ export default async function RootLayout({
       <body>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
+          <FlowProvider>
+            <Nav />
+            {children}
+            <FloatingGuide />
+          </FlowProvider>
         </NextIntlClientProvider>
       </body>
     </html>

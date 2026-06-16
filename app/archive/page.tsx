@@ -16,6 +16,7 @@ interface Member {
 }
 
 const QUICK_ACTIONS = [
+  { href: '/ask', icon: 'ti-message-circle-search', t: 'Ask your family', d: 'Answers from your archive' },
   { href: '/begin', icon: 'ti-user-plus', t: 'Add family member', d: 'Everyone gets a chapter' },
   { href: '/album', icon: 'ti-photos', t: 'Photos & videos', d: 'Scan, upload, organise' },
   { href: '/future', icon: 'ti-clock', t: 'Future messages', d: 'Letters across time' },

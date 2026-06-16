@@ -37,6 +37,13 @@ export default function FuturePage() {
       return;
     }
     setSealed(true);
+    // Encrypt + persist server-side. The plaintext is sealed before it touches
+    // the database; there is no path to read it back before its unlock day.
+    fetch('/api/future-messages/seal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recipientDescription: to, unlockCondition: when, messageText: msg }),
+    }).catch(() => {});
     setTimeout(() => router.push('/archive'), 1400);
   }
 

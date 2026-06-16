@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ancestralk — No one gets forgotten</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#B8935A;--g2:#E8D5B0;--g3:#8A6B34;--g5:#FAF4EA;--ink:#141009;--ink2:#2E2518;--ink3:#6B5E4E;--ink4:#A8998A;--paper:#FDFAF5;--paper2:#F5EFE3;--paper3:#EDE3D3;--w:#FFF;--dk:#141009;--r:10px;--rl:18px;--sh:0 2px 20px rgba(20,16,9,.06);--sh2:0 8px 40px rgba(20,16,9,.12)}
+[data-theme="emerald"]{--g:#3E7C5B;--g2:#CDE5D6;--g3:#27543C;--g5:#EEF7F1;--paper:#F8FBF9;--paper2:#EDF4EF;--paper3:#DCE9E0;--ink:#101813;--ink2:#243029;--ink3:#5C6B62;--ink4:#9AA89F;--dk:#101813}
+[data-theme="royal"]{--g:#4E5FAB;--g2:#D5DAF1;--g3:#36417E;--g5:#F0F2FB;--paper:#F9FAFD;--paper2:#EEF0F8;--paper3:#DEE2F0;--ink:#10121C;--ink2:#252938;--ink3:#5E6377;--ink4:#9CA1B3;--dk:#10121C}
+[data-theme="rose"]{--g:#B05E72;--g2:#EFD3DA;--g3:#833F50;--g5:#FAF0F3;--paper:#FDF9FA;--paper2:#F6ECEF;--paper3:#ECDCE1;--ink:#1A1013;--ink2:#322227;--ink3:#71595F;--ink4:#AB969C;--dk:#1A1013}
+[data-theme="midnight"]{--paper:#14110C;--paper2:#1E1A13;--paper3:#332C22;--w:#1E1A14;--ink:#F1EDE5;--ink2:#D9D2C6;--ink3:#A89E8E;--ink4:#6F675B;--g:#C9A56A;--g2:#4A3D28;--g3:#E0C089;--g5:#262017;--dk:#0A0805;--sh:0 2px 20px rgba(0,0,0,.3);--sh2:0 8px 40px rgba(0,0,0,.5)}
+body{font-family:'Jost',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+.serif{font-family:'Cormorant Garamond',serif}
+input[type=file]{display:none}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(253,250,245,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--paper3);position:sticky;top:0;z-index:300;flex-wrap:wrap;gap:8px}
+.logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;letter-spacing:2.5px;color:var(--ink);display:flex;align-items:center;gap:8px;cursor:pointer}
+.logo-mark{width:22px;height:22px;border:1.5px solid var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--g)}
+.nav-r{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.nb{padding:7px 14px;border-radius:8px;font-size:12px;font-family:'Jost',sans-serif;cursor:pointer;transition:all .2s;border:none}
+.nb.ghost{background:transparent;color:var(--ink3);border:1px solid var(--paper3)}
+.nb.ghost:hover{border-color:var(--g2);color:var(--ink)}
+.nb.gold{background:var(--g);color:var(--w);font-weight:500}
+.nb.gold:hover{background:var(--g3)}
+.lang-sel{padding:6px 10px;border:1px solid var(--paper3);border-radius:7px;font-size:12px;font-family:'Jost',sans-serif;color:var(--ink3);background:var(--w);cursor:pointer}
+.sc{display:none}
+.sc.on{display:block;animation:rv .4s ease both}
+@keyframes rv{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.hero{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:70px 24px 50px;position:relative}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 20%,rgba(184,147,90,.09),transparent 70%);pointer-events:none}
+.eyebrow{font-size:11px;letter-spacing:3.5px;color:var(--g);margin-bottom:20px;font-weight:500}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,6.5vw,68px);font-weight:300;line-height:1.1;margin-bottom:22px;max-width:700px}
+.hero h1 em{font-style:italic;color:var(--g3)}
+.hero-sub{font-size:16px;color:var(--ink3);line-height:1.75;max-width:470px;margin:0 auto 40px;font-weight:300}
+.hbtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.hb{padding:14px 30px;border-radius:9px;font-size:15px;font-family:'Jost',sans-serif;cursor:pointer;transition:all .25s;border:none;font-weight:500}
+.hb.pri{background:var(--g);color:var(--w)}
+.hb.pri:hover{background:var(--g3);transform:translateY(-2px);box-shadow:0 8px 28px rgba(184,147,90,.35)}
+.hb.out{background:transparent;color:var(--ink);border:1.5px solid var(--paper3)}
+.hb.out:hover{border-color:var(--g)}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:760px;margin:50px auto 0;padding:0 24px}
+.feat{background:var(--w);border-radius:var(--rl);padding:20px;border:1px solid var(--paper3);box-shadow:var(--sh);text-align:left;transition:all .3s}
+.feat:hover{transform:translateY(-3px);box-shadow:var(--sh2)}
+.fi-icon{width:38px;height:38px;border-radius:10px;background:var(--g5);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--g);margin-bottom:12px;border:1px solid var(--g2)}
+.fi-t{font-size:13px;font-weight:500;margin-bottom:5px}
+.fi-d{font-size:12px;color:var(--ink3);line-height:1.55;font-weight:300}
+.price-wrap{max-width:760px;margin:60px auto;padding:0 24px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pcard{background:var(--w);border-radius:var(--rl);padding:26px;border:1px solid var(--paper3);box-shadow:var(--sh)}
+.pcard.hot{border:1.5px solid var(--g2);box-shadow:var(--sh2)}
+.pbadge{display:inline-block;background:var(--g);color:var(--w);font-size:10px;font-weight:500;letter-spacing:1.5px;padding:4px 12px;border-radius:20px;margin-bottom:14px}
+.pbadge.free{background:var(--paper2);color:var(--ink3)}
+.pname{font-family:'Cormorant Garamond',serif;font-size:26px;margin-bottom:2px}
+.pamt{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;color:var(--g3)}
+.pper{font-size:14px;color:var(--ink3);font-weight:300}
+.pdesc{font-size:12px;color:var(--ink3);margin:10px 0 18px;line-height:1.6}
+.pf{font-size:12px;color:var(--ink2);display:flex;gap:7px;padding:3px 0;line-height:1.4}
+.pf i{color:var(--g);flex-shrink:0;margin-top:1px;font-size:13px}
+.prog{display:flex;gap:5px;padding:13px 24px;background:var(--w);border-bottom:1px solid var(--paper3)}
+.pd{flex:1;height:2px;border-radius:1px;background:var(--paper3);transition:all .4s}
+.pd.done{background:var(--g)}.pd.act{background:linear-gradient(90deg,var(--g),var(--g2))}
+.fw{max-width:560px;margin:0 auto;padding:30px 22px 100px}
+.fey{font-size:11px;letter-spacing:2px;color:var(--g);margin-bottom:9px;font-weight:500}
+.ftit{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:400;margin-bottom:8px;line-height:1.2}
+.fsub{font-size:14px;color:var(--ink3);line-height:1.7;margin-bottom:28px;font-weight:300}
+.fl{display:block;font-size:11px;font-weight:500;letter-spacing:1.2px;color:var(--ink3);text-transform:uppercase;margin-bottom:6px}
+.fi2{width:100%;padding:12px 14px;border:1.5px solid var(--paper3);border-radius:9px;font-size:14px;font-family:'Jost',sans-serif;background:var(--w);transition:border .2s;outline:none;font-weight:300;color:var(--ink)}
+.fi2:focus{border-color:var(--g)}
+.fta{width:100%;padding:12px 14px;border:1.5px solid var(--paper3);border-radius:9px;font-size:14px;font-family:'Jost',sans-serif;background:var(--w);outline:none;resize:none;line-height:1.65;font-weight:300;color:var(--ink)}
+.fta:focus{border-color:var(--g)}
+.field{margin-bottom:18px}
+.who-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:26px}
+.wo{padding:16px;border:1.5px solid var(--paper3);border-radius:var(--r);cursor:pointer;transition:all .2s;background:var(--w);position:relative}
+.wo:hover{border-color:var(--g2);background:var(--g5)}
+.wo.sel{border-color:var(--g);background:var(--g5)}
+.wo-ic{font-size:21px;color:var(--g);margin-bottom:8px}
+.wo-t{font-size:13px;font-weight:500;margin-bottom:2px}
+.wo-s{font-size:11px;color:var(--ink3);line-height:1.45;font-weight:300}
+.wo-c{position:absolute;top:11px;right:11px;width:17px;height:17px;border-radius:50%;background:var(--g);display:none;align-items:center;justify-content:center;font-size:9px;color:var(--w)}
+.wo.sel .wo-c{display:flex}
+.vrow{display:flex;gap:8px;margin-bottom:6px}
+.vbtn{display:flex;align-items:center;gap:6px;padding:9px 13px;border:1.5px solid var(--paper3);border-radius:8px;background:var(--w);cursor:pointer;font-size:12px;font-family:'Jost',sans-serif;color:var(--ink3);transition:all .2s;white-space:nowrap}
+.vbtn:hover{border-color:var(--g2);color:var(--ink)}
+.vbtn.rec{border-color:#D0483C;color:#D0483C;background:#FFF8F7;animation:rp 1.2s ease infinite}
+@keyframes rp{0%,100%{box-shadow:0 0 0 0 rgba(208,72,60,.15)}50%{box-shadow:0 0 0 7px rgba(208,72,60,0)}}
+.vd{width:7px;height:7px;border-radius:50%;background:#D0483C;animation:bl 1s ease infinite;display:none}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+.vbtn.rec .vd{display:inline-block}
+.vstat{font-size:12px;color:var(--g3);font-style:italic;min-height:15px;margin-top:2px}
+.vpb{display:none;align-items:center;gap:10px;background:var(--g5);border:1px solid var(--g2);border-radius:8px;padding:9px 13px;margin:6px 0}
+.vpb.show{display:flex}
+.vp-btn{width:28px;height:28px;border-radius:50%;background:var(--g);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--w);flex-shrink:0}
+.vp-btn:hover{background:var(--g3)}
+.vwave{flex:1;height:22px;display:flex;align-items:center;gap:2px}
+.vwb{width:3px;border-radius:2px;background:var(--g2)}
+.sug{background:var(--g5);border:1px solid var(--g2);border-radius:9px;padding:10px 13px;margin-top:8px;display:none}
+.sug.show{display:block;animation:rv .25s ease}
+.sug-l{font-size:11px;color:var(--g3);font-weight:500;margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.sug-c{display:flex;flex-wrap:wrap;gap:6px}
+.schip{padding:5px 11px;background:var(--w);border:1px solid var(--g2);border-radius:20px;font-size:11px;color:var(--ink2);cursor:pointer;transition:all .2s;font-family:'Jost',sans-serif}
+.schip:hover{border-color:var(--g);color:var(--g3)}
+.guide{position:fixed;bottom:26px;right:22px;z-index:400;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.gb{background:var(--dk);color:var(--w);border-radius:14px 14px 4px 14px;padding:11px 15px;font-size:12px;max-width:225px;line-height:1.55;box-shadow:var(--sh2);display:none;font-weight:300}
+.gb.show{display:block;animation:rv .3s ease}
+.gbtn{width:44px;height:44px;border-radius:50%;background:var(--g);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(184,147,90,.4);transition:all .2s;font-size:17px;color:var(--w)}
+.gbtn:hover{transform:scale(1.08);background:var(--g3)}
+.bp{width:100%;padding:13px;background:var(--g);color:var(--w);border:none;border-radius:9px;font-size:14px;font-weight:500;font-family:'Jost',sans-serif;cursor:pointer;transition:all .2s}
+.bp:hover{background:var(--g3);transform:translateY(-1px)}
+.bp:disabled{background:var(--paper3);color:var(--ink4);cursor:not-allowed;transform:none}
+.bb{padding:11px 20px;background:transparent;color:var(--ink3);border:1px solid var(--paper3);border-radius:9px;font-size:13px;font-family:'Jost',sans-serif;cursor:pointer;font-weight:300}
+.bb:hover{border-color:var(--ink3)}
+.brow{display:flex;gap:10px;margin-top:14px}
+.brow .bp{flex:1}
+.pdrop{border:2px dashed var(--paper3);border-radius:var(--r);padding:18px;text-align:center;cursor:pointer;transition:all .2s;background:var(--w)}
+.pdrop:hover{border-color:var(--g2);background:var(--g5)}
+.frec{background:var(--g5);border:1px solid var(--g2);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--g3);margin-top:8px;display:none;align-items:center;gap:8px}
+.frec.show{display:flex}
+.ibox{background:var(--g5);border:1px solid var(--g2);border-radius:9px;padding:10px 13px;font-size:12px;color:var(--g3);line-height:1.6;margin-bottom:16px;display:flex;gap:8px;font-weight:300}
+.enote{background:var(--paper2);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:7px;margin-top:8px;font-weight:300}
+.sov{position:fixed;inset:0;background:rgba(20,16,9,.65);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
+.sov.show{display:flex;animation:fi .3s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.smod{background:var(--w);border-radius:var(--rl);padding:36px 32px;max-width:380px;width:100%;text-align:center;box-shadow:var(--sh2)}
+.ssi{width:25px;height:25px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;transition:all .3s}
+.ssi-p{background:var(--paper2);color:var(--ink4)}.ssi-d{background:var(--g2);color:var(--g3);animation:rp 1s ease infinite}.ssi-ok{background:#D4EDDA;color:#1A6B38}
+.ssitem{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--paper3);font-size:12px;color:var(--ink3);text-align:left;font-weight:300}
+.ssitem:last-child{border-bottom:none}
+.swrap{background:var(--w);border-radius:var(--rl);border:1px solid var(--paper3);overflow:hidden;box-shadow:var(--sh)}
+.shead{display:flex;align-items:center;gap:16px;padding:20px;border-bottom:1px solid var(--paper2)}
+.sav{width:54px;height:54px;border-radius:50%;background:var(--g2);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--g3);font-weight:500;flex-shrink:0;overflow:hidden;border:2px solid var(--g2)}
+.sav img{width:100%;height:100%;object-fit:cover}
+.sname{font-family:'Cormorant Garamond',serif;font-size:21px}
+.smeta{font-size:12px;color:var(--ink3);margin-top:2px;font-weight:300}
+.stabs{display:flex;gap:4px;padding:12px 20px;background:var(--paper2);border-bottom:1px solid var(--paper3)}
+.stab{padding:6px 14px;border-radius:20px;font-size:11px;cursor:pointer;font-family:'Jost',sans-serif;border:none;background:transparent;color:var(--ink3);font-weight:300}
+.stab.on{background:var(--w);color:var(--ink);font-weight:500;box-shadow:0 1px 4px rgba(20,16,9,.08)}
+.sbody{padding:20px;font-family:'Cormorant Garamond',serif;font-size:15px;line-height:1.9;color:var(--ink2)}
+.sbody p{margin-bottom:13px}
+.squote{border-left:2px solid var(--g2);padding-left:15px;margin:16px 0;font-style:italic;color:var(--ink3);font-size:14px}
+.sraw{padding:20px;font-size:12px;line-height:1.75;color:var(--ink3);font-family:'Jost',sans-serif;white-space:pre-wrap;font-weight:300}
+.stags{display:flex;flex-wrap:wrap;gap:6px;padding:0 20px 18px}
+.stag{background:var(--paper2);color:var(--g3);font-size:10px;padding:4px 10px;border-radius:20px;font-weight:500}
+.vbar{background:var(--dk);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:13px;margin:0 20px 18px}
+.vbp{width:34px;height:34px;border-radius:50%;background:var(--g);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--w);flex-shrink:0}
+.vbp:hover{background:var(--g3)}
+.vbn{font-size:12px;color:rgba(255,255,255,.9);font-weight:500;margin-bottom:2px}
+.vbd{font-size:10px;color:rgba(255,255,255,.45)}
+.vbw{display:flex;align-items:center;gap:2px;height:26px;flex:1;justify-content:flex-end}
+.vbb{width:3px;border-radius:2px;background:rgba(184,147,90,.5)}
+.dash{max-width:680px;margin:0 auto;padding:26px 22px 80px}
+.dh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px}
+.dname{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:400;line-height:1.1}
+.dsub{font-size:12px;color:var(--ink3);margin-top:3px;font-weight:300}
+.dbadge{background:var(--g);color:var(--w);font-size:10px;padding:5px 12px;border-radius:20px;font-weight:500}
+.slbl{font-size:11px;font-weight:500;letter-spacing:1.4px;color:var(--ink4);text-transform:uppercase;margin-bottom:10px;margin-top:18px}
+.tout{background:var(--w);border-radius:var(--rl);border:1px solid var(--paper3);overflow:hidden;margin-bottom:14px;box-shadow:var(--sh)}
+.thead{padding:14px 18px;border-bottom:1px solid var(--paper2);display:flex;align-items:center;justify-content:space-between}
+.ttitle{font-size:12px;font-weight:500}
+.tadd{font-size:11px;color:var(--g);background:transparent;border:1px solid var(--g2);border-radius:7px;padding:5px 11px;cursor:pointer;font-family:'Jost',sans-serif}
+.tadd:hover{background:var(--g5)}
+.tsvg-w{overflow-x:auto;padding:14px}
+.rem{background:linear-gradient(135deg,#FEF3E8,var(--w));border:1px solid #F5D9A8;border-radius:var(--rl);padding:18px;margin-bottom:14px;display:flex;gap:13px}
+.rem-i{font-size:22px;color:var(--g);flex-shrink:0}
+.rem-t{font-size:13px;font-weight:500;margin-bottom:3px}
+.rem-d{font-size:12px;color:var(--ink3);line-height:1.55;font-weight:300}
+.rem-b{margin-top:9px;padding:7px 14px;background:var(--g);color:var(--w);border:none;border-radius:7px;font-size:11px;font-family:'Jost',sans-serif;cursor:pointer;font-weight:500}
+.rem-b:hover{background:var(--g3)}
+.yr{background:linear-gradient(135deg,var(--g5),var(--w));border:1.5px solid var(--g2);border-radius:var(--rl);padding:20px;margin-bottom:14px}
+.yr-t{font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:4px}
+.yr-s{font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.6;font-weight:300}
+.yr-g{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
+.yri{background:var(--w);border-radius:var(--r);padding:12px 9px;border:1px solid var(--paper3);text-align:center}
+.yri-i{font-size:18px;color:var(--g);margin-bottom:5px}
+.yri-l{font-size:11px;font-weight:500;margin-bottom:1px}
+.yri-s{font-size:10px;color:var(--ink3);font-weight:300}
+.acg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+.ac{background:var(--w);border:1px solid var(--paper3);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .2s;box-shadow:var(--sh)}
+.ac:hover{border-color:var(--g2);transform:translateY(-2px);box-shadow:var(--sh2)}
+.ac-i{font-size:18px;color:var(--g);margin-bottom:7px}
+.ac-t{font-size:12px;font-weight:500;margin-bottom:2px}
+.ac-d{font-size:11px;color:var(--ink3);line-height:1.4;font-weight:300}
+.fmo{background:var(--w);border-radius:var(--rl);border:1px solid var(--paper3);overflow:hidden;margin-bottom:14px;box-shadow:var(--sh)}
+.fmh{background:var(--dk);padding:14px 18px}
+.fmt{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--w)}
+.fms{font-size:11px;color:rgba(255,255,255,.45);margin-top:1px;font-weight:300}
+.fmi{display:flex;align-items:center;gap:13px;padding:12px 18px;border-bottom:1px solid var(--paper2)}
+.fmi:last-child{border-bottom:none}
+.fseal{width:34px;height:34px;border-radius:8px;background:var(--g2);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--g3);flex-shrink:0}
+.fto{font-size:12px;font-weight:500}
+.fwhen{font-size:11px;color:var(--ink3);font-weight:300}
+.fst{font-size:10px;background:var(--g5);color:var(--g3);padding:3px 8px;border-radius:20px;font-weight:500;margin-left:auto}
+.fma{display:flex;align-items:center;gap:9px;padding:12px 18px;cursor:pointer;border-top:1px solid var(--paper2);color:var(--g);font-size:12px;font-weight:500}
+.fma:hover{background:var(--g5)}
+.mrow{display:flex;align-items:center;gap:11px;padding:11px 18px;border-bottom:1px solid var(--paper2)}
+.mrow:last-child{border-bottom:none}
+.mav{width:36px;height:36px;border-radius:50%;background:var(--g2);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--g3);font-weight:500;flex-shrink:0;overflow:hidden}
+.mav img{width:100%;height:100%;object-fit:cover}
+.mn{font-size:12px;font-weight:500}
+.mr{font-size:11px;color:var(--ink3);font-weight:300}
+.ms{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500;margin-left:auto}
+.ms-d{background:#D4EDDA;color:#1A6B38}.ms-p{background:var(--paper2);color:var(--ink4)}.ms-w{background:var(--g5);color:var(--g3)}
+.irow{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--paper2)}
+.iin{flex:1;padding:9px 12px;border:1.5px solid var(--paper3);border-radius:8px;font-size:12px;font-family:'Jost',sans-serif;outline:none;background:var(--w);color:var(--ink)}
+.iin:focus{border-color:var(--g)}
+.ibtn{padding:9px 14px;background:var(--g);color:var(--w);border:none;border-radius:8px;font-size:12px;font-family:'Jost',sans-serif;cursor:pointer;font-weight:500;white-space:nowrap}
+.ibtn:hover{background:var(--g3)}
+.tl{position:relative;padding-left:24px}
+.tl::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:1.5px;background:var(--g2)}
+.tli{position:relative;padding:9px 0 9px 12px}
+.tli::before{content:'';position:absolute;left:-21px;top:14px;width:9px;height:9px;border-radius:50%;background:var(--g);border:2px solid var(--w);box-shadow:0 0 0 1.5px var(--g2)}
+.tly{font-size:11px;color:var(--g3);font-weight:500}
+.tlt{font-size:13px;font-weight:500;margin:1px 0}
+.tld{font-size:11px;color:var(--ink3);font-weight:300}
+.ag{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+.acell{aspect-ratio:1;border-radius:9px;background:var(--paper2);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:26px;cursor:pointer;transition:transform .2s;position:relative;overflow:hidden;gap:4px}
+.acell:hover{transform:scale(1.03)}
+.acell img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.acell-l{font-size:9px;color:var(--ink3)}
+.aibadge{position:absolute;top:6px;right:6px;background:var(--g);color:var(--w);font-size:8px;padding:2px 6px;border-radius:20px;font-weight:500;z-index:2}
+.atabs{display:flex;gap:5px;margin-bottom:14px;background:var(--paper2);border-radius:9px;padding:4px;flex-wrap:wrap}
+.atab{flex:1;padding:7px;border:none;background:transparent;border-radius:7px;font-size:11px;font-family:'Jost',sans-serif;cursor:pointer;color:var(--ink3);min-width:70px}
+.atab.on{background:var(--w);color:var(--ink);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.seal-p{background:var(--dk);border-radius:var(--rl);padding:28px;text-align:center;margin-bottom:18px}
+.seal-i{font-size:44px;color:rgba(184,147,90,.4);margin-bottom:10px;transition:all .4s}
+.seal-i.on{color:var(--g);font-size:52px}
+.seal-m{font-family:'Cormorant Garamond',serif;font-size:17px;color:rgba(255,255,255,.8);margin-bottom:3px}
+.seal-d{font-size:11px;color:rgba(255,255,255,.35);font-weight:300}
+.eld{position:fixed;inset:0;background:var(--paper);z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+.eld.on{display:flex}
+.eld-q{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,5vw,40px);line-height:1.35;max-width:600px;margin-bottom:36px;color:var(--ink)}
+.eld-mic{width:110px;height:110px;border-radius:50%;background:var(--g);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:42px;color:var(--w);box-shadow:0 8px 40px rgba(184,147,90,.4);transition:all .3s;margin-bottom:20px}
+.eld-mic:hover{transform:scale(1.05)}
+.eld-mic.rec{background:#D0483C;animation:rp 1.2s ease infinite}
+.eld-hint{font-size:16px;color:var(--ink3);font-weight:300;margin-bottom:30px}
+.eld-trans{font-size:15px;color:var(--g3);font-style:italic;max-width:500px;min-height:40px;line-height:1.6}
+.eld-x{position:absolute;top:24px;right:24px;background:transparent;border:1px solid var(--paper3);border-radius:50%;width:42px;height:42px;font-size:17px;color:var(--ink3);cursor:pointer}
+.bkp{background:var(--w);border:1px solid var(--paper3);border-radius:var(--rl);padding:18px;display:flex;align-items:center;gap:15px;margin-bottom:12px}
+.bkc{background:var(--g);border-radius:6px 3px 3px 6px;padding:18px 13px;min-width:64px;text-align:center;box-shadow:3px 3px 0 var(--g3)}
+.bkt{font-family:'Cormorant Garamond',serif;font-size:10px;color:var(--w);letter-spacing:1px}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid var(--paper2);font-size:13px}
+.set-row:last-child{border-bottom:none}
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--paper3);position:relative;cursor:pointer;transition:background .2s;border:none}
+.toggle.on{background:var(--g)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--w);transition:left .2s}
+.toggle.on::after{left:20px}
+@media(max-width:640px){.feat-grid{grid-template-columns:1fr}.price-wrap{grid-template-columns:1fr}.who-grid{grid-template-columns:1fr}.acg{grid-template-columns:1fr 1fr}.yr-g{grid-template-columns:1fr}.ag{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div class="guide"><div class="gb" id="gb"></div><button class="gbtn" onclick="tgGuide()" aria-label="Guide">✦</button></div>
+
+<div class="sov" id="sov"><div class="smod">
+<div style="font-size:32px;color:var(--g);margin-bottom:12px">✦</div>
+<div class="serif" style="font-size:26px;margin-bottom:4px" id="sm-t">Saving forever</div>
+<div style="font-size:12px;color:var(--ink3);margin-bottom:20px;font-weight:300">Watch where everything goes</div>
+<div><div class="ssitem"><div class="ssi ssi-p" id="s1">1</div><span>Writing to your family archive</span></div>
+<div class="ssitem"><div class="ssi ssi-p" id="s2">2</div><span>Linking to the family tree</span></div>
+<div class="ssitem"><div class="ssi ssi-p" id="s3">3</div><span>Adding to their life timeline</span></div>
+<div class="ssitem"><div class="ssi ssi-p" id="s4">4</div><span>Securing voice recordings</span></div>
+<div class="ssitem"><div class="ssi ssi-p" id="s5">5</div><span>Notifying family members</span></div></div>
+<button class="bp" id="sdone" style="display:none;margin-top:18px" onclick="closeSave()">Open the archive ✦</button>
+</div></div>
+
+<div class="eld" id="eld">
+<button class="eld-x" onclick="exitEld()">✕</button>
+<div class="eld-q" id="eld-q">What is the earliest memory you have that still feels vivid today?</div>
+<button class="eld-mic" id="eld-mic" onclick="eldRec()"><i class="ti ti-microphone"></i></button>
+<div class="eld-hint" id="eld-hint">Tap and speak. Take your time.</div>
+<div class="eld-trans" id="eld-trans"></div>
+</div>
+
+<nav class="nav">
+<div class="logo" onclick="go('home')"><div class="logo-mark">✦</div> ANCESTRALK</div>
+<div class="nav-r">
+<select class="lang-sel" id="theme" onchange="setTheme(this.value)" title="Theme"><option value="heritage">🟡 Heritage</option><option value="emerald">🟢 Emerald</option><option value="royal">🔵 Royal</option><option value="rose">🌸 Rose</option><option value="midnight">🌙 Midnight</option></select>
+<select class="lang-sel" id="lang" onchange="setLang(this.value)"><option value="en">English</option><option value="hi">हिन्दी</option><option value="ar">العربية</option></select>
+<button class="nb ghost" onclick="go('home')" data-t="nav_home">Home</button>
+<button class="nb ghost" onclick="go('dashboard')" data-t="nav_fam">My Family</button>
+<button class="nb ghost" onclick="go('settings')"><i class="ti ti-settings"></i></button>
+<button class="nb gold" onclick="go('who')" data-t="nav_begin">Begin your legacy</button>
+</div>
+</nav>
+
+<!-- HOME -->
+<div class="sc on" id="sc-home">
+<div class="hero"><div class="hero-bg"></div>
+<div class="eyebrow" data-t="h_eye">FOR EVERY FAMILY · FOR EVERY GENERATION</div>
+<h1 data-t-html="h_title">No one in your family<br>should ever be <em>forgotten</em></h1>
+<p class="hero-sub" data-t="h_sub">Capture the voices, stories, and faces of everyone you love — so that a century from now, your great-grandchildren will know exactly who you were.</p>
+<div class="hbtns"><button class="hb pri" onclick="go('who')" data-t="h_cta">Start your family's story</button><button class="hb out" onclick="go('dashboard')" data-t="h_cta2">See a family archive</button></div>
+<div class="feat-grid">
+<div class="feat"><div class="fi-icon"><i class="ti ti-microphone"></i></div><div class="fi-t">Speak, don't type</div><div class="fi-d">Every question answered by voice. We keep their exact words, their pauses, their warmth — forever.</div></div>
+<div class="feat"><div class="fi-icon"><i class="ti ti-git-fork"></i></div><div class="fi-t">Living family tree</div><div class="fi-d">Every branch carries a full story, photos, voice, and a life timeline. The tree grows as your family does.</div></div>
+<div class="feat"><div class="fi-icon"><i class="ti ti-clock"></i></div><div class="fi-t">Future messages</div><div class="fi-d">A letter sealed until your grandchild's 18th birthday. Delivered decades from now. Nothing like it exists.</div></div>
+<div class="feat"><div class="fi-icon"><i class="ti ti-photo-album"></i></div><div class="fi-t">Yearly album</div><div class="fi-d">Every year — an auto-made video album and printable photo book. A new chapter, automatically.</div></div>
+<div class="feat"><div class="fi-icon"><i class="ti ti-users"></i></div><div class="fi-t">Every voice included</div><div class="fi-d">A sister in Dubai, a parent in Delhi, a cousin in Toronto — each adds their own chapter to one archive.</div></div>
+<div class="feat"><div class="fi-icon"><i class="ti ti-bell"></i></div><div class="fi-t">Gentle reminders</div><div class="fi-d">"Your mother turns 75 today. Her chapter is still blank." The nudge that beats forgetting.</div></div>
+</div>
+<div class="price-wrap">
+<div class="pcard"><div class="pbadge free">FREE TO BEGIN</div><div class="pname serif">Starter</div><div style="display:flex;align-items:baseline;gap:4px"><div class="pamt serif">$0</div></div>
+<div class="pdesc">See what your family's archive could become — no card needed.</div>
+<div class="pf"><i class="ti ti-check"></i>1 family member profile</div><div class="pf"><i class="ti ti-check"></i>4 story questions</div><div class="pf"><i class="ti ti-check"></i>1 written chapter</div><div class="pf"><i class="ti ti-check"></i>5 photos</div>
+<div style="height:14px"></div><button class="bp" style="background:var(--paper2);color:var(--ink2)" onclick="go('who')">Try free</button></div>
+<div class="pcard hot"><div class="pbadge">ONE FAMILY · ONE PRICE</div><div class="pname serif">Family Legacy</div><div style="display:flex;align-items:baseline;gap:4px"><div class="pamt serif">$60</div><div class="pper">/ year</div></div>
+<div class="pdesc">Unlimited members. Grandparents to grandchildren yet unborn. Everything included.</div>
+<div class="pf"><i class="ti ti-check"></i>Unlimited family members</div><div class="pf"><i class="ti ti-check"></i>Voice archive & playback</div><div class="pf"><i class="ti ti-check"></i>Future messages</div><div class="pf"><i class="ti ti-check"></i>Yearly album + photo book</div><div class="pf"><i class="ti ti-check"></i>Life timelines</div><div class="pf"><i class="ti ti-check"></i>Elderly voice-only mode</div><div class="pf"><i class="ti ti-check"></i>3 languages, more coming</div>
+<div style="height:14px"></div><button class="bp" onclick="go('who')">Begin your family's story</button></div>
+</div>
+</div>
+</div>
+
+<!-- WHO -->
+<div class="sc" id="sc-who">
+<div class="prog"><div class="pd act"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+<div class="fw">
+<div class="fey">STEP 1 OF 5</div>
+<div class="ftit serif" data-t="w_title">Who are you starting with?</div>
+<div class="fsub">Add every family member over time. Start with whoever matters most right now.</div>
+<div class="who-grid">
+<div class="wo" onclick="selWho(this,'myself')"><div class="wo-c"><i class="ti ti-check" style="font-size:9px"></i></div><div class="wo-ic"><i class="ti ti-user"></i></div><div class="wo-t">Myself</div><div class="wo-s">Record my own story for my family</div></div>
+<div class="wo" onclick="selWho(this,'parent_self')"><div class="wo-c"><i class="ti ti-check" style="font-size:9px"></i></div><div class="wo-ic"><i class="ti ti-hearth"></i></div><div class="wo-t">A parent — they'll fill it</div><div class="wo-s">Your parent answers themselves</div></div>
+<div class="wo" onclick="selWho(this,'parent_you')"><div class="wo-c"><i class="ti ti-check" style="font-size:9px"></i></div><div class="wo-ic"><i class="ti ti-heart"></i></div><div class="wo-t">A parent — I'll fill it</div><div class="wo-s">You answer from what you know</div></div>
+<div class="wo" onclick="selWho(this,'both')"><div class="wo-c"><i class="ti ti-check" style="font-size:9px"></i></div><div class="wo-ic"><i class="ti ti-users"></i></div><div class="wo-t">Both parents</div><div class="wo-s">Separate profiles for Mum and Dad</div></div>
+<div class="wo" onclick="selWho(this,'grandparent')"><div class="wo-c"><i class="ti ti-check" style="font-size:9px"></i></div><div class="wo-ic"><i class="ti ti-star"></i></div><div class="wo-t">A grandparent</div><div class="wo-s">Before the stories are lost</div></div>
+<div class="wo" onclick="selWho(this,'someone')"><div class="wo-c"><i class="ti ti-check" style="font-size:9px"></i></div><div class="wo-ic"><i class="ti ti-friends"></i></div><div class="wo-t">Someone else</div><div class="wo-s">Any family member</div></div>
+</div>
+<div id="both-note" style="display:none"><div class="ibox"><i class="ti ti-info-circle"></i> Two separate profiles — one per parent. First one now, second right after.</div></div>
+<div class="ibox" style="background:var(--paper2);border-color:var(--paper3);color:var(--ink3)"><i class="ti ti-accessible"></i> Filling this for an elderly person? Try <b style="cursor:pointer;color:var(--g3)" onclick="openEld()">&nbsp;Voice-only mode&nbsp;</b> — large text, one question at a time, just speaking.</div>
+<button class="bp" id="who-n" disabled onclick="go('basics')">Continue</button>
+</div>
+</div>
+
+<!-- BASICS -->
+<div class="sc" id="sc-basics">
+<div class="prog"><div class="pd done"></div><div class="pd act"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+<div class="fw">
+<div class="fey">STEP 2 OF 5</div>
+<div class="ftit serif">Tell us about them</div>
+<div class="fsub">Everything can be edited any time. Nothing is final until you want it to be.</div>
+<div class="field"><label class="fl">Full name</label><input class="fi2" id="f-name" placeholder="e.g. Margaret Ellis" oninput="chkB()"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="field"><label class="fl">Birth year</label><input class="fi2" id="f-year" placeholder="e.g. 1942"></div>
+<div class="field"><label class="fl">Where they grew up</label><input class="fi2" id="f-town" placeholder="e.g. Bristol, Nairobi…"></div>
+</div>
+<div class="field"><label class="fl">Known for in your family</label>
+<div class="vrow"><input class="fi2" id="f-known" placeholder="Best cook, always had a story…" style="flex:1" oninput="sugKnown(this.value)"><button class="vbtn" id="kv" onclick="voice('f-known','kvs','kv','kvp')"><span class="vd"></span><i class="ti ti-microphone"></i></button></div>
+<div class="vstat" id="kvs"></div>
+<div class="vpb" id="kvp"><button class="vp-btn" onclick="play('kvp')"><i class="ti ti-player-play" id="kvp-i"></i></button><div style="font-size:11px;color:var(--g3)">Voice recorded</div><div class="vwave" id="kvp-w"></div></div>
+<div class="sug" id="ks"><div class="sug-l"><i class="ti ti-sparkles" style="font-size:12px"></i> Examples — tap to add</div><div class="sug-c" id="ksc"></div></div>
+</div>
+<div class="field"><label class="fl">Photo <span style="font-size:10px;color:var(--ink4);text-transform:none;letter-spacing:0">(optional)</span></label>
+<div class="pdrop" onclick="document.getElementById('pup').click()"><div id="pinner"><div style="font-size:26px;color:var(--paper3);margin-bottom:6px"><i class="ti ti-camera"></i></div><div style="font-size:12px;color:var(--ink3);font-weight:300">Tap to add a photo — faces are recognised and linked</div></div></div>
+<input type="file" id="pup" accept="image/*" onchange="photo(this)">
+<div class="frec" id="frec"><i class="ti ti-face-id"></i> <span id="ftxt">Face recognised</span></div>
+</div>
+<div class="enote"><i class="ti ti-pencil" style="color:var(--g)"></i> Edit any field any time from the archive.</div>
+<div class="brow"><button class="bb" onclick="go('who')">Back</button><button class="bp" id="b-n" disabled onclick="go('story')">Continue</button></div>
+</div>
+</div>
+
+<!-- STORY -->
+<div class="sc" id="sc-story">
+<div class="prog"><div class="pd done"></div><div class="pd done"></div><div class="pd act"></div><div class="pd"></div><div class="pd"></div></div>
+<div class="fw">
+<div class="fey">STEP 3 OF 5</div>
+<div class="ftit serif">Their story</div>
+<div class="fsub">Even a few words is enough. Speak if typing feels hard. Add more any time.</div>
+<div class="field"><label class="fl">What did they do, and what were they proud of?</label>
+<div class="vrow"><button class="vbtn" id="v1" onclick="voice('q1','v1s','v1','v1p')"><span class="vd"></span><i class="ti ti-microphone"></i> Speak your answer</button></div>
+<div class="vstat" id="v1s"></div>
+<div class="vpb" id="v1p"><button class="vp-btn" onclick="play('v1p')"><i class="ti ti-player-play" id="v1p-i"></i></button><div style="font-size:11px;color:var(--g3)">Recorded</div><div class="vwave" id="v1p-w"></div></div>
+<textarea class="fta" id="q1" rows="3" placeholder="e.g. She ran a bakery from her kitchen and was known across the village for her bread…" oninput="onQ1()"></textarea>
+<div class="sug" id="q1s"><div class="sug-l"><i class="ti ti-sparkles" style="font-size:12px"></i> Based on what you shared — go deeper:</div><div class="sug-c" id="q1c"></div></div>
+</div>
+<div class="field"><label class="fl">What values did they live by?</label>
+<div class="vrow"><button class="vbtn" id="v2" onclick="voice('q2','v2s','v2','v2p')"><span class="vd"></span><i class="ti ti-microphone"></i> Speak</button></div>
+<div class="vstat" id="v2s"></div><div class="vpb" id="v2p"><button class="vp-btn" onclick="play('v2p')"><i class="ti ti-player-play" id="v2p-i"></i></button><div style="font-size:11px;color:var(--g3)">Recorded</div><div class="vwave" id="v2p-w"></div></div>
+<textarea class="fta" id="q2" rows="3" placeholder="A belief, a phrase they always said, how they treated people…"></textarea></div>
+<div class="field"><label class="fl">One memory you never want to forget</label>
+<div class="vrow"><button class="vbtn" id="v3" onclick="voice('q3','v3s','v3','v3p')"><span class="vd"></span><i class="ti ti-microphone"></i> Speak</button></div>
+<div class="vstat" id="v3s"></div><div class="vpb" id="v3p"><button class="vp-btn" onclick="play('v3p')"><i class="ti ti-player-play" id="v3p-i"></i></button><div style="font-size:11px;color:var(--g3)">Recorded</div><div class="vwave" id="v3p-w"></div></div>
+<textarea class="fta" id="q3" rows="3" placeholder="A moment, a smell, a sound, a feeling…"></textarea></div>
+<div class="field"><label class="fl">What should future generations know about them?</label>
+<div class="vrow"><button class="vbtn" id="v4" onclick="voice('q4','v4s','v4','v4p')"><span class="vd"></span><i class="ti ti-microphone"></i> Speak</button></div>
+<div class="vstat" id="v4s"></div><div class="vpb" id="v4p"><button class="vp-btn" onclick="play('v4p')"><i class="ti ti-player-play" id="v4p-i"></i></button><div style="font-size:11px;color:var(--g3)">Recorded</div><div class="vwave" id="v4p-w"></div></div>
+<textarea class="fta" id="q4" rows="3" placeholder="What they carried quietly. What made them who they were."></textarea></div>
+<div class="field"><label class="fl">Key life events <span style="font-size:10px;color:var(--ink4);text-transform:none">(for their timeline — optional)</span></label>
+<textarea class="fta" id="q5" rows="2" placeholder="e.g. Moved to London 1965. Married 1968. Opened the shop 1974. First grandchild 1995."></textarea></div>
+<div class="ibox"><i class="ti ti-plus"></i> Want to go deeper? After saving, the full interview offers 20+ more questions across 7 life dimensions.</div>
+<div class="brow"><button class="bb" onclick="go('basics')">Back</button><button class="bp" id="st-n" onclick="gen()">Write their chapter ✦</button></div>
+</div>
+</div>
+
+<!-- GEN -->
+<div class="sc" id="sc-gen"><div class="fw" style="text-align:center;padding-top:90px">
+<div style="width:50px;height:50px;border:2px solid var(--paper3);border-top-color:var(--g);border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 26px"></div>
+<style>@keyframes sp{to{transform:rotate(360deg)}}</style>
+<div class="serif" style="font-size:30px;margin-bottom:8px" id="gm">Reading their story…</div>
+<div style="font-size:13px;color:var(--ink3);font-weight:300" id="gs">Finding the thread that holds it together</div>
+</div></div>
+
+<!-- CHAPTER -->
+<div class="sc" id="sc-chapter">
+<div class="prog"><div class="pd done"></div><div class="pd done"></div><div class="pd done"></div><div class="pd act"></div><div class="pd"></div></div>
+<div class="fw" style="max-width:620px">
+<div class="fey">STEP 4 OF 5 — THEIR CHAPTER</div>
+<div class="ftit serif" id="ch-t">Their chapter</div>
+<div class="fsub">Read both versions. Edit anything. Then save it forever.</div>
+<div class="swrap" style="margin-bottom:14px">
+<div class="shead"><div class="sav" id="o-av"></div><div><div class="sname" id="o-n"></div><div class="smeta" id="o-m"></div></div></div>
+<div class="vbar" id="vbar" style="display:none"><button class="vbp" onclick="mainPlay()"><i class="ti ti-player-play" id="mp-i"></i></button><div><div class="vbn" id="vb-n">Voice recordings</div><div class="vbd">Tap to hear them speak</div></div><div class="vbw" id="vb-w"></div></div>
+<div class="stabs"><button class="stab on" onclick="ver('w',this)">Written chapter</button><button class="stab" onclick="ver('r',this)">Your words</button><button class="stab" onclick="ver('t',this)">Timeline</button></div>
+<div id="vw"><div class="sbody" id="o-b"></div><div class="stags" id="o-t"></div></div>
+<div id="vr" style="display:none"><div class="sraw" id="o-r"></div></div>
+<div id="vt" style="display:none"><div style="padding:20px"><div class="tl" id="o-tl"></div></div></div>
+</div>
+<div class="enote" style="margin-bottom:14px"><i class="ti ti-pencil" style="color:var(--g)"></i> The chapter can be edited any time. Never changed without your permission.</div>
+<div class="brow"><button class="bb" onclick="go('story')">Edit answers</button><button class="bp" onclick="runSave()">Save to archive forever ✦</button></div>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="sc" id="sc-dashboard">
+<div class="dash">
+<div class="rem"><div class="rem-i"><i class="ti ti-bell"></i></div><div><div class="rem-t" id="r-t">A story is waiting to be told</div><div class="rem-d" id="r-d">Invite family members to add their own chapters before their stories fade.</div><button class="rem-b" onclick="go('collab')">Invite family now</button></div></div>
+<div class="dh"><div><div class="dname serif" id="d-t">The Family Archive</div><div class="dsub">Living legacy · Est. 2026 · English, हिन्दी, العربية</div></div><div class="dbadge">ACTIVE</div></div>
+
+<div class="slbl">Family tree</div>
+<div class="tout"><div class="thead"><div class="ttitle">Your family — tap any branch</div><button class="tadd" onclick="go('who')">+ Add member</button></div>
+<div class="tsvg-w"><svg id="tree" viewBox="0 0 580 320" width="580" height="320" role="img" aria-label="Family tree"></svg></div></div>
+
+<div class="slbl">This year's legacy package</div>
+<div class="yr"><div class="yr-t serif">Your 2026 family album</div><div class="yr-s">Auto-generated at renewal from stories, photos, videos, and voices. Yours forever.</div>
+<div class="yr-g">
+<div class="yri"><div class="yri-i"><i class="ti ti-device-tv"></i></div><div class="yri-l">Video album</div><div class="yri-s">Auto-compiled · shareable</div></div>
+<div class="yri"><div class="yri-i"><i class="ti ti-photo-album"></i></div><div class="yri-l">Digital book PDF</div><div class="yri-s">Included free</div></div>
+<div class="yri"><div class="yri-i"><i class="ti ti-book"></i></div><div class="yri-l">Printed album</div><div class="yri-s">QR codes play voices</div></div>
+</div>
+<button class="bp" style="font-size:12px;padding:10px" onclick="go('album')">Open album & book</button></div>
+
+<div class="slbl">Quick actions</div>
+<div class="acg">
+<div class="ac" onclick="go('who')"><div class="ac-i"><i class="ti ti-user-plus"></i></div><div class="ac-t">Add family member</div><div class="ac-d">Everyone gets a chapter</div></div>
+<div class="ac" onclick="go('album')"><div class="ac-i"><i class="ti ti-photos"></i></div><div class="ac-t">Photos & videos</div><div class="ac-d">Scan, upload, organise</div></div>
+<div class="ac" onclick="go('future')"><div class="ac-i"><i class="ti ti-clock"></i></div><div class="ac-t">Future messages</div><div class="ac-d">Letters across time</div></div>
+<div class="ac" onclick="go('collab')"><div class="ac-i"><i class="ti ti-users"></i></div><div class="ac-t">Invite family</div><div class="ac-d">Every voice matters</div></div>
+<div class="ac" onclick="go('book')"><div class="ac-i"><i class="ti ti-book-2"></i></div><div class="ac-t">Digital Book Studio</div><div class="ac-d">Flip through your family book</div></div>
+<div class="ac" onclick="openEld()"><div class="ac-i"><i class="ti ti-accessible"></i></div><div class="ac-t">Voice-only mode</div><div class="ac-d">For elderly relatives</div></div>
+</div>
+
+<div class="slbl">Future messages</div>
+<div class="fmo"><div class="fmh"><div class="fmt serif">Letters across time</div><div class="fms">Sealed until the moment you choose</div></div>
+<div id="fm-l">
+<div class="fmi"><div class="fseal"><i class="ti ti-lock"></i></div><div><div class="fto">To: My grandchild</div><div class="fwhen">Opens on their 18th birthday</div></div><div class="fst">Sealed ✦</div></div>
+<div class="fmi"><div class="fseal"><i class="ti ti-lock"></i></div><div><div class="fto">To: My daughter</div><div class="fwhen">Opens on her wedding day</div></div><div class="fst">Sealed ✦</div></div>
+</div>
+<div class="fma" onclick="go('future')"><i class="ti ti-plus"></i> Write a new future message</div></div>
+
+<div class="slbl">Family contributors</div>
+<div class="tout">
+<div id="m-l">
+<div class="mrow"><div class="mav" id="d-av">ME</div><div><div class="mn" id="d-mn">First member</div><div class="mr">First chapter · admin</div></div><div class="ms ms-d">Complete</div></div>
+<div class="mrow"><div class="mav" style="background:#D4EDDA;color:#1A6B38">RT</div><div><div class="mn">Robert (invited)</div><div class="mr">Reminder scheduled for his birthday</div></div><div class="ms ms-p">Pending</div></div>
+</div>
+<div class="irow"><input class="iin" id="inv" placeholder="WhatsApp, email, or name…"><button class="ibtn" onclick="addM()">Invite</button></div>
+</div>
+</div>
+</div>
+
+<!-- ALBUM -->
+<div class="sc" id="sc-album">
+<div class="dash">
+<button class="bb" style="margin-bottom:16px" onclick="go('dashboard')">← Archive</button>
+<div class="dname serif" style="font-size:26px;margin-bottom:2px">Family Album · 2026</div>
+<div class="dsub" style="margin-bottom:18px">Photos, videos, voices — organised automatically</div>
+<div class="atabs">
+<button class="atab on" onclick="atab('all',this)">All</button>
+<button class="atab" onclick="atab('person',this)">By person</button>
+<button class="atab" onclick="atab('decade',this)">By decade</button>
+<button class="atab" onclick="atab('video',this)">Videos</button>
+<button class="atab" onclick="atab('book',this)">Photo book</button>
+</div>
+
+<div id="at-all">
+<div class="pdrop" style="margin-bottom:14px" onclick="document.getElementById('aup').click()">
+<div style="font-size:26px;color:var(--paper3);margin-bottom:5px"><i class="ti ti-cloud-upload"></i></div>
+<div style="font-size:12px;color:var(--ink3);font-weight:300">Drop photos here, upload, or scan old printed photos with your camera</div>
+<div style="display:flex;gap:7px;justify-content:center;margin-top:10px">
+<button class="ibtn" onclick="event.stopPropagation();document.getElementById('aup').click()"><i class="ti ti-upload"></i> Upload</button>
+<button class="bb" style="padding:8px 14px;font-size:12px" onclick="event.stopPropagation();scanDemo()"><i class="ti ti-scan"></i> Scan old photo</button>
+</div></div>
+<input type="file" id="aup" accept="image/*,video/*" multiple onchange="addPhotos(this.files)">
+<div class="ag" id="agrid">
+<div class="acell" style="background:#E8D5B0">🌿<div class="acell-l">Garden · 1970s</div><div class="aibadge">AI tagged</div></div>
+<div class="acell" style="background:#D4C4A0">🏡<div class="acell-l">Home · 1980s</div><div class="aibadge">AI tagged</div></div>
+<div class="acell" style="background:#E0CEAD">👨‍👩‍👧‍👦<div class="acell-l">Family · 1990s</div></div>
+<div class="acell" style="background:#CEBF9A">🎂<div class="acell-l">Birthday · 2000s</div></div>
+<div class="acell" style="background:#D8C9A6">📸<div class="acell-l">Recent · 2020s</div></div>
+<div class="acell" style="border:2px dashed var(--paper3);background:transparent" onclick="document.getElementById('aup').click()"><i class="ti ti-plus" style="font-size:20px;color:var(--paper3)"></i><div class="acell-l">Add</div></div>
+</div>
+</div>
+
+<div id="at-person" style="display:none">
+<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px">
+<div style="text-align:center;cursor:pointer"><div class="mav" style="width:50px;height:50px;background:var(--g);color:var(--w)">All</div><div style="font-size:10px;color:var(--ink3);margin-top:4px">Everyone</div></div>
+<div style="text-align:center;cursor:pointer"><div class="mav" style="width:50px;height:50px" id="pp-av">ME</div><div style="font-size:10px;color:var(--ink3);margin-top:4px" id="pp-n">Member</div></div>
+<div style="text-align:center;cursor:pointer" onclick="go('who')"><div class="mav" style="width:50px;height:50px;border:2px dashed var(--paper3);background:transparent;color:var(--paper3)">+</div><div style="font-size:10px;color:var(--ink3);margin-top:4px">Add</div></div>
+</div>
+<div class="ag"><div class="acell" style="background:#E8D5B0">🌿</div><div class="acell" style="background:#E0CEAD">👨‍👩‍👧‍👦</div><div class="acell" style="background:#CEBF9A">🎂</div></div>
+</div>
+
+<div id="at-decade" style="display:none">
+<div class="slbl">1970s</div><div class="ag"><div class="acell" style="background:#E8D5B0">🌿</div></div>
+<div class="slbl">1980s</div><div class="ag"><div class="acell" style="background:#D4C4A0">🏡</div></div>
+<div class="slbl">1990s — now</div><div class="ag"><div class="acell" style="background:#E0CEAD">👨‍👩‍👧‍👦</div><div class="acell" style="background:#CEBF9A">🎂</div><div class="acell" style="background:#D8C9A6">📸</div></div>
+</div>
+
+<div id="at-video" style="display:none">
+<div style="background:var(--dk);border-radius:var(--rl);padding:26px;text-align:center;margin-bottom:12px">
+<div style="font-size:34px;color:var(--g);margin-bottom:8px"><i class="ti ti-player-play"></i></div>
+<div class="serif" style="font-size:18px;color:var(--w);margin-bottom:4px">The Family · 2026</div>
+<div style="font-size:11px;color:#888;margin-bottom:14px">Auto-compiled from photos, voices & stories at renewal</div>
+<button class="ibtn">Preview video album</button></div>
+<div class="pdrop" onclick="document.getElementById('aup').click()"><div style="font-size:22px;color:var(--paper3)"><i class="ti ti-video"></i></div><div style="font-size:12px;color:var(--ink3);font-weight:300;margin-top:4px">Upload short family videos — linked to people & events</div></div>
+</div>
+
+<div id="at-book" style="display:none">
+<div class="bkp"><div class="bkc"><div class="bkt">FAMILY</div><div style="font-size:14px;color:rgba(255,255,255,.6);margin:6px 0">✦</div><div class="bkt" style="font-size:8px">2026</div></div>
+<div style="flex:1"><div style="font-size:14px;font-weight:500;margin-bottom:3px">The Family Legacy · 2026</div>
+<div style="font-size:11px;color:var(--ink3);line-height:1.6;margin-bottom:10px;font-weight:300">48 pages · hardcover · QR codes on each page play that person's voice when scanned · ships worldwide</div>
+<div style="display:flex;gap:7px;flex-wrap:wrap"><button class="ibtn">Order hardcover ₹2,800</button><button class="bb" style="padding:8px 13px;font-size:11px">Softcover ₹1,500</button><button class="bb" style="padding:8px 13px;font-size:11px">Download PDF free</button></div></div></div>
+<div class="ibox"><i class="ti ti-qrcode"></i> Every chapter page carries a QR code. Scan it with any phone — and hear that person's actual voice. The physical book meets the digital archive.</div>
+</div>
+</div>
+</div>
+
+<!-- FUTURE MESSAGES -->
+<div class="sc" id="sc-future">
+<div class="fw">
+<button class="bb" style="margin-bottom:16px" onclick="go('dashboard')">← Archive</button>
+<div class="fey">LETTERS ACROSS TIME</div>
+<div class="ftit serif">Write to someone<br>you may never meet</div>
+<div class="fsub">A letter, voice note, or video — sealed until a day you choose. A grandchild's 18th birthday. A wedding. A moment of grief.</div>
+<div class="seal-p"><div class="seal-i" id="se-i"><i class="ti ti-mail"></i></div><div class="seal-m serif" id="se-m">Your message is being written</div><div class="seal-d" id="se-d">Fill in below</div></div>
+<div class="field"><label class="fl">Who is this for?</label><input class="fi2" id="fm-to" placeholder="My granddaughter, my son's future child…" oninput="seal()"></div>
+<div class="field"><label class="fl">When should it open?</label>
+<select class="fi2" id="fm-when" onchange="seal()" style="cursor:pointer"><option value="">Choose a moment…</option><option>Their 18th birthday</option><option>Their wedding day</option><option>When they have their first child</option><option>After I am gone</option><option>A specific date</option><option>A moment of grief or hardship</option></select></div>
+<div class="field"><label class="fl">Your message</label>
+<div class="vrow"><button class="vbtn" id="fv" onclick="voice('fm-msg','fvs','fv','fvp')"><span class="vd"></span><i class="ti ti-microphone"></i> Speak your message</button></div>
+<div class="vstat" id="fvs"></div>
+<div class="vpb" id="fvp"><button class="vp-btn" onclick="play('fvp')"><i class="ti ti-player-play" id="fvp-i"></i></button><div style="font-size:11px;color:var(--g3)">Recorded in your voice</div><div class="vwave" id="fvp-w"></div></div>
+<textarea class="fta" id="fm-msg" rows="6" placeholder="Write freely. Only they will read this — on the day it opens." oninput="seal()"></textarea></div>
+<div class="ibox"><i class="ti ti-lock"></i> Sealed the moment you save. Only the recipient can open it, only on the chosen day. Delivery is automatic — WhatsApp or email on the date, even decades away. Even you cannot read it after sealing.</div>
+<button class="bp" onclick="doSeal()">Seal this message ✦</button>
+</div>
+</div>
+
+<!-- COLLAB -->
+<div class="sc" id="sc-collab">
+<div class="fw">
+<button class="bb" style="margin-bottom:16px" onclick="go('dashboard')">← Archive</button>
+<div class="fey">EVERY VOICE MATTERS</div>
+<div class="ftit serif">Invite your family</div>
+<div class="fsub">Each member gets their own private chapter — in their own language, their own voice. Everything merges into one living archive.</div>
+<div class="tout" style="margin-bottom:14px">
+<div class="thead"><div class="ttitle">Current members</div></div>
+<div id="c-l">
+<div class="mrow"><div class="mav" id="c-av">ME</div><div><div class="mn" id="c-mn">First member</div><div class="mr">Admin · chapter complete</div></div><div class="ms ms-d">Complete</div></div>
+<div class="mrow"><div class="mav" style="background:#D4EDDA;color:#1A6B38">AT</div><div><div class="mn">Aunt Teresa</div><div class="mr">Joined yesterday · writing in Spanish</div></div><div class="ms ms-w">Writing</div></div>
+</div>
+<div class="irow"><input class="iin" id="c-inv" placeholder="WhatsApp number, email, or name…"><button class="ibtn" onclick="addC()">Send invite</button></div>
+</div>
+<div class="ibox"><i class="ti ti-shield"></i> Every member controls their own chapter. They can mark parts private. Nobody else can edit their story — not even the admin.</div>
+<div class="slbl">How it works</div>
+<div class="tout">
+<div class="mrow"><div class="mav" style="background:var(--g);color:var(--w);font-family:'Jost',sans-serif;font-size:12px">1</div><div><div class="mn">You send an invite</div><div class="mr">WhatsApp, email, or private link. 10 seconds.</div></div></div>
+<div class="mrow"><div class="mav" style="background:var(--g);color:var(--w);font-family:'Jost',sans-serif;font-size:12px">2</div><div><div class="mn">They answer in their own voice</div><div class="mr">Their language, their words, their chapter alone.</div></div></div>
+<div class="mrow"><div class="mav" style="background:var(--g);color:var(--w);font-family:'Jost',sans-serif;font-size:12px">3</div><div><div class="mn">The archive grows together</div><div class="mr">If they go quiet, a gentle reminder arrives on their birthday.</div></div></div>
+</div>
+</div>
+</div>
+
+<!-- BOOK STUDIO -->
+<div class="sc" id="sc-book">
+<div class="dash" style="max-width:620px">
+<button class="bb" style="margin-bottom:16px" onclick="go('dashboard')">← Archive</button>
+<div class="dname serif" style="font-size:26px;margin-bottom:2px">Digital Book Studio</div>
+<div class="dsub" style="margin-bottom:16px">Your photos, videos, and chapters — composed into a living book. Flip through, add media, then order in print.</div>
+
+<div class="ibox"><i class="ti ti-upload"></i> <span><b>Add media to the book:</b> photos (JPG/PNG, min 1200px for print) and short videos (MP4, up to 2 min — they appear in the digital book as playable, and as QR codes in print).</span></div>
+<div style="display:flex;gap:8px;margin-bottom:18px">
+<button class="ibtn" onclick="document.getElementById('bkup').click()"><i class="ti ti-photo-plus"></i> Add photos</button>
+<button class="bb" style="padding:9px 14px;font-size:12px" onclick="document.getElementById('bkup').click()"><i class="ti ti-video-plus"></i> Add video</button>
+</div>
+<input type="file" id="bkup" accept="image/*,video/*" multiple onchange="bkAdd(this.files)">
+
+<!-- The book itself -->
+<div style="background:var(--dk);border-radius:var(--rl);padding:26px 18px;margin-bottom:14px">
+<div id="bk-page" style="background:var(--paper);border-radius:8px;min-height:380px;padding:28px 24px;box-shadow:0 8px 40px rgba(0,0,0,.4);position:relative;display:flex;flex-direction:column;transition:opacity .25s"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px">
+<button class="bb" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.7)" onclick="bkNav(-1)">← Previous</button>
+<div style="font-size:11px;color:rgba(255,255,255,.4)" id="bk-num">Page 1 of 7</div>
+<button class="bb" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.7)" onclick="bkNav(1)">Next →</button>
+</div>
+</div>
+
+<div class="bkp"><div class="bkc"><div class="bkt">FAMILY</div><div style="font-size:13px;color:rgba(255,255,255,.6);margin:5px 0">✦</div><div class="bkt" style="font-size:8px">2026</div></div>
+<div style="flex:1"><div style="font-size:13px;font-weight:500;margin-bottom:2px">Order this book in print</div>
+<div style="font-size:11px;color:var(--ink3);line-height:1.55;margin-bottom:9px;font-weight:300">Exactly what you see here — hardcover, premium paper, QR codes that play voices and videos. Ships worldwide.</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="ibtn">Hardcover ₹2,800</button><button class="bb" style="padding:8px 12px;font-size:11px">Softcover ₹1,500</button><button class="bb" style="padding:8px 12px;font-size:11px">PDF free</button></div></div></div>
+</div>
+</div>
+
+<!-- SETTINGS -->
+<div class="sc" id="sc-settings">
+<div class="fw">
+<button class="bb" style="margin-bottom:16px" onclick="go('dashboard')">← Archive</button>
+<div class="ftit serif">Settings</div>
+<div class="fsub">Your family's plan, languages, privacy, and data.</div>
+<div class="slbl">Subscription</div>
+<div class="tout">
+<div class="set-row"><div><div style="font-weight:500">Family Legacy Plan</div><div style="font-size:11px;color:var(--ink3)">$60/year · renews 12 Jan 2027 · unlimited members</div></div><div class="dbadge">ACTIVE</div></div>
+<div class="set-row"><div>Yearly album auto-generation</div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+<div class="set-row"><div>Smart birthday & inactivity reminders</div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+</div>
+<div class="slbl">Languages</div>
+<div class="tout">
+<div class="set-row"><div>English · हिन्दी · العربية</div><div style="font-size:11px;color:var(--g3)">Active</div></div>
+<div class="set-row"><div>Punjabi, Tamil, Gujarati, Telugu, Bengali</div><div style="font-size:11px;color:var(--ink4)">Coming soon</div></div>
+</div>
+<div class="slbl">Privacy & data</div>
+<div class="tout">
+<div class="set-row"><div>Members control their own chapters</div><div style="font-size:11px;color:var(--g3)">Always on</div></div>
+<div class="set-row"><div>Export full archive (photos, voices, stories)</div><button class="ibtn" style="font-size:11px;padding:6px 12px">Export</button></div>
+<div class="set-row"><div>Permanent preservation guarantee</div><div style="font-size:11px;color:var(--ink4)">Add-on · coming</div></div>
+</div>
+</div>
+</div>
+
+<script>
+const S={who:'',name:'',year:'',town:'',known:'',q1:'',q2:'',q3:'',q4:'',q5:'',photo:'',ini:'ME',recs:{}};
+let mp=false,mpi=null;
+const T={
+en:{nav_home:'Home',nav_fam:'My Family',nav_begin:'Begin your legacy',h_eye:'FOR EVERY FAMILY · FOR EVERY GENERATION',h_title:'No one in your family<br>should ever be <em>forgotten</em>',h_sub:'Capture the voices, stories, and faces of everyone you love — so that a century from now, your great-grandchildren will know exactly who you were.',h_cta:"Start your family's story",h_cta2:'See a family archive',w_title:'Who are you starting with?'},
+hi:{nav_home:'होम',nav_fam:'मेरा परिवार',nav_begin:'अपनी विरासत शुरू करें',h_eye:'हर परिवार के लिए · हर पीढ़ी के लिए',h_title:'आपके परिवार में कोई भी<br>कभी <em>भुलाया</em> नहीं जाना चाहिए',h_sub:'अपने प्रियजनों की आवाज़ें, कहानियाँ और चेहरे संजोएं — ताकि सौ साल बाद भी आपके परपोते जानें कि आप कौन थे।',h_cta:'अपने परिवार की कहानी शुरू करें',h_cta2:'एक पारिवारिक संग्रह देखें',w_title:'आप किससे शुरुआत कर रहे हैं?'},
+ar:{nav_home:'الرئيسية',nav_fam:'عائلتي',nav_begin:'ابدأ إرثك',h_eye:'لكل عائلة · لكل جيل',h_title:'لا أحد في عائلتك<br>يجب أن يُ<em>نسى</em> أبداً',h_sub:'احفظ أصوات وقصص ووجوه كل من تحب — حتى يعرف أحفاد أحفادك بعد قرن من هو أنت.',h_cta:'ابدأ قصة عائلتك',h_cta2:'شاهد أرشيف عائلة',w_title:'بمن تبدأ؟'}
+};
+function setTheme(t){
+  if(t==='heritage')document.body.removeAttribute('data-theme');
+  else document.body.setAttribute('data-theme',t);
+  try{localStorage.setItem('ank-theme',t);}catch(e){}
+}
+try{const sv=localStorage.getItem('ank-theme');if(sv&&sv!=='heritage'){document.body.setAttribute('data-theme',sv);const ts=document.getElementById('theme');if(ts)ts.value=sv;}}catch(e){}
+function setLang(l){
+  document.documentElement.dir=l==='ar'?'rtl':'ltr';
+  const t=T[l];
+  document.querySelectorAll('[data-t]').forEach(e=>{if(t[e.dataset.t])e.textContent=t[e.dataset.t]});
+  document.querySelectorAll('[data-t-html]').forEach(e=>{if(t[e.dataset.tHtml])e.innerHTML=t[e.dataset.tHtml]});
+}
+const tips={who:["Start with whoever feels most urgent — add everyone else later.","Elderly grandparent? Use voice-only mode. Every day matters."],basics:["Don't know the exact year? A decade is fine.","Photos optional — voice and words matter most."],story:["Tap the microphone on any question to speak instead of type.","One sentence per question is enough to begin."],chapter:["Both versions are saved — your words and the written chapter.","Edit anything, any time, from the archive."],future:["Sealed means sealed — even you can't read it after.","Voice messages mean they hear your actual voice when it opens."],collab:["Every member owns their own chapter. No one can edit another's.","Reminders go out automatically on birthdays."],album:["Scan old printed photos with your phone camera — AI enhances them.","Photos auto-organise by person and decade."]};
+let gv=false,gi=0,cur='home';
+function go(id){document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));document.getElementById('sc-'+id).classList.add('on');cur=id;window.scrollTo(0,0);setTimeout(()=>{const tt=tips[id];if(tt){const b=document.getElementById('gb');b.textContent=tt[0];b.classList.add('show');setTimeout(()=>b.classList.remove('show'),4500);}},800);if(id==='dashboard')dash();}
+function tgGuide(){const b=document.getElementById('gb');const tt=tips[cur]||["Everything can be edited later. Nothing is final."];gv=!gv;if(gv){b.textContent=tt[gi%tt.length];gi++;b.classList.add('show');}else b.classList.remove('show');}
+function selWho(el,v){document.querySelectorAll('.wo').forEach(w=>w.classList.remove('sel'));el.classList.add('sel');S.who=v;document.getElementById('both-note').style.display=v==='both'?'block':'none';document.getElementById('who-n').disabled=false;}
+function chkB(){const v=document.getElementById('f-name').value.trim();document.getElementById('b-n').disabled=v.length<2;if(v.length>1)S.ini=v.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase();}
+function photo(i){if(!i.files||!i.files[0])return;const r=new FileReader();r.onload=e=>{S.photo=e.target.result;document.getElementById('pinner').innerHTML=`<img src="${e.target.result}" style="width:76px;height:76px;border-radius:50%;object-fit:cover;border:2px solid var(--g2)">`;setTimeout(()=>{document.getElementById('frec').classList.add('show');const n=document.getElementById('f-name').value.trim();document.getElementById('ftxt').textContent=n?`Face recognised — linked to ${n}`:'Face detected — add a name to link';},1000);};r.readAsDataURL(i.files[0]);}
+const kSug=['Always had a story for every moment','Made every room warmer','The one everyone called in a crisis','Fed people the way others say I love you','Never asked anything for themselves'];
+function sugKnown(v){const b=document.getElementById('ks');if(v.length<3){b.classList.remove('show');return;}document.getElementById('ksc').innerHTML=kSug.map(s=>`<button class="schip" onclick="ap('f-known','${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');b.classList.add('show');}
+function ap(f,t){const e=document.getElementById(f);const c=e.value.trim();e.value=c?c+(c.endsWith('.')?' ':'. ')+t:t;}
+const q1M={bak:['How did they learn to bake?','Was there a recipe never written down?','Who taught them?'],teach:['Which subject? Which school?','A student who stayed with them?','What did education mean to them?'],farm:['What did they grow?','Was the land inherited or earned?','What did the seasons mean?'],def:['What did a typical day look like?','A moment their work was truly seen?','What sacrifice did it quietly require?']};
+function onQ1(){const v=document.getElementById('q1').value.toLowerCase();if(v.length<8){document.getElementById('q1s').classList.remove('show');return;}let s=q1M.def;if(v.includes('bak')||v.includes('cook')||v.includes('bread'))s=q1M.bak;else if(v.includes('teach')||v.includes('school'))s=q1M.teach;else if(v.includes('farm')||v.includes('land'))s=q1M.farm;document.getElementById('q1c').innerHTML=s.map(x=>`<button class="schip" onclick="apq('${x.replace(/'/g,"\\'")}')">${x}</button>`).join('');document.getElementById('q1s').classList.add('show');}
+function apq(t){const e=document.getElementById('q1');e.value+=(e.value.trim()?'\n':'')+t;}
+function voice(tid,sid,bid,pid){
+  const b=document.getElementById(bid);
+  if(b.classList.contains('rec')){b.classList.remove('rec');document.getElementById(sid).textContent='Saved ✓';S.recs[tid]=1;showPB(pid);return;}
+  b.classList.add('rec');document.getElementById(sid).textContent='Listening…';
+  const D={'f-known':'She was known for her patience and making everyone feel at home','q1':'She worked as a nurse for thirty-five years. She was proudest of the night shifts nobody else wanted, and the patients who remembered her name decades later.','q2':'She believed kindness costs nothing and is worth everything. She said it almost every day.','q3':'Sunday mornings. The smell of bread in her kitchen. She hummed the same three songs and the whole house felt safe.','q4':'That she carried a great deal quietly and never let it show. She wanted everyone else to be okay first.','fm-msg':'My darling — I do not know who you will be when you read this. But I know you come from people who loved deeply, worked hard, and asked for very little. I am already proud of you.'};
+  const w=(D[tid]||'A remarkable person who shaped everyone around them').split(' ');let i=0;
+  const iv=setInterval(()=>{const e=document.getElementById(tid);if(e)e.value=w.slice(0,i+1).join(' ');document.getElementById(sid).textContent='Recording: "'+w.slice(0,Math.min(i+1,5)).join(' ')+'…"';if(tid==='q1')onQ1();if(tid==='fm-msg')seal();if(++i>=w.length){clearInterval(iv);b.classList.remove('rec');document.getElementById(sid).textContent='Saved ✓';S.recs[tid]=1;showPB(pid);}},105);
+}
+function showPB(pid){const p=document.getElementById(pid);if(!p)return;p.classList.add('show');const w=document.getElementById(pid+'-w');if(w&&!w.children.length){[4,8,12,15,9,6,11,16,10,7,13,5,9,12,8].forEach(h=>{const d=document.createElement('div');d.className='vwb';d.style.height=h+'px';w.appendChild(d);});}}
+let pAnim={};
+function play(pid){const ic=document.getElementById(pid+'-i');const on=ic.classList.contains('ti-player-pause');if(on){ic.className='ti ti-player-play';clearInterval(pAnim[pid]);}else{ic.className='ti ti-player-pause';pAnim[pid]=setInterval(()=>{document.querySelectorAll('#'+pid+'-w .vwb').forEach(b=>b.style.height=(Math.random()*13+3)+'px');},130);setTimeout(()=>{ic.className='ti ti-player-play';clearInterval(pAnim[pid]);},7000);}}
+function mainPlay(){mp=!mp;const ic=document.getElementById('mp-i');if(mp){ic.className='ti ti-player-pause';mpi=setInterval(()=>{document.querySelectorAll('#vb-w .vbb').forEach(b=>b.style.height=(Math.random()*17+4)+'px');},130);setTimeout(()=>{if(mp){mp=false;ic.className='ti ti-player-play';clearInterval(mpi);}},10000);}else{ic.className='ti ti-player-play';clearInterval(mpi);}}
+async function gen(){
+S.name=document.getElementById('f-name').value.trim()||'this person';S.year=document.getElementById('f-year').value.trim();S.town=document.getElementById('f-town').value.trim();S.known=document.getElementById('f-known').value.trim();
+S.q1=document.getElementById('q1').value.trim();S.q2=document.getElementById('q2').value.trim();S.q3=document.getElementById('q3').value.trim();S.q4=document.getElementById('q4').value.trim();S.q5=document.getElementById('q5').value.trim();
+S.ini=S.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+go('gen');
+const M=[['Reading their story…','Finding the thread'],['Gathering the fragments…','Every detail matters'],['Writing their chapter…','The beginning of something permanent']];let mi=0;
+const lt=setInterval(()=>{if(mi<M.length){document.getElementById('gm').textContent=M[mi][0];document.getElementById('gs').textContent=M[mi][1];mi++;}},1900);
+const pr=`You are a warm literary biographer for Ancestralk, a private family legacy platform. Write a beautiful 3-paragraph biographical chapter about ${S.name}${S.year?', born '+S.year:''}${S.town?', from '+S.town:''}.${S.known?' Known for: '+S.known+'.':''}
+Shared: Work/pride: "${S.q1}" Values: "${S.q2||'—'}" Memory: "${S.q3||'—'}" For future generations: "${S.q4||'—'}"${S.q5?' Life events: "'+S.q5+'"':''}
+Literary warmth, emotional precision, every specific detail used, zero generic phrases. Written for a great-grandchild who never met them.
+Then: TAGS: 4-5 single-word values. QUOTE: one portrait-caption sentence.${S.q5?' TIMELINE: each life event as "year|title" separated by ;':''}`;
+try{
+const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,messages:[{role:'user',content:pr}]})});
+const d=await r.json();clearInterval(lt);
+const tx=d.content[0].text;
+const tg=tx.match(/TAGS:\s*(.+)/);const qt=tx.match(/QUOTE:\s*(.+)/);const tl=tx.match(/TIMELINE:\s*(.+)/);
+const raw=tx.replace(/TAGS:.+/s,'').replace(/QUOTE:.+/s,'').replace(/TIMELINE:.+/s,'').trim();
+const ps=raw.split('\n\n').filter(p=>p.trim().length>10);
+const av=document.getElementById('o-av');av.innerHTML=S.photo?`<img src="${S.photo}">`:S.ini;
+document.getElementById('o-n').textContent=S.name;
+document.getElementById('o-m').textContent=(S.year?'b. '+S.year:'')+(S.town?(S.year?' · ':'')+S.town:'');
+document.getElementById('ch-t').textContent=S.name.split(' ')[0]+"'s chapter";
+let h='';ps.forEach(p=>h+=`<p>${p.trim()}</p>`);
+if(qt)h+=`<div class="squote">${qt[1].trim()}</div>`;
+document.getElementById('o-b').innerHTML=h;
+if(tg)document.getElementById('o-t').innerHTML=tg[1].split(',').map(t=>`<span class="stag">${t.trim()}</span>`).join('');
+document.getElementById('o-r').textContent=(S.q1?'What they did:\n'+S.q1+'\n\n':'')+(S.q2?'Values:\n'+S.q2+'\n\n':'')+(S.q3?'A memory:\n'+S.q3+'\n\n':'')+(S.q4?'For the future:\n'+S.q4:'');
+let tlh='';
+if(tl){tl[1].split(';').forEach(it=>{const[y,t]=it.split('|');if(y&&t)tlh+=`<div class="tli"><div class="tly">${y.trim()}</div><div class="tlt">${t.trim()}</div></div>`;});}
+else if(S.q5){S.q5.split('.').filter(x=>x.trim()).forEach(ev=>{const ym=ev.match(/\d{4}/);tlh+=`<div class="tli"><div class="tly">${ym?ym[0]:'—'}</div><div class="tlt">${ev.trim()}</div></div>`;});}
+if(S.year)tlh=`<div class="tli"><div class="tly">${S.year}</div><div class="tlt">Born${S.town?' in '+S.town:''}</div></div>`+tlh;
+document.getElementById('o-tl').innerHTML=tlh||'<div style="font-size:12px;color:var(--ink4)">Add life events in the story step to build the timeline.</div>';
+const hv=Object.keys(S.recs).length>0;document.getElementById('vbar').style.display=hv?'flex':'none';
+if(hv){document.getElementById('vb-n').textContent=S.name+"'s voice";const w=document.getElementById('vb-w');w.innerHTML='';for(let i=0;i<20;i++){const b=document.createElement('div');b.className='vbb';b.style.height=(Math.random()*14+4)+'px';w.appendChild(b);}}
+go('chapter');
+}catch(e){clearInterval(lt);document.getElementById('o-b').innerHTML='<p style="color:var(--ink3)">Could not connect — check your internet and try again.</p>';go('chapter');}}
+function ver(v,b){document.querySelectorAll('.stab').forEach(t=>t.classList.remove('on'));b.classList.add('on');document.getElementById('vw').style.display=v==='w'?'block':'none';document.getElementById('vr').style.display=v==='r'?'block':'none';document.getElementById('vt').style.display=v==='t'?'block':'none';}
+function runSave(){const o=document.getElementById('sov');o.classList.add('show');for(let i=1;i<=5;i++){const e=document.getElementById('s'+i);e.className='ssi ssi-p';e.textContent=i;}document.getElementById('sdone').style.display='none';document.getElementById('sm-t').textContent='Saving forever';
+[0,850,1700,2550,3400].forEach((d,i)=>setTimeout(()=>{if(i>0){const p=document.getElementById('s'+i);p.className='ssi ssi-ok';p.textContent='✓';}document.getElementById('s'+(i+1)).className='ssi ssi-d';},d));
+setTimeout(()=>{document.getElementById('s5').className='ssi ssi-ok';document.getElementById('s5').textContent='✓';document.getElementById('sm-t').textContent='Saved forever ✦';document.getElementById('sdone').style.display='block';},4400);}
+function closeSave(){document.getElementById('sov').classList.remove('show');go('dashboard');}
+function dash(){const n=S.name||'Margaret Ellis';const f=n.split(' ').slice(-1)[0];
+document.getElementById('d-t').textContent='The '+f+' Family Archive';
+['d-mn','c-mn'].forEach(id=>document.getElementById(id).textContent=n);
+document.getElementById('pp-n').textContent=n.split(' ')[0];
+const ini=S.ini||'ME';['d-av','c-av','pp-av'].forEach(id=>{const e=document.getElementById(id);if(S.photo)e.innerHTML=`<img src="${S.photo}">`;else e.textContent=ini;});
+document.getElementById('r-t').textContent=n+"'s chapter has been saved";
+document.getElementById('r-d').textContent='Now invite family to add their own voices. Reminders go out automatically if someone goes quiet.';
+tree(n,ini,S.photo);}
+function tree(nm,ini,ph){const svg=document.getElementById('tree');
+const N=[{x:120,y:55,l:'Grandfather',a:1},{x:240,y:55,l:'Grandmother',a:1},{x:350,y:55,l:'Grandfather',a:1},{x:460,y:55,l:'Grandmother',a:1},{x:180,y:150,l:'Father',a:1},{x:380,y:150,l:'Mother',a:1},{x:290,y:245,l:nm,a:0,f:1,p:ph,i:ini},{x:170,y:305,l:'Add child',a:1},{x:290,y:305,l:'Add child',a:1},{x:410,y:305,l:'Add child',a:1}];
+const E=[[0,4],[1,4],[2,5],[3,5],[4,6],[5,6],[6,7],[6,8],[6,9]];let s='';
+E.forEach(([a,b])=>{s+=`<line x1="${N[a].x}" y1="${N[a].y+20}" x2="${N[b].x}" y2="${N[b].y-20}" stroke="#EDE3D3" stroke-width="1.5" ${N[a].a||N[b].a?'stroke-dasharray="4 3"':''}/>`;});
+N.forEach((n,i)=>{const r=n.f?24:16;
+if(n.f&&n.p)s+=`<g onclick="go('chapter')" style="cursor:pointer"><defs><clipPath id="c${i}"><circle cx="${n.x}" cy="${n.y}" r="${r}"/></clipPath></defs><circle cx="${n.x}" cy="${n.y}" r="${r+2}" fill="#E8D5B0"/><image href="${n.p}" x="${n.x-r}" y="${n.y-r}" width="${r*2}" height="${r*2}" clip-path="url(#c${i})"/><circle cx="${n.x}" cy="${n.y}" r="${r}" fill="none" stroke="#B8935A" stroke-width="2"/><text x="${n.x}" y="${n.y+r+13}" text-anchor="middle" font-size="11" fill="#2E2518" font-family="Jost" font-weight="500">${n.l.length>13?n.l.slice(0,12)+'…':n.l}</text></g>`;
+else if(n.f)s+=`<g onclick="go('chapter')" style="cursor:pointer"><circle cx="${n.x}" cy="${n.y}" r="${r}" fill="#B8935A" stroke="#8A6B34" stroke-width="2"/><text x="${n.x}" y="${n.y+4}" text-anchor="middle" font-size="11" fill="#FFF" font-family="Jost" font-weight="500">${n.i}</text><text x="${n.x}" y="${n.y+r+13}" text-anchor="middle" font-size="11" fill="#2E2518" font-family="Jost" font-weight="500">${n.l.length>13?n.l.slice(0,12)+'…':n.l}</text></g>`;
+else s+=`<g onclick="go('who')" style="cursor:pointer;opacity:.55"><circle cx="${n.x}" cy="${n.y}" r="${r}" fill="#F5EFE3" stroke="#EDE3D3" stroke-dasharray="3 2"/><text x="${n.x}" y="${n.y+4}" text-anchor="middle" font-size="12" fill="#A8998A" font-family="Jost">+</text><text x="${n.x}" y="${n.y+r+12}" text-anchor="middle" font-size="9" fill="#A8998A" font-family="Jost">${n.l}</text></g>`;});
+svg.innerHTML=s;}
+function seal(){const to=document.getElementById('fm-to').value.trim();const wh=document.getElementById('fm-when').value;const m=document.getElementById('fm-msg').value.trim();const i=document.getElementById('se-i'),sm=document.getElementById('se-m'),sd=document.getElementById('se-d');
+if(to&&wh&&m.length>10){i.className='seal-i on';i.innerHTML='<i class="ti ti-lock"></i>';sm.textContent='Ready to seal';sd.textContent='To: '+to+' · Opens: '+wh;}
+else{sm.textContent=to?'To: '+to:'Addressed to…';sd.textContent=wh?'Opens: '+wh:'Choose when it opens';}}
+function doSeal(){const to=document.getElementById('fm-to').value.trim();const wh=document.getElementById('fm-when').value;if(!to||!wh){alert('Please add who this is for and when it opens.');return;}
+document.getElementById('se-i').className='seal-i on';document.getElementById('se-m').textContent='Sealed forever ✦';document.getElementById('se-d').textContent='Delivery is automatic on the day';
+const it=document.createElement('div');it.className='fmi';it.innerHTML=`<div class="fseal"><i class="ti ti-lock"></i></div><div><div class="fto">To: ${to}</div><div class="fwhen">Opens: ${wh}</div></div><div class="fst">Sealed ✦</div>`;
+document.getElementById('fm-l').appendChild(it);setTimeout(()=>go('dashboard'),1300);}
+function addM(){mAdd('inv','m-l');}
+function addC(){mAdd('c-inv','c-l');}
+function mAdd(iid,lid){const v=document.getElementById(iid).value.trim();if(!v)return;const ini=v.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase()||'?';
+const r=document.createElement('div');r.className='mrow';r.innerHTML=`<div class="mav" style="background:var(--paper2);color:var(--ink3)">${ini}</div><div><div class="mn">${v}</div><div class="mr">Invite sent just now · reminder on their birthday</div></div><div class="ms ms-w">Pending</div>`;
+document.getElementById(lid).appendChild(r);document.getElementById(iid).value='';}
+function atab(t,b){document.querySelectorAll('.atab').forEach(x=>x.classList.remove('on'));b.classList.add('on');['all','person','decade','video','book'].forEach(x=>document.getElementById('at-'+x).style.display=x===t?'block':'none');}
+function addPhotos(fs){Array.from(fs).forEach(f=>{if(!f.type.startsWith('image/'))return;const r=new FileReader();r.onload=e=>{const g=document.getElementById('agrid');const c=document.createElement('div');c.className='acell';c.innerHTML=`<img src="${e.target.result}"><div class="aibadge">AI tagging…</div>`;g.insertBefore(c,g.lastElementChild);setTimeout(()=>{c.querySelector('.aibadge').textContent='AI tagged';},1800);};r.readAsDataURL(f);});}
+function scanDemo(){alert('Scan flow: point your camera at any printed photo. AI enhances it, estimates the decade, recognises faces, and files it automatically. (Full camera flow in the mobile app.)');}
+const eldQs=["What is the earliest memory you have that still feels vivid today?","Who was the person in your childhood who made you feel most safe?","What is the hardest year of your life, and what got you through it?","What do you want to be remembered for, that has nothing to do with work or money?","What message would you leave for a grandchild you may never meet?"];
+let eq=0,eRec=false;
+function openEld(){document.getElementById('eld').classList.add('on');eq=0;document.getElementById('eld-q').textContent=eldQs[0];document.getElementById('eld-trans').textContent='';}
+function exitEld(){document.getElementById('eld').classList.remove('on');}
+function eldRec(){const m=document.getElementById('eld-mic');eRec=!eRec;
+if(eRec){m.classList.add('rec');document.getElementById('eld-hint').textContent='Listening… take all the time you need';
+const demo="I remember the courtyard of my mother's house. The smell of rain on the stones. I must have been four years old.".split(' ');let i=0;
+const iv=setInterval(()=>{document.getElementById('eld-trans').textContent=demo.slice(0,i+1).join(' ');if(++i>=demo.length){clearInterval(iv);m.classList.remove('rec');eRec=false;document.getElementById('eld-hint').textContent='Saved ✓ — tap for the next question';
+m.onclick=()=>{eq++;if(eq<eldQs.length){document.getElementById('eld-q').textContent=eldQs[eq];document.getElementById('eld-trans').textContent='';document.getElementById('eld-hint').textContent='Tap and speak. Take your time.';m.onclick=eldRec;}else{exitEld();alert('All answers saved to the archive. Their chapter is being written.');}};}},140);}
+else{m.classList.remove('rec');}}
+/* BOOK STUDIO */
+let bkPg=0;let bkMedia=[];
+function bkPages(){
+const nm=S.name||'Margaret Ellis';const fam=nm.split(' ').slice(-1)[0];const ini=S.ini||'ME';
+const chapEl=document.getElementById('o-b');
+const chap=chapEl&&chapEl.querySelector('p')?chapEl.querySelector('p').textContent:'Their chapter appears here once written — complete the story step to fill this page.';
+const P=[];
+P.push(`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center"><div style="font-size:11px;letter-spacing:3px;color:var(--g);margin-bottom:14px">ANCESTRALK PRESENTS</div><div class="serif" style="font-size:34px;line-height:1.2;margin-bottom:10px">The ${fam} Family</div><div style="font-size:12px;color:var(--ink3);letter-spacing:1px">A LIVING LEGACY · 2026</div><div style="font-size:22px;color:var(--g);margin-top:18px">✦</div></div>`);
+P.push(`<div style="flex:1"><div style="font-size:10px;letter-spacing:2px;color:var(--g);margin-bottom:12px">THE FAMILY TREE</div><div style="text-align:center;padding:18px 0"><div style="display:inline-flex;flex-direction:column;align-items:center;gap:8px"><div style="display:flex;gap:14px"><div class="mav" style="width:42px;height:42px;opacity:.4">GF</div><div class="mav" style="width:42px;height:42px;opacity:.4">GM</div></div><div style="width:1px;height:14px;background:var(--g2)"></div><div class="mav" style="width:54px;height:54px;background:var(--g);color:var(--w)">${S.photo?'':ini}${S.photo?`<img src="${S.photo}">`:''}</div><div class="serif" style="font-size:15px;margin-top:2px">${nm}</div></div></div><div style="font-size:11px;color:var(--ink4);text-align:center;font-weight:300">The tree grows with every member added</div></div>`);
+P.push(`<div style="flex:1"><div style="font-size:10px;letter-spacing:2px;color:var(--g);margin-bottom:12px">CHAPTER ONE</div><div style="display:flex;gap:14px;margin-bottom:14px;align-items:center"><div class="mav" style="width:48px;height:48px">${S.photo?`<img src="${S.photo}">`:ini}</div><div><div class="serif" style="font-size:19px">${nm}</div><div style="font-size:11px;color:var(--ink3)">${S.year?'b. '+S.year:''}${S.town?(S.year?' · ':'')+S.town:''}</div></div></div><div class="serif" style="font-size:13px;line-height:1.85;color:var(--ink2)">${chap.slice(0,420)}${chap.length>420?'…':''}</div><div style="font-size:10px;color:var(--g3);margin-top:12px;display:flex;align-items:center;gap:6px"><i class="ti ti-qrcode"></i> In print: scan to hear ${nm.split(' ')[0]}'s voice</div></div>`);
+const ph=bkMedia.filter(m=>m.t==='img');
+P.push(`<div style="flex:1"><div style="font-size:10px;letter-spacing:2px;color:var(--g);margin-bottom:12px">PHOTOGRAPHS</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${ph.length?ph.slice(0,4).map(m=>`<div style="aspect-ratio:1;border-radius:6px;overflow:hidden"><img src="${m.src}" style="width:100%;height:100%;object-fit:cover"></div>`).join(''):`<div style="aspect-ratio:1;border-radius:6px;background:var(--paper2);display:flex;align-items:center;justify-content:center;font-size:24px">🌿</div><div style="aspect-ratio:1;border-radius:6px;background:#E8D5B0;display:flex;align-items:center;justify-content:center;font-size:24px">🏡</div><div style="aspect-ratio:1;border-radius:6px;background:#E0CEAD;display:flex;align-items:center;justify-content:center;font-size:24px">👨‍👩‍👧‍👦</div><div style="aspect-ratio:1;border-radius:6px;border:2px dashed var(--paper3);display:flex;align-items:center;justify-content:center;color:var(--ink4);font-size:11px;cursor:pointer" onclick="document.getElementById('bkup').click()">+ Add</div>`}</div><div style="font-size:10px;color:var(--ink4);margin-top:10px;font-weight:300;text-align:center">Photos auto-arrange by decade · captions from your tags</div></div>`);
+const vd=bkMedia.filter(m=>m.t==='vid');
+P.push(`<div style="flex:1"><div style="font-size:10px;letter-spacing:2px;color:var(--g);margin-bottom:12px">MOVING MEMORIES</div><div style="background:var(--dk);border-radius:8px;aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:10px">${vd.length?`<video src="${vd[0].src}" controls style="width:100%;height:100%;border-radius:8px;object-fit:cover"></video>`:`<div style="font-size:30px;color:var(--g)"><i class="ti ti-player-play"></i></div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px">Family video · tap Add video above</div>`}</div><div style="font-size:10px;color:var(--g3);display:flex;align-items:center;gap:6px"><i class="ti ti-qrcode"></i> In the printed book, this page carries a QR code — scan to watch</div></div>`);
+P.push(`<div style="flex:1"><div style="font-size:10px;letter-spacing:2px;color:var(--g);margin-bottom:12px">LETTERS TO THE FUTURE</div><div style="border:1px solid var(--g2);border-radius:8px;padding:16px;background:var(--g5);margin-bottom:10px"><div style="font-size:12px;font-weight:500;margin-bottom:3px">To: My grandchild</div><div style="font-size:11px;color:var(--ink3);font-weight:300">Sealed · opens on their 18th birthday</div><div style="font-size:18px;color:var(--g);margin-top:8px"><i class="ti ti-lock"></i></div></div><div style="font-size:11px;color:var(--ink4);font-weight:300;text-align:center">Sealed letters appear here as locked pages — until their day comes</div></div>`);
+P.push(`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center"><div class="serif" style="font-size:22px;line-height:1.4;margin-bottom:12px;font-style:italic;color:var(--ink2)">"No one in this family<br>will ever be forgotten."</div><div style="font-size:11px;color:var(--ink4);font-weight:300">The next chapter belongs to whoever comes next.<br>This page is reserved for them.</div><div style="font-size:18px;color:var(--g);margin-top:16px">✦</div></div>`);
+return P;}
+function bkRender(){const P=bkPages();const pg=document.getElementById('bk-page');pg.style.opacity=0;setTimeout(()=>{pg.innerHTML=P[bkPg];pg.style.opacity=1;},200);document.getElementById('bk-num').textContent='Page '+(bkPg+1)+' of '+P.length;}
+function bkNav(d){const P=bkPages();bkPg=Math.max(0,Math.min(P.length-1,bkPg+d));bkRender();}
+function bkAdd(fs){Array.from(fs).forEach(f=>{const r=new FileReader();r.onload=e=>{bkMedia.push({t:f.type.startsWith('video')?'vid':'img',src:e.target.result});bkRender();};r.readAsDataURL(f);});}
+const _go=go;go=function(id){_go(id);if(id==='book'){bkPg=0;bkRender();}};
+tree('Your family','?',null);
+
+</script>
+</body>
+</html>

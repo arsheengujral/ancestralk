@@ -42,6 +42,25 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      <div className="slbl">Legacy plan</div>
+      <div className="tout">
+        <div className="set-row">
+          <div>
+            <div style={{ fontWeight: 500 }}>Passing the torch</div>
+            <div style={{ fontSize: 11, color: 'var(--ink3)' }}>
+              Choose how this archive lives on across generations
+            </div>
+          </div>
+          <button className="ibtn" style={{ fontSize: 11, padding: '6px 12px' }} onClick={() => router.push('/legacy')}>
+            Set up
+          </button>
+        </div>
+        <div className="set-row">
+          <div>Continuity guarantee</div>
+          <div style={{ fontSize: 11, color: 'var(--g3)' }}>This archive will outlive all of us</div>
+        </div>
+      </div>
+
       <div className="slbl">Languages</div>
       <div className="tout">
         <div className="set-row">

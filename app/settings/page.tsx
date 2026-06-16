@@ -12,6 +12,40 @@ function Toggle({ initial = true }: { initial?: boolean }) {
 
 export default function SettingsPage() {
   const router = useRouter();
+  const [upgradeMsg, setUpgradeMsg] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  async function upgrade() {
+    setBusy(true);
+    setUpgradeMsg('');
+    try {
+      let region = '';
+      try {
+        region = JSON.parse(sessionStorage.getItem('ank-flow') || '{}').region || '';
+      } catch {
+        /* ignore */
+      }
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ region }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url; // Stripe Checkout
+      } else if (!data.configured) {
+        setUpgradeMsg(
+          `Payments aren't live in this environment yet. When configured, you'll pay ${data.price?.label ?? ''} via ${data.provider}.`,
+        );
+      } else {
+        setUpgradeMsg('Order created — complete payment to upgrade.');
+      }
+    } catch {
+      setUpgradeMsg('Could not start checkout right now.');
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <div className="fw">
@@ -40,7 +74,23 @@ export default function SettingsPage() {
           <div>Smart birthday &amp; inactivity reminders</div>
           <Toggle />
         </div>
+        <div className="set-row">
+          <div>
+            <div style={{ fontWeight: 500 }}>Upgrade / manage plan</div>
+            <div style={{ fontSize: 11, color: 'var(--ink3)' }}>
+              Stripe worldwide · Razorpay in India
+            </div>
+          </div>
+          <button className="ibtn" style={{ fontSize: 11, padding: '6px 12px' }} onClick={upgrade} disabled={busy}>
+            {busy ? '…' : 'Upgrade'}
+          </button>
+        </div>
       </div>
+      {upgradeMsg && (
+        <div className="enote" style={{ marginTop: -6, marginBottom: 8 }}>
+          <i className="ti ti-info-circle" style={{ color: 'var(--g)' }} /> {upgradeMsg}
+        </div>
+      )}
 
       <div className="slbl">Legacy plan</div>
       <div className="tout">
@@ -70,6 +120,25 @@ export default function SettingsPage() {
         <div className="set-row">
           <div>Punjabi, Tamil, Gujarati, Telugu, Bengali</div>
           <div style={{ fontSize: 11, color: 'var(--ink4)' }}>Coming soon</div>
+        </div>
+      </div>
+
+      <div className="slbl">Help</div>
+      <div className="tout">
+        <div className="set-row">
+          <div>
+            <div style={{ fontWeight: 500 }}>Take the guided tour</div>
+            <div style={{ fontSize: 11, color: 'var(--ink3)' }}>A walk through everything Ancestralk can do</div>
+          </div>
+          <button className="ibtn" style={{ fontSize: 11, padding: '6px 12px' }} onClick={() => router.push('/archive?tour=1')}>
+            Replay
+          </button>
+        </div>
+        <div className="set-row">
+          <div>How it works — tutorial library</div>
+          <button className="bb" style={{ fontSize: 11, padding: '6px 12px' }} onClick={() => router.push('/learn')}>
+            Open
+          </button>
         </div>
       </div>
 

@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "family": "Mi familia",
+    "settings": "Ajustes",
+    "begin": "Comienza tu legado",
+    "signin": "Iniciar sesión",
+    "menu": "Menú"
+  },
+  "home": {
+    "eyebrow": "PARA CADA FAMILIA · PARA CADA GENERACIÓN",
+    "titleLine1": "Nadie en tu familia",
+    "titleEmphasis": "olvidado",
+    "titleLine2": "debería ser jamás",
+    "subtitle": "Captura las voces, las historias y los rostros de quienes amas — para que dentro de un siglo tus bisnietos sepan exactamente quién fuiste.",
+    "ctaPrimary": "Comienza la historia de tu familia",
+    "ctaSecondary": "Ver un archivo familiar"
+  },
+  "auth": {
+    "title": "Comienza el legado de tu familia",
+    "subtitle": "Crea tu archivo privado — o vuelve a iniciar sesión. Las historias de tu familia están protegidas y son solo tuyas.",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@familia.com",
+    "sendLink": "Envíame un enlace para entrar",
+    "google": "Continuar con Google",
+    "or": "o",
+    "checkEmail": "Revisa tu correo para comenzar.",
+    "preview": "Echa un vistazo primero",
+    "guarantee": "Tu archivo es privado. Solo la familia que invites podrá verlo."
+  },
+  "common": {
+    "continue": "Continuar",
+    "back": "Atrás",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "next": "Siguiente",
+    "skip": "Omitir",
+    "add": "Añadir",
+    "done": "Listo"
+  },
+  "region": {
+    "title": "¿De dónde es tu familia?",
+    "subtitle": "Sugeriremos los idiomas que se hablan allí — pero todos los idiomas siguen disponibles para ti.",
+    "suggested": "Sugerido para ti",
+    "allLanguages": "Todos los idiomas",
+    "languageLabel": "Tu idioma"
+  }
+}

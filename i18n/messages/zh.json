@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "home": "首页",
+    "family": "我的家庭",
+    "settings": "设置",
+    "begin": "开始你的传承",
+    "signin": "登录",
+    "menu": "菜单"
+  },
+  "home": {
+    "eyebrow": "为每个家庭 · 为每一代人",
+    "titleLine1": "你的家人，没有一个人",
+    "titleEmphasis": "遗忘",
+    "titleLine2": "应该被",
+    "subtitle": "留住你所爱之人的声音、故事与面容——让一个世纪之后，你的曾孙仍然知道你究竟是谁。",
+    "ctaPrimary": "开始你家庭的故事",
+    "ctaSecondary": "查看一个家庭档案"
+  },
+  "auth": {
+    "title": "开始你家庭的传承",
+    "subtitle": "创建你的私人档案——或重新登录。你家庭的故事受到保护，只属于你。",
+    "email": "电子邮箱",
+    "emailPlaceholder": "you@family.com",
+    "sendLink": "给我发送登录链接",
+    "google": "使用 Google 继续",
+    "or": "或",
+    "checkEmail": "请查收你的邮箱以开始。",
+    "preview": "先看看",
+    "guarantee": "你的档案是私密的。只有你邀请的家人才能看到。"
+  },
+  "common": {
+    "continue": "继续",
+    "back": "返回",
+    "save": "保存",
+    "cancel": "取消",
+    "next": "下一步",
+    "skip": "跳过",
+    "add": "添加",
+    "done": "完成"
+  },
+  "region": {
+    "title": "你的家庭来自哪里？",
+    "subtitle": "我们会推荐当地的语言——但所有语言都向你开放。",
+    "suggested": "为你推荐",
+    "allLanguages": "所有语言",
+    "languageLabel": "你的语言"
+  }
+}

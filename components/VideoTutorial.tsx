@@ -32,7 +32,7 @@ export default function VideoTutorial({
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 16, alignItems: 'start' }}>
+    <div className="tut-grid" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 16, alignItems: 'start' }}>
       <div
         style={{ position: 'relative', borderRadius: 'var(--rl)', overflow: 'hidden', background: 'var(--dk)', aspectRatio: '16/9' }}
       >

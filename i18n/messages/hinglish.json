@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "home": "Home",
+    "family": "Mera Parivaar",
+    "settings": "Settings",
+    "begin": "Apni legacy shuru karein",
+    "signin": "Sign in",
+    "menu": "Menu"
+  },
+  "home": {
+    "eyebrow": "HAR PARIVAAR KE LIYE · HAR PEEDHI KE LIYE",
+    "titleLine1": "Aapke parivaar mein koi bhi",
+    "titleEmphasis": "bhulaya",
+    "titleLine2": "kabhi nahi jaana chahiye",
+    "subtitle": "Apne logon ki aawaazein, kahaniyaan aur chehre save karein — taaki sau saal baad bhi aapke par-pote jaanein ki aap kaun the.",
+    "ctaPrimary": "Apne parivaar ki kahani shuru karein",
+    "ctaSecondary": "Ek family archive dekhein"
+  },
+  "auth": {
+    "title": "Apne parivaar ki legacy shuru karein",
+    "subtitle": "Apna private archive banayein — ya wapas sign in karein. Aapke parivaar ki kahaniyaan safe hain, sirf aapki.",
+    "email": "Email",
+    "emailPlaceholder": "you@family.com",
+    "sendLink": "Mujhe sign-in link email karein",
+    "google": "Google se continue karein",
+    "or": "ya",
+    "checkEmail": "Shuru karne ke liye apna email check karein.",
+    "preview": "Pehle dekh lein",
+    "guarantee": "Aapka archive private hai. Sirf woh parivaar dekh sakta hai jise aap invite karte hain."
+  },
+  "common": {
+    "continue": "Continue",
+    "back": "Wapas",
+    "save": "Save karein",
+    "cancel": "Cancel",
+    "next": "Aage",
+    "skip": "Skip",
+    "add": "Add karein",
+    "done": "Ho gaya"
+  },
+  "region": {
+    "title": "Aapka parivaar kahan se hai?",
+    "subtitle": "Hum wahan boli jaane waali languages suggest karenge — par har language aapke liye open rahegi.",
+    "suggested": "Aapke liye suggested",
+    "allLanguages": "Saari languages",
+    "languageLabel": "Aapki language"
+  }
+}

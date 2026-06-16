@@ -24,6 +24,8 @@ export interface ChapterResult {
 }
 
 export interface FlowState {
+  region: string;
+  language: string; // content language code (lib/languages)
   who: string;
   name: string;
   year: string;
@@ -40,6 +42,7 @@ export interface FlowState {
 }
 
 const EMPTY: FlowState = {
+  region: '', language: 'en',
   who: '', name: '', year: '', town: '', known: '',
   q1: '', q2: '', q3: '', q4: '', q5: '',
   photo: '', recs: {}, chapter: null,

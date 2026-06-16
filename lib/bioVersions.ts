@@ -30,21 +30,5 @@ export interface BioContent {
   timeline: { year: string; title: string }[];
 }
 
-// The 15 supported content languages — passed through to Whisper + Claude.
-export const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'hinglish', label: 'Hinglish' },
-  { code: 'hi', label: 'हिन्दी' },
-  { code: 'ar', label: 'العربية' },
-  { code: 'pa', label: 'ਪੰਜਾਬੀ' },
-  { code: 'ta', label: 'தமிழ்' },
-  { code: 'te', label: 'తెలుగు' },
-  { code: 'gu', label: 'ગુજરાતી' },
-  { code: 'bn', label: 'বাংলা' },
-  { code: 'mr', label: 'मराठी' },
-  { code: 'ur', label: 'اردو' },
-  { code: 'es', label: 'Español' },
-  { code: 'fr', label: 'Français' },
-  { code: 'zh', label: '中文' },
-  { code: 'tl', label: 'Tagalog' },
-] as const;
+// Re-exported for convenience; the canonical list lives in lib/languages.ts.
+export { LANGUAGES } from '@/lib/languages';

@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "family": "Ma famille",
+    "settings": "Paramètres",
+    "begin": "Commencez votre héritage",
+    "signin": "Se connecter",
+    "menu": "Menu"
+  },
+  "home": {
+    "eyebrow": "POUR CHAQUE FAMILLE · POUR CHAQUE GÉNÉRATION",
+    "titleLine1": "Personne dans votre famille",
+    "titleEmphasis": "oublié",
+    "titleLine2": "ne devrait jamais être",
+    "subtitle": "Préservez les voix, les histoires et les visages de ceux que vous aimez — pour que dans un siècle, vos arrière-petits-enfants sachent exactement qui vous étiez.",
+    "ctaPrimary": "Commencez l'histoire de votre famille",
+    "ctaSecondary": "Voir une archive familiale"
+  },
+  "auth": {
+    "title": "Commencez l'héritage de votre famille",
+    "subtitle": "Créez votre archive privée — ou reconnectez-vous. Les histoires de votre famille sont protégées et n'appartiennent qu'à vous.",
+    "email": "E-mail",
+    "emailPlaceholder": "vous@famille.com",
+    "sendLink": "Envoyez-moi un lien de connexion",
+    "google": "Continuer avec Google",
+    "or": "ou",
+    "checkEmail": "Consultez votre e-mail pour commencer.",
+    "preview": "Jetez d'abord un œil",
+    "guarantee": "Votre archive est privée. Seule la famille que vous invitez peut la voir."
+  },
+  "common": {
+    "continue": "Continuer",
+    "back": "Retour",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "next": "Suivant",
+    "skip": "Passer",
+    "add": "Ajouter",
+    "done": "Terminé"
+  },
+  "region": {
+    "title": "D'où vient votre famille ?",
+    "subtitle": "Nous suggérerons les langues qu'on y parle — mais toutes les langues vous restent ouvertes.",
+    "suggested": "Suggéré pour vous",
+    "allLanguages": "Toutes les langues",
+    "languageLabel": "Votre langue"
+  }
+}

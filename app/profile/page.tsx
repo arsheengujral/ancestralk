@@ -4,12 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFlow } from '@/components/FlowProvider';
 import VoicePlayback from '@/components/VoicePlayback';
-import {
-  BIO_VERSIONS,
-  LANGUAGES,
-  type BioVersionId,
-  type BioContent,
-} from '@/lib/bioVersions';
+import { BIO_VERSIONS, type BioVersionId, type BioContent } from '@/lib/bioVersions';
+import { LANGUAGES } from '@/lib/languages';
 
 /**
  * A person's profile with the six biography versions (Feature Set E) and the
@@ -161,7 +157,7 @@ export default function ProfilePage() {
             >
               {LANGUAGES.map((l) => (
                 <option key={l.code} value={l.code}>
-                  {l.label}
+                  {l.native}
                 </option>
               ))}
             </select>

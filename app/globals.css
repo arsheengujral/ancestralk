@@ -357,3 +357,76 @@ input[type=file] { display: none; }
 .ank-route { animation: ank-dash 1.2s linear infinite; }
 @keyframes ank-dash { to { stroke-dashoffset: -14; } }
 .leaflet-container { font-family: var(--font-jost), 'Jost', sans-serif; }
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * MOBILE RESPONSIVENESS (Phase 3 must-have)
+ * Every screen beautiful and usable on a phone — most family members, and
+ * especially elderly relatives, will use phones.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+/* Nav: desktop row vs. mobile hamburger menu. */
+.nav-burger { display: none; background: transparent; border: 1px solid var(--paper3); border-radius: 8px; width: 38px; height: 34px; align-items: center; justify-content: center; color: var(--ink); cursor: pointer; font-size: 18px; }
+.nav-mobile { display: none; }
+.nav-settings-label { display: none; }
+
+svg { max-width: 100%; }
+.tsvg-w svg { height: auto; }
+
+@media (max-width: 760px) {
+  .nav { padding: 12px 16px; }
+  .nav-desktop { display: none; }
+  .nav-burger { display: flex; }
+  .nav-mobile {
+    display: flex; flex-direction: column; gap: 10px; width: 100%;
+    padding: 12px 2px 4px; animation: rv .2s ease;
+  }
+  .nav-mobile-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav-mobile-row .lang-sel { flex: 1; min-width: 120px; }
+  .nav-mobile-links { display: flex; flex-direction: column; gap: 8px; }
+  .nav-mobile-links .nb { width: 100%; text-align: left; padding: 12px 14px; font-size: 14px; }
+  .nav-settings-label { display: inline; }
+}
+
+@media (max-width: 640px) {
+  /* Comfortable touch targets + no iOS zoom-on-focus (inputs ≥ 16px). */
+  .fi2, .fta, .iin, .lang-sel { font-size: 16px; }
+  .fw { padding: 22px 16px 90px; }
+  .dash { padding: 20px 16px 90px; }
+  .ftit, .dname { font-size: 26px !important; }
+  .hero { min-height: 80vh; padding: 48px 18px 40px; }
+  .hero h1 { font-size: clamp(34px, 9vw, 46px); }
+  .hero-sub { font-size: 15px; }
+  .hb { padding: 13px 22px; width: 100%; max-width: 320px; }
+  .hbtns { width: 100%; }
+  .pcard { padding: 22px; }
+
+  /* Bigger, easier tap targets for buttons and rows. */
+  .bp { padding: 15px; font-size: 15px; }
+  .ac { padding: 16px; }
+  .acg { gap: 10px; }
+  .stab { padding: 8px 13px; font-size: 12px; }
+  .atab { padding: 9px; font-size: 12px; }
+
+  /* Tutorial player + similar two-column blocks stack on phones. */
+  .tut-grid { grid-template-columns: 1fr !important; }
+
+  /* Save ceremony / walkthrough modals breathe on small screens. */
+  .smod { padding: 28px 22px; }
+
+  /* Floating guide sits above thumb reach, not under it. */
+  .guide { bottom: 18px; right: 16px; }
+}
+
+/* Elderly voice-only mode: even larger, calmer on phones. */
+@media (max-width: 640px) {
+  .eld { padding: 24px 20px; }
+  .eld-mic { width: 124px; height: 124px; font-size: 46px; }
+  .eld-q { font-size: clamp(24px, 7vw, 34px); }
+}
+
+/* RTL niceties for Arabic + Urdu. */
+[dir='rtl'] .squote { border-left: none; border-right: 2px solid var(--g2); padding-left: 0; padding-right: 15px; }
+[dir='rtl'] .tl { padding-left: 0; padding-right: 24px; }
+[dir='rtl'] .tl::before { left: auto; right: 7px; }
+[dir='rtl'] .tli::before { left: auto; right: -21px; }
+[dir='rtl'] .gb { border-radius: 14px 14px 14px 4px; }

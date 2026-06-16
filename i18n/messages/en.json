@@ -3,7 +3,9 @@
     "home": "Home",
     "family": "My Family",
     "settings": "Settings",
-    "begin": "Begin your legacy"
+    "begin": "Begin your legacy",
+    "signin": "Sign in",
+    "menu": "Menu"
   },
   "home": {
     "eyebrow": "FOR EVERY FAMILY · FOR EVERY GENERATION",
@@ -13,5 +15,34 @@
     "subtitle": "Capture the voices, stories, and faces of everyone you love — so that a century from now, your great-grandchildren will know exactly who you were.",
     "ctaPrimary": "Start your family's story",
     "ctaSecondary": "See a family archive"
+  },
+  "auth": {
+    "title": "Begin your family's legacy",
+    "subtitle": "Create your private archive — or sign back in. Your family's stories are protected and yours alone.",
+    "email": "Email",
+    "emailPlaceholder": "you@family.com",
+    "sendLink": "Email me a sign-in link",
+    "google": "Continue with Google",
+    "or": "or",
+    "checkEmail": "Check your email for a link to begin.",
+    "preview": "Look around first",
+    "guarantee": "Your archive is private. Only the family you invite can ever see it."
+  },
+  "common": {
+    "continue": "Continue",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "next": "Next",
+    "skip": "Skip",
+    "add": "Add",
+    "done": "Done"
+  },
+  "region": {
+    "title": "Where is your family from?",
+    "subtitle": "We'll suggest the languages spoken there — but every language stays open to you.",
+    "suggested": "Suggested for you",
+    "allLanguages": "All languages",
+    "languageLabel": "Your language"
   }
 }

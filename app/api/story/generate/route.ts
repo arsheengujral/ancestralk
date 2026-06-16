@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { env, isAnthropicConfigured } from '@/lib/env';
 import { modelFor, MAX_TOKENS, type GenerationTask } from '@/lib/models';
+import { englishName } from '@/lib/languages';
 
 /**
  * POST /api/story/generate
@@ -61,15 +62,11 @@ function taskFor(version?: string): GenerationTask {
   }
 }
 
-const LANG_NAMES: Record<string, string> = {
-  en: 'English', hi: 'Hindi', hinglish: 'Hinglish (romanised Hindi-English mix)',
-  ar: 'Arabic', pa: 'Punjabi', ta: 'Tamil', te: 'Telugu', gu: 'Gujarati',
-  bn: 'Bengali', mr: 'Marathi', ur: 'Urdu', es: 'Spanish', fr: 'French',
-  zh: 'Chinese', tl: 'Tagalog',
-};
-
 function systemPrompt(version: GenerationTask, language: string): string {
-  const lang = LANG_NAMES[language] ?? 'English';
+  const lang =
+    language === 'hinglish'
+      ? 'Hinglish (romanised Hindi-English mix, the way urban/NRI Indians speak)'
+      : englishName(language);
   const base = `You are a warm literary biographer for Ancestralk, a private family legacy platform. Respond entirely in ${lang}.`;
   const tail = ` Then on their own lines output: TAGS: 4-5 single-word values separated by commas. QUOTE: one portrait-caption sentence. TIMELINE: any dated life events as "year|title" separated by semicolons.`;
 

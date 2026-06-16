@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFlow, type ChapterResult } from '@/components/FlowProvider';
+import { useUser } from '@/lib/useUser';
+import { LANGUAGES, REGIONS } from '@/lib/languages';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import VoicePlayback from '@/components/VoicePlayback';
 import SaveCeremony from '@/components/SaveCeremony';
 
-type Step = 'who' | 'basics' | 'story' | 'gen' | 'chapter';
+type Step = 'region' | 'who' | 'basics' | 'story' | 'gen' | 'chapter';
 
 const WHO_OPTIONS = [
   { v: 'myself', icon: 'ti-user', t: 'Myself', s: 'Record my own story for my family' },
@@ -56,7 +58,8 @@ function PROG({ active }: { active: number }) {
 export default function BeginPage() {
   const router = useRouter();
   const { state, ini, set } = useFlow();
-  const [step, setStep] = useState<Step>('who');
+  const { user, configured } = useUser();
+  const [step, setStep] = useState<Step>('region');
   const [saving, setSaving] = useState(false);
   const [chapterTab, setChapterTab] = useState<'w' | 'r' | 't'>('w');
   const [genMsg, setGenMsg] = useState('Reading their story…');
@@ -118,7 +121,7 @@ export default function BeginPage() {
         body: JSON.stringify({
           name: state.name, year: state.year, town: state.town, known: state.known,
           q1: state.q1, q2: state.q2, q3: state.q3, q4: state.q4, q5: state.q5,
-          who: state.who, language: 'en', version: 'full',
+          who: state.who, language: state.language || 'en', version: 'full',
         }),
       });
       const data = (await res.json()) as ChapterResult;
@@ -137,8 +140,84 @@ export default function BeginPage() {
   const ch = state.chapter;
   const firstName = (state.name || 'this person').split(' ')[0];
 
+  const suggested = REGIONS.find((r) => r.id === state.region)?.suggests ?? ['en'];
+
+  function requestSave() {
+    // Account required to save and protect private family data (must-have #4).
+    if (configured && !user) {
+      router.push('/auth?next=/begin');
+      return;
+    }
+    setSaving(true);
+  }
+
   return (
     <div>
+      {/* ── STEP 0: REGION + LANGUAGE ───────────────────────────────────── */}
+      {step === 'region' && (
+        <div className="fw">
+          <div className="fey">YOUR FAMILY&apos;S LANGUAGE</div>
+          <div className="ftit serif">Where is your family from?</div>
+          <div className="fsub">
+            We&apos;ll suggest the languages spoken there — but every language stays open to you. You
+            can speak and write in whichever feels like home.
+          </div>
+
+          <div className="who-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+            {REGIONS.map((r) => (
+              <div
+                key={r.id}
+                className={`wo${state.region === r.id ? ' sel' : ''}`}
+                onClick={() => {
+                  set('region', r.id);
+                  set('language', r.suggests[0]);
+                }}
+              >
+                <div className="wo-c">
+                  <i className="ti ti-check" style={{ fontSize: 9 }} />
+                </div>
+                <div className="wo-ic" style={{ fontSize: 24 }}>{r.flag}</div>
+                <div className="wo-t">{r.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {state.region && (
+            <div className="field">
+              <label className="fl">Suggested for you</label>
+              <div className="sug-c" style={{ marginBottom: 12 }}>
+                {suggested.map((code) => {
+                  const lang = LANGUAGES.find((l) => l.code === code);
+                  if (!lang) return null;
+                  return (
+                    <button
+                      key={code}
+                      className="schip"
+                      style={state.language === code ? { borderColor: 'var(--g)', color: 'var(--g3)', fontWeight: 500 } : undefined}
+                      onClick={() => set('language', code)}
+                    >
+                      {lang.native}
+                    </button>
+                  );
+                })}
+              </div>
+              <label className="fl">All languages</label>
+              <select className="fi2" value={state.language} onChange={(e) => set('language', e.target.value)}>
+                {LANGUAGES.map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.native} — {l.english}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <button className="bp" disabled={!state.region} onClick={() => setStep('who')}>
+            Continue
+          </button>
+        </div>
+      )}
+
       {/* ── STEP 1: WHO ─────────────────────────────────────────────────── */}
       {step === 'who' && (
         <>
@@ -541,7 +620,7 @@ export default function BeginPage() {
               <button className="bb" onClick={() => setStep('story')}>
                 Edit answers
               </button>
-              <button className="bp" onClick={() => setSaving(true)}>
+              <button className="bp" onClick={requestSave}>
                 Save to archive forever ✦
               </button>
             </div>

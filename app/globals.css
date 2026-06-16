@@ -352,3 +352,8 @@ input[type=file] { display: none; }
   .yr-g { grid-template-columns:1fr }
   .ag { grid-template-columns:repeat(2,1fr) }
 }
+
+/* Family Map (Set H) — animated dashed migration route + Leaflet popup font. */
+.ank-route { animation: ank-dash 1.2s linear infinite; }
+@keyframes ank-dash { to { stroke-dashoffset: -14; } }
+.leaflet-container { font-family: var(--font-jost), 'Jost', sans-serif; }

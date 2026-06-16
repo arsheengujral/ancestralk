@@ -23,6 +23,7 @@ const QUICK_ACTIONS = [
   { href: '/book', icon: 'ti-book-2', t: 'Digital Book Studio', d: 'Flip through your family book' },
   { href: '/designs', icon: 'ti-palette', t: 'Album design', d: 'Choose from 20 styles' },
   { href: '/values', icon: 'ti-heart-handshake', t: 'Values & traditions', d: 'What the family stands for' },
+  { href: '/map', icon: 'ti-map-2', t: 'Family map', d: 'Your geography across the world' },
   { href: '/elderly', icon: 'ti-accessible', t: 'Voice-only mode', d: 'For elderly relatives' },
 ];
 

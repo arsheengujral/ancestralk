@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { tutorialForRoute } from '@/lib/tutorials';
 
 // Contextual tips per route — ported from the prototype's `tips` map.
 const TIPS: Record<string, string[]> = {
@@ -39,11 +40,13 @@ const TIPS: Record<string, string[]> = {
 
 export default function FloatingGuide() {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
   const idx = useRef(0);
 
   const tips = TIPS[pathname] ?? TIPS['/'];
+  const tutorial = tutorialForRoute(pathname);
 
   // Briefly surface the first tip on route change, like the prototype.
   useEffect(() => {
@@ -73,6 +76,16 @@ export default function FloatingGuide() {
   return (
     <div className="guide">
       <div className={`gb${open ? ' show' : ''}`}>{text}</div>
+      {/* Contextual help — opens the relevant tutorial for this screen. */}
+      <button
+        className="gbtn"
+        style={{ background: 'var(--w)', color: 'var(--g)', border: '1.5px solid var(--g2)', width: 38, height: 38, fontSize: 16 }}
+        onClick={() => router.push(tutorial ? `/learn?topic=${tutorial.id}` : '/learn')}
+        aria-label="Help"
+        title="How does this work?"
+      >
+        <i className="ti ti-help" />
+      </button>
       <button className="gbtn" onClick={toggle} aria-label="Guide">
         ✦
       </button>

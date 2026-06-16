@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFlow } from '@/components/FlowProvider';
 import FamilyTree from '@/components/FamilyTree';
+import Walkthrough from '@/components/Walkthrough';
 
 interface Member {
   ini: string;
@@ -26,6 +27,7 @@ const QUICK_ACTIONS = [
   { href: '/values', icon: 'ti-heart-handshake', t: 'Values & traditions', d: 'What the family stands for' },
   { href: '/map', icon: 'ti-map-2', t: 'Family map', d: 'Your geography across the world' },
   { href: '/business', icon: 'ti-building-store', t: 'Business legacy', d: 'The family enterprise' },
+  { href: '/learn', icon: 'ti-help-circle', t: 'How it works', d: 'Short guides for everything' },
   { href: '/elderly', icon: 'ti-accessible', t: 'Voice-only mode', d: 'For elderly relatives' },
 ];
 
@@ -69,6 +71,7 @@ export default function ArchivePage() {
 
   return (
     <div className="dash">
+      <Walkthrough />
       <div className="rem">
         <div className="rem-i">
           <i className="ti ti-bell" />

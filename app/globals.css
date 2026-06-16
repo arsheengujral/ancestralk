@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design tokens ported verbatim from ancestralk_final.html (the visual spec).
+ * Heritage is the default (:root). Four alternate themes apply via [data-theme].
+ * These five themes are the brand's theme system — preserve them everywhere.
+ */
+:root {
+  --g: #B8935A;   /* gold accent           */
+  --g2: #E8D5B0;  /* gold light            */
+  --g3: #8A6B34;  /* gold dark             */
+  --g5: #FAF4EA;  /* gold wash / tint bg   */
+  --ink: #141009;
+  --ink2: #2E2518;
+  --ink3: #6B5E4E;
+  --ink4: #A8998A;
+  --paper: #FDFAF5;
+  --paper2: #F5EFE3;
+  --paper3: #EDE3D3;
+  --w: #FFF;      /* surface (cards)       */
+  --dk: #141009;  /* deep / inverted bars  */
+  --r: 10px;
+  --rl: 18px;
+  --sh: 0 2px 20px rgba(20, 16, 9, 0.06);
+  --sh2: 0 8px 40px rgba(20, 16, 9, 0.12);
+}
+
+[data-theme='emerald'] {
+  --g: #3E7C5B; --g2: #CDE5D6; --g3: #27543C; --g5: #EEF7F1;
+  --paper: #F8FBF9; --paper2: #EDF4EF; --paper3: #DCE9E0;
+  --ink: #101813; --ink2: #243029; --ink3: #5C6B62; --ink4: #9AA89F; --dk: #101813;
+}
+
+[data-theme='royal'] {
+  --g: #4E5FAB; --g2: #D5DAF1; --g3: #36417E; --g5: #F0F2FB;
+  --paper: #F9FAFD; --paper2: #EEF0F8; --paper3: #DEE2F0;
+  --ink: #10121C; --ink2: #252938; --ink3: #5E6377; --ink4: #9CA1B3; --dk: #10121C;
+}
+
+[data-theme='rose'] {
+  --g: #B05E72; --g2: #EFD3DA; --g3: #833F50; --g5: #FAF0F3;
+  --paper: #FDF9FA; --paper2: #F6ECEF; --paper3: #ECDCE1;
+  --ink: #1A1013; --ink2: #322227; --ink3: #71595F; --ink4: #AB969C; --dk: #1A1013;
+}
+
+[data-theme='midnight'] {
+  --paper: #14110C; --paper2: #1E1A13; --paper3: #332C22; --w: #1E1A14;
+  --ink: #F1EDE5; --ink2: #D9D2C6; --ink3: #A89E8E; --ink4: #6F675B;
+  --g: #C9A56A; --g2: #4A3D28; --g3: #E0C089; --g5: #262017; --dk: #0A0805;
+  --sh: 0 2px 20px rgba(0, 0, 0, 0.3);
+  --sh2: 0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-jost), 'Jost', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.serif {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+}
+
+/* Section reveal animation, ported from the prototype. */
+@keyframes rv {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

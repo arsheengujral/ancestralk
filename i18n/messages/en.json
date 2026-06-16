@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "home": "Home",
+    "family": "My Family",
+    "settings": "Settings",
+    "begin": "Begin your legacy"
+  },
+  "home": {
+    "eyebrow": "FOR EVERY FAMILY · FOR EVERY GENERATION",
+    "titleLine1": "No one in your family",
+    "titleEmphasis": "forgotten",
+    "titleLine2": "should ever be",
+    "subtitle": "Capture the voices, stories, and faces of everyone you love — so that a century from now, your great-grandchildren will know exactly who you were.",
+    "ctaPrimary": "Start your family's story",
+    "ctaSecondary": "See a family archive"
+  }
+}

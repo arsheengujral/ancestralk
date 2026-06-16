@@ -4,6 +4,8 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useFlow } from '@/components/FlowProvider';
+import { useDesign } from '@/components/DesignProvider';
+import DesignTree, { SAMPLE_NODES, SAMPLE_EDGES } from '@/components/DesignTree';
 
 interface Media {
   type: 'img' | 'vid';
@@ -20,6 +22,7 @@ interface Media {
 export default function BookPage() {
   const router = useRouter();
   const { state, ini } = useFlow();
+  const { design } = useDesign();
   const [page, setPage] = useState(0);
   const [media, setMedia] = useState<Media[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -51,25 +54,25 @@ export default function BookPage() {
       <div className="serif" style={{ fontSize: 34, lineHeight: 1.2, marginBottom: 10 }}>The {fam} Family</div>
       <div style={{ fontSize: 12, color: 'var(--ink3)', letterSpacing: 1 }}>A LIVING LEGACY · 2026</div>
       <div style={{ fontSize: 22, color: 'var(--g)', marginTop: 18 }}>✦</div>
+      <div style={{ fontSize: 10, color: 'var(--ink4)', letterSpacing: 1, marginTop: 12 }}>
+        {design.name.toUpperCase()} EDITION
+      </div>
     </div>,
-    // Tree
+    // Tree — rendered in the family's chosen design (Set A drives the book).
     <div key="tree" style={{ flex: 1 }}>
       <div style={{ fontSize: 10, letterSpacing: 2, color: 'var(--g)', marginBottom: 12 }}>THE FAMILY TREE</div>
-      <div style={{ textAlign: 'center', padding: '18px 0' }}>
-        <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-          <div style={{ display: 'flex', gap: 14 }}>
-            <div className="mav" style={{ width: 42, height: 42, opacity: 0.4 }}>GF</div>
-            <div className="mav" style={{ width: 42, height: 42, opacity: 0.4 }}>GM</div>
-          </div>
-          <div style={{ width: 1, height: 14, background: 'var(--g2)' }} />
-          <div className="mav" style={{ width: 54, height: 54, background: 'var(--g)', color: 'var(--w)' }}>
-            {state.photo ? <img src={state.photo} alt="" /> : ini}
-          </div>
-          <div className="serif" style={{ fontSize: 15, marginTop: 2 }}>{name}</div>
-        </div>
+      <div style={{ textAlign: 'center' }}>
+        <DesignTree
+          design={design}
+          nodes={SAMPLE_NODES.map((n) => (n.featured ? { ...n, label: name, photo: state.photo || undefined, ini } : n))}
+          edges={SAMPLE_EDGES}
+          width={380}
+          height={210}
+          preview
+        />
       </div>
-      <div style={{ fontSize: 11, color: 'var(--ink4)', textAlign: 'center', fontWeight: 300 }}>
-        The tree grows with every member added
+      <div style={{ fontSize: 11, color: 'var(--ink4)', textAlign: 'center', fontWeight: 300, marginTop: 8 }}>
+        {design.name} · the tree grows with every member added
       </div>
     </div>,
     // Chapter

@@ -4,6 +4,7 @@ import { getLocale, getMessages } from 'next-intl/server';
 import { cormorant, jost } from '@/lib/fonts';
 import { rtlLocales } from '@/i18n/request';
 import { FlowProvider } from '@/components/FlowProvider';
+import { DesignProvider } from '@/components/DesignProvider';
 import Nav from '@/components/Nav';
 import FloatingGuide from '@/components/FloatingGuide';
 import './globals.css';
@@ -45,9 +46,11 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <FlowProvider>
-            <Nav />
-            {children}
-            <FloatingGuide />
+            <DesignProvider>
+              <Nav />
+              {children}
+              <FloatingGuide />
+            </DesignProvider>
           </FlowProvider>
         </NextIntlClientProvider>
       </body>

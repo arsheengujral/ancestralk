@@ -21,6 +21,7 @@ const QUICK_ACTIONS = [
   { href: '/future', icon: 'ti-clock', t: 'Future messages', d: 'Letters across time' },
   { href: '/collaborate', icon: 'ti-users', t: 'Invite family', d: 'Every voice matters' },
   { href: '/book', icon: 'ti-book-2', t: 'Digital Book Studio', d: 'Flip through your family book' },
+  { href: '/designs', icon: 'ti-palette', t: 'Album design', d: 'Choose from 20 styles' },
   { href: '/elderly', icon: 'ti-accessible', t: 'Voice-only mode', d: 'For elderly relatives' },
 ];
 

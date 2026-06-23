@@ -25,19 +25,6 @@
 create extension if not exists pgcrypto;   -- gen_random_uuid()
 create extension if not exists vector;     -- pgvector, for ask-your-archive (Set G)
 
--- ─── Helper: the family_id(s) the current auth user belongs to ────────────────
--- SECURITY DEFINER so it reads profiles without tripping that table's own RLS
--- (prevents recursive policy evaluation). Used by every policy below.
-create or replace function public.auth_family_ids()
-returns setof uuid
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select family_id from public.profiles where user_id = auth.uid();
-$$;
-
 -- ─── updated_at trigger ───────────────────────────────────────────────────────
 create or replace function public.set_updated_at()
 returns trigger language plpgsql as $$
@@ -294,6 +281,21 @@ create trigger stories_updated_at before update on public.stories
 -- Pattern: every table is family-scoped. A user may read/write a row only when
 -- its family_id is one the user belongs to (public.auth_family_ids()).
 -- ════════════════════════════════════════════════════════════════════════════
+
+-- ─── Helper: the family_id(s) the current auth user belongs to ────────────────
+-- Defined here, AFTER profiles exists (Supabase validates function bodies at
+-- creation time). SECURITY DEFINER so it reads profiles without tripping that
+-- table's own RLS (prevents recursive policy evaluation). Used by every policy.
+create or replace function public.auth_family_ids()
+returns setof uuid
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select family_id from public.profiles where user_id = auth.uid();
+$$;
+
 do $$
 declare t text;
 begin

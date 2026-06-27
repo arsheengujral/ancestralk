@@ -1,10 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFlow } from '@/components/FlowProvider';
+import { isDbActive, loadMembers, type SavedMember } from '@/lib/familyStore';
 import FamilyTree from '@/components/FamilyTree';
 import Walkthrough from '@/components/Walkthrough';
+
+function initialsOf(name: string | null | undefined): string {
+  return (name ?? '')
+    .trim()
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase() || '?';
+}
+
+const REL_LABEL: Record<string, string> = {
+  myself: 'Themselves', parent_self: 'Parent', parent_you: 'Parent',
+  both: 'Parent', grandparent: 'Grandparent', someone: 'Family member',
+};
 
 interface Member {
   ini: string;
@@ -36,9 +53,15 @@ export default function ArchivePage() {
   const router = useRouter();
   const { state, ini } = useFlow();
 
-  const name = state.name || 'Margaret Ellis';
+  // Featured person + heading: real saved data when signed in, else the demo.
+  const [featured, setFeatured] = useState<{ name: string; ini: string; photo?: string } | null>(null);
+  const [loadedFromDb, setLoadedFromDb] = useState(false);
+
+  const name = featured?.name || state.name || 'Margaret Ellis';
+  const displayIni = featured?.ini || ini;
+  const displayPhoto = featured?.photo || state.photo || undefined;
   const surname = name.split(' ').slice(-1)[0];
-  const hasChapter = Boolean(state.chapter);
+  const hasChapter = loadedFromDb || Boolean(state.chapter);
 
   const [members, setMembers] = useState<Member[]>([
     {
@@ -58,6 +81,36 @@ export default function ArchivePage() {
     },
   ]);
   const [invite, setInvite] = useState('');
+
+  // Load real saved members from the database when signed in.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      if (!(await isDbActive())) return;
+      const m: SavedMember[] = await loadMembers();
+      if (!active || m.length === 0) return;
+      setMembers(
+        m.map((p) => ({
+          ini: initialsOf(p.full_name),
+          name: p.full_name || 'A family member',
+          meta: p.is_admin ? 'Owner · admin' : REL_LABEL[p.relationship ?? ''] ?? 'Family member',
+          status: 'Complete' as const,
+          photo: p.photo_url || undefined,
+        })),
+      );
+      const f = m[m.length - 1]; // most recently added
+      setFeatured({ name: f.full_name || 'Your family', ini: initialsOf(f.full_name), photo: f.photo_url || undefined });
+      setLoadedFromDb(true);
+      try {
+        sessionStorage.setItem('ank-active-member', f.id);
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   function addMember() {
     const v = invite.trim();
@@ -109,7 +162,7 @@ export default function ArchivePage() {
           </button>
         </div>
         <div className="tsvg-w">
-          <FamilyTree name={name} ini={ini} photo={state.photo || undefined} />
+          <FamilyTree name={name} ini={displayIni} photo={displayPhoto} />
         </div>
       </div>
 

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFlow, type ChapterResult } from '@/components/FlowProvider';
 import { useUser } from '@/lib/useUser';
+import { getFamilyContext, saveMember } from '@/lib/familyStore';
 import { LANGUAGES, REGIONS } from '@/lib/languages';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import VoicePlayback from '@/components/VoicePlayback';
@@ -142,13 +143,25 @@ export default function BeginPage() {
 
   const suggested = REGIONS.find((r) => r.id === state.region)?.suggests ?? ['en'];
 
-  function requestSave() {
+  async function requestSave() {
     // Account required to save and protect private family data (must-have #4).
     if (configured && !user) {
       router.push('/auth?next=/begin');
       return;
     }
-    setSaving(true);
+    setSaving(true); // start the ceremony immediately
+    // Persist to the database in the background while the ceremony plays.
+    if (configured && user) {
+      try {
+        const ctx = await getFamilyContext();
+        if (ctx) {
+          const memberId = await saveMember(state, ctx.familyId);
+          if (memberId) sessionStorage.setItem('ank-last-member', memberId);
+        }
+      } catch (err) {
+        console.error('Saving to the archive failed:', err);
+      }
+    }
   }
 
   return (

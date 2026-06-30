@@ -8,6 +8,7 @@ import {
   type TraditionItem,
   type TraditionType,
 } from '@/lib/traditions';
+import { getFamilyContext, loadTraditions, addTradition, removeTradition } from '@/lib/familyStore';
 
 /**
  * Feature Set F — Family Values & Traditions. The soul of the archive, separate
@@ -32,17 +33,32 @@ export default function ValuesPage() {
   const router = useRouter();
   const [view, setView] = useState<View>('principle');
   const [items, setItems] = useState<TraditionItem[]>(SEED);
+  const [familyId, setFamilyId] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem(KEY);
-      if (raw) setItems(JSON.parse(raw));
-    } catch {
-      /* ignore */
-    }
+    let active = true;
+    (async () => {
+      const ctx = await getFamilyContext();
+      if (ctx && active) {
+        // Database is the source of truth when signed in.
+        setFamilyId(ctx.familyId);
+        const rows = await loadTraditions();
+        if (active) setItems(rows);
+        return;
+      }
+      try {
+        const raw = sessionStorage.getItem(KEY);
+        if (raw && active) setItems(JSON.parse(raw));
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
 
-  function persist(next: TraditionItem[]) {
+  function persistLocal(next: TraditionItem[]) {
     setItems(next);
     try {
       sessionStorage.setItem(KEY, JSON.stringify(next));
@@ -51,8 +67,23 @@ export default function ValuesPage() {
     }
   }
 
-  const add = (item: TraditionItem) => persist([...items, item]);
-  const remove = (id: string) => persist(items.filter((i) => i.id !== id));
+  async function add(item: TraditionItem) {
+    if (familyId) {
+      const id = await addTradition(familyId, item);
+      setItems((cur) => [...cur, { ...item, id: id ?? item.id }]);
+    } else {
+      persistLocal([...items, item]);
+    }
+  }
+
+  function remove(id: string) {
+    if (familyId) {
+      void removeTradition(id);
+      setItems((cur) => cur.filter((i) => i.id !== id));
+    } else {
+      persistLocal(items.filter((i) => i.id !== id));
+    }
+  }
 
   return (
     <div className="dash" style={{ maxWidth: 640 }}>

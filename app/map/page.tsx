@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useDesign } from '@/components/DesignProvider';
@@ -11,6 +11,7 @@ import {
   type MapPlace,
   type PlaceType,
 } from '@/lib/mapPlaces';
+import { getFamilyContext, loadPlaces, addPlace as addPlaceDb } from '@/lib/familyStore';
 
 // Leaflet touches `window`, so the map renders client-side only.
 const FamilyMapView = dynamic(() => import('@/components/FamilyMapView'), {
@@ -33,6 +34,22 @@ export default function MapPage() {
   const router = useRouter();
   const { design } = useDesign();
   const [places, setPlaces] = useState<MapPlace[]>(SEED_PLACES);
+  const [familyId, setFamilyId] = useState<string | null>(null);
+
+  // Load saved places from the database when signed in.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const ctx = await getFamilyContext();
+      if (!ctx || !active) return;
+      setFamilyId(ctx.familyId);
+      const rows = await loadPlaces();
+      if (active) setPlaces(rows.length ? rows : []);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const years = places.map((p) => Number(p.year)).filter((n) => !Number.isNaN(n));
   const minYear = years.length ? Math.min(...years) : 1940;
@@ -61,13 +78,20 @@ export default function MapPage() {
       return;
     }
     setGeoError('');
-    setPlaces((ps) => [
-      ...ps,
-      { id: crypto.randomUUID(), lat: coords[0], lng: coords[1], placeName: placeName.trim(), type, year: year.trim() || String(maxYear), story: story.trim() },
-    ]);
+    const place: MapPlace = {
+      id: crypto.randomUUID(), lat: coords[0], lng: coords[1],
+      placeName: placeName.trim(), type, year: year.trim() || String(maxYear), story: story.trim(),
+    };
+    setPlaces((ps) => [...ps, place]);
     setPlaceName('');
     setYear('');
     setStory('');
+    // Persist to the database when signed in.
+    if (familyId) {
+      addPlaceDb(familyId, place).then((id) => {
+        if (id) setPlaces((ps) => ps.map((p) => (p.id === place.id ? { ...p, id } : p)));
+      });
+    }
   }
 
   return (

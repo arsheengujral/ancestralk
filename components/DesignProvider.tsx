@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { DEFAULT_DESIGN_ID, getDesign, type AlbumDesign } from '@/lib/albumDesigns';
+import { loadDesign, saveDesign } from '@/lib/familyStore';
 
 /**
  * Holds the family's chosen album design (Feature Set A). In degraded/mock mode
@@ -23,12 +24,28 @@ export function DesignProvider({ children }: { children: ReactNode }) {
   const [designId, setDesignIdState] = useState<string>(DEFAULT_DESIGN_ID);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(KEY);
-      if (saved) setDesignIdState(saved);
-    } catch {
-      /* ignore */
-    }
+    // Prefer the family's saved design from the database; fall back to local.
+    let active = true;
+    (async () => {
+      try {
+        const fromDb = await loadDesign();
+        if (active && fromDb) {
+          setDesignIdState(fromDb);
+          return;
+        }
+      } catch {
+        /* not signed in / not configured */
+      }
+      try {
+        const saved = localStorage.getItem(KEY);
+        if (active && saved) setDesignIdState(saved);
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
 
   const value = useMemo<DesignContextValue>(
@@ -42,7 +59,8 @@ export function DesignProvider({ children }: { children: ReactNode }) {
         } catch {
           /* ignore */
         }
-        // TODO(Phase 3): persist to families.album_design via Supabase.
+        // Persist to families.album_design when signed in (no-op otherwise).
+        void saveDesign(id).catch(() => {});
       },
     }),
     [designId],

@@ -1,8 +1,16 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFlow } from '@/components/FlowProvider';
+import {
+  getFamilyContext,
+  addPhoto,
+  loadPhotos,
+  addVideo,
+  loadVideos,
+  type LoadedVideo,
+} from '@/lib/familyStore';
 
 type Tab = 'all' | 'person' | 'decade' | 'video' | 'book';
 
@@ -31,21 +39,58 @@ export default function AlbumPage() {
   const { state } = useFlow();
   const [tab, setTab] = useState<Tab>('all');
   const [cells, setCells] = useState<Cell[]>(SEED_CELLS);
+  const [videos, setVideos] = useState<LoadedVideo[]>([]);
+  const [familyId, setFamilyId] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Load real photos + videos from the database when signed in.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const ctx = await getFamilyContext();
+      if (!ctx || !active) return;
+      setFamilyId(ctx.familyId);
+      const [photos, vids] = await Promise.all([loadPhotos(), loadVideos()]);
+      if (!active) return;
+      if (photos.length) setCells(photos.map((p) => ({ src: p.url, tagged: true, label: p.caption ?? undefined })));
+      setVideos(vids);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   function onFiles(files: FileList | null) {
     if (!files) return;
     Array.from(files).forEach((f) => {
-      if (!f.type.startsWith('image/')) return;
+      const isImage = f.type.startsWith('image/');
+      const isVideo = f.type.startsWith('video/');
+
+      // Signed in → upload to private storage permanently.
+      if (familyId && (isImage || isVideo)) {
+        if (isImage) {
+          const placeholder: Cell = { tagging: true };
+          setCells((cs) => [...cs, placeholder]);
+          addPhoto(familyId, f).then((p) => {
+            if (p) setCells((cs) => cs.map((c) => (c === placeholder ? { src: p.url, tagged: true } : c)));
+            else setCells((cs) => cs.filter((c) => c !== placeholder));
+          });
+        } else {
+          addVideo(familyId, f).then((v) => {
+            if (v) setVideos((vs) => [v, ...vs]);
+          });
+        }
+        return;
+      }
+
+      // Not signed in → in-browser preview only (degraded mode).
+      if (!isImage) return;
       const reader = new FileReader();
       reader.onload = (ev) => {
         const src = ev.target?.result as string;
         setCells((cs) => [...cs, { src, tagging: true }]);
-        // Simulate the auto-tag completing.
         setTimeout(() => {
-          setCells((cs) =>
-            cs.map((c) => (c.src === src ? { ...c, tagging: false, tagged: true } : c)),
-          );
+          setCells((cs) => cs.map((c) => (c.src === src ? { ...c, tagging: false, tagged: true } : c)));
         }, 1800);
       };
       reader.readAsDataURL(f);
@@ -206,6 +251,13 @@ export default function AlbumPage() {
               Upload short family videos — linked to people &amp; events
             </div>
           </div>
+          {videos.length > 0 && (
+            <div className="ag" style={{ gridTemplateColumns: '1fr 1fr', marginTop: 12 }}>
+              {videos.map((v) => (
+                <video key={v.id} src={v.url} controls style={{ width: '100%', borderRadius: 9, background: '#000' }} />
+              ))}
+            </div>
+          )}
         </div>
       )}
 

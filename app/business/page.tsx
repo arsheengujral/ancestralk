@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import VoiceRecorder from '@/components/VoiceRecorder';
+import { getFamilyContext, loadBusiness, saveBusiness } from '@/lib/familyStore';
 
 /**
  * Feature Set I — Family Business Legacy. A dedicated module for business
@@ -48,22 +49,44 @@ const SEED: BusinessData = {
 export default function BusinessPage() {
   const router = useRouter();
   const [data, setData] = useState<BusinessData>(SEED);
+  const [familyId, setFamilyId] = useState<string | null>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem(KEY);
-      if (raw) setData(JSON.parse(raw));
-    } catch {
-      /* ignore */
-    }
+    let active = true;
+    (async () => {
+      const ctx = await getFamilyContext();
+      if (ctx && active) {
+        setFamilyId(ctx.familyId);
+        const rec = await loadBusiness();
+        // Show the saved record; empty until they fill it in (no demo seed).
+        if (active) setData(rec ?? { name: '', founder: '', foundedYear: '', founderStory: '', timeline: [], values: [], decisions: [], lessons: [] });
+        return;
+      }
+      try {
+        const raw = sessionStorage.getItem(KEY);
+        if (raw && active) setData(JSON.parse(raw));
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
 
   function update(next: BusinessData) {
     setData(next);
-    try {
-      sessionStorage.setItem(KEY, JSON.stringify(next));
-    } catch {
-      /* ignore */
+    if (familyId) {
+      // Debounce DB writes while the owner types.
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(() => void saveBusiness(familyId, next), 600);
+    } else {
+      try {
+        sessionStorage.setItem(KEY, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
     }
   }
 

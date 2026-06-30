@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client';
 import type { FlowState, ChapterResult } from '@/components/FlowProvider';
 import type { TraditionItem } from '@/lib/traditions';
 import type { MapPlace, PlaceType } from '@/lib/mapPlaces';
+import type { ImportPreview } from '@/lib/importParsers';
 import { takeAllAudio } from '@/lib/voiceBuffer';
 
 /**
@@ -514,4 +515,43 @@ export async function saveLegacy(cfg: LegacyRow): Promise<void> {
     transfer_date: cfg.transferDate || null,
     inactivity_months: cfg.inactivityMonths,
   }).eq('id', fam.id);
+}
+
+// ── Social / professional import (Set C) — persist a confirmed preview ────────
+export async function commitImport(
+  familyId: string,
+  profileId: string,
+  preview: ImportPreview,
+): Promise<void> {
+  const supabase = sb();
+  if (!supabase) return;
+
+  // Photos + memory notes → photo records (caption-only; no binary in an export
+  // preview). Imported events → the owner's timeline. Provenance kept via source.
+  const photoRows = [
+    ...preview.photos.map((p) => ({
+      family_id: familyId,
+      caption: p.caption || null,
+      decade: p.timestamp ? `${new Date(p.timestamp).getFullYear()}` : null,
+      source: p.source,
+    })),
+    ...preview.memories.map((m) => ({ family_id: familyId, caption: m.text, source: m.source })),
+  ];
+  if (photoRows.length) {
+    const { error } = await supabase.from('photos').insert(photoRows);
+    if (error) console.error('commitImport: photos failed', error);
+  }
+
+  if (preview.events.length) {
+    const { error } = await supabase.from('timeline_events').insert(
+      preview.events.map((e) => ({
+        family_id: familyId,
+        profile_id: profileId,
+        year: e.year,
+        title: e.title,
+        source: e.source,
+      })),
+    );
+    if (error) console.error('commitImport: events failed', error);
+  }
 }

@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ImportPreview, ImportSource } from '@/lib/importParsers';
+import { getFamilyContext, commitImport } from '@/lib/familyStore';
 
 /**
  * Feature Set C — Social & Professional Import. A friendly importer: pick a
@@ -227,7 +228,22 @@ export default function ImportPage() {
                 ))}
               </PreviewBlock>
 
-              <button className="bp" onClick={() => setConfirmed(true)} style={{ marginTop: 6 }}>
+              <button
+                className="bp"
+                onClick={async () => {
+                  setConfirmed(true);
+                  // Persist the imported items to the archive when signed in.
+                  if (preview) {
+                    try {
+                      const ctx = await getFamilyContext();
+                      if (ctx) await commitImport(ctx.familyId, ctx.profileId, preview);
+                    } catch (err) {
+                      console.error('Import save failed:', err);
+                    }
+                  }
+                }}
+                style={{ marginTop: 6 }}
+              >
                 Import {preview.photos.length + preview.events.length + preview.memories.length} items ✦
               </button>
             </>

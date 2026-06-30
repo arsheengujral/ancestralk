@@ -9,6 +9,7 @@ import {
   type InheritanceMode,
   type LegacyConfig,
 } from '@/lib/legacy';
+import { getFamilyContext, loadLegacy, saveLegacy } from '@/lib/familyStore';
 
 /**
  * Feature Set B — the Legacy Plan. The owner chooses how the archive passes
@@ -26,22 +27,52 @@ export default function LegacyPage() {
   const router = useRouter();
   const [cfg, setCfg] = useState<LegacyConfig>(DEFAULT_LEGACY);
   const [heir, setHeir] = useState('');
+  const [dbActive, setDbActive] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem(KEY);
-      if (raw) setCfg({ ...DEFAULT_LEGACY, ...JSON.parse(raw) });
-    } catch {
-      /* ignore */
-    }
+    let active = true;
+    (async () => {
+      const ctx = await getFamilyContext();
+      if (ctx && active) {
+        setDbActive(true);
+        const row = await loadLegacy();
+        if (row && active) {
+          setCfg({
+            mode: row.mode as InheritanceMode,
+            successorNames: row.successorNames,
+            transferDate: row.transferDate,
+            inactivityMonths: row.inactivityMonths,
+          });
+        }
+        return;
+      }
+      try {
+        const raw = sessionStorage.getItem(KEY);
+        if (raw && active) setCfg({ ...DEFAULT_LEGACY, ...JSON.parse(raw) });
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
 
   function save(next: LegacyConfig) {
     setCfg(next);
-    try {
-      sessionStorage.setItem(KEY, JSON.stringify(next));
-    } catch {
-      /* ignore */
+    if (dbActive) {
+      void saveLegacy({
+        mode: next.mode,
+        successorNames: next.successorNames,
+        transferDate: next.transferDate,
+        inactivityMonths: next.inactivityMonths,
+      });
+    } else {
+      try {
+        sessionStorage.setItem(KEY, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
     }
   }
 

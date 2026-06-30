@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import VoiceRecorder from '@/components/VoiceRecorder';
+import { getFamilyContext } from '@/lib/familyStore';
 
 const WHEN_OPTIONS = [
   'Their 18th birthday',
@@ -39,12 +40,20 @@ export default function FuturePage() {
     setSealed(true);
     // Encrypt + persist server-side. The plaintext is sealed before it touches
     // the database; there is no path to read it back before its unlock day.
-    fetch('/api/future-messages/seal', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ recipientDescription: to, unlockCondition: when, messageText: msg }),
-    }).catch(() => {});
-    setTimeout(() => router.push('/archive'), 1400);
+    // Ensure the account is provisioned first (so the message has a family).
+    (async () => {
+      try {
+        await getFamilyContext();
+      } catch {
+        /* not signed in — seal route will no-op safely */
+      }
+      await fetch('/api/future-messages/seal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipientDescription: to, unlockCondition: when, messageText: msg }),
+      }).catch(() => {});
+    })();
+    setTimeout(() => router.push('/archive'), 1600);
   }
 
   return (

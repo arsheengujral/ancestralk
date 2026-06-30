@@ -39,13 +39,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, configured: false, sealed: true });
   }
 
+  // Derive the family + author from the session — never trusted from the client.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ ok: true, configured: false, sealed: true });
+  }
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id, family_id')
+    .eq('user_id', user.id)
+    .limit(1)
+    .maybeSingle();
+  if (!profile) {
+    return NextResponse.json({ ok: true, configured: false, sealed: true });
+  }
+
   const ciphertext = seal(body.messageText);
 
   const { data, error } = await supabase
     .from('future_messages')
     .insert({
-      family_id: body.familyId,
-      from_profile_id: body.fromProfileId ?? null,
+      family_id: profile.family_id,
+      from_profile_id: profile.id,
       recipient_description: body.recipientDescription ?? null,
       recipient_profile_id: body.recipientProfileId ?? null,
       unlock_condition: body.unlockCondition ?? null,

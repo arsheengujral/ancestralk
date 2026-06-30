@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFlow } from '@/components/FlowProvider';
-import { isDbActive, loadMembers, type SavedMember } from '@/lib/familyStore';
+import { isDbActive, loadMembers, loadFutureMessages, type SavedMember, type FutureMessageRow } from '@/lib/familyStore';
 import FamilyTree from '@/components/FamilyTree';
 import Walkthrough from '@/components/Walkthrough';
 
@@ -81,14 +81,18 @@ export default function ArchivePage() {
     },
   ]);
   const [invite, setInvite] = useState('');
+  const [futureMsgs, setFutureMsgs] = useState<FutureMessageRow[] | null>(null);
+  const [rawMembers, setRawMembers] = useState<SavedMember[] | null>(null);
 
-  // Load real saved members from the database when signed in.
+  // Load real saved members + sealed letters from the database when signed in.
   useEffect(() => {
     let active = true;
     (async () => {
       if (!(await isDbActive())) return;
+      loadFutureMessages().then((fm) => active && setFutureMsgs(fm));
       const m: SavedMember[] = await loadMembers();
       if (!active || m.length === 0) return;
+      setRawMembers(m);
       setMembers(
         m.map((p) => ({
           ini: initialsOf(p.full_name),
@@ -162,7 +166,7 @@ export default function ArchivePage() {
           </button>
         </div>
         <div className="tsvg-w">
-          <FamilyTree name={name} ini={displayIni} photo={displayPhoto} />
+          <FamilyTree name={name} ini={displayIni} photo={displayPhoto} members={rawMembers ?? undefined} />
         </div>
       </div>
 
@@ -211,11 +215,17 @@ export default function ArchivePage() {
           <div className="fmt serif">Letters across time</div>
           <div className="fms">Sealed until the moment you choose</div>
         </div>
-        {[
-          ['To: My grandchild', 'Opens on their 18th birthday'],
-          ['To: My daughter', 'Opens on her wedding day'],
-        ].map(([to, when]) => (
-          <div className="fmi" key={to}>
+        {(futureMsgs
+          ? futureMsgs.map((f) => [
+              `To: ${f.recipient_description ?? 'someone'}`,
+              f.unlock_condition || (f.unlock_date ? `Opens ${f.unlock_date}` : 'Sealed'),
+            ])
+          : [
+              ['To: My grandchild', 'Opens on their 18th birthday'],
+              ['To: My daughter', 'Opens on her wedding day'],
+            ]
+        ).map(([to, when], i) => (
+          <div className="fmi" key={`${to}-${i}`}>
             <div className="fseal">
               <i className="ti ti-lock" />
             </div>

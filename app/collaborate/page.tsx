@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFlow } from '@/components/FlowProvider';
+import { getFamilyContext, loadMembers, loadInvites, addInvite } from '@/lib/familyStore';
 
 interface Member {
   ini: string;
@@ -11,6 +12,10 @@ interface Member {
   status: 'Complete' | 'Writing' | 'Pending';
   bg?: string;
   fg?: string;
+}
+
+function initialsOf(name: string | null | undefined): string {
+  return (name ?? '').trim().split(' ').filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase() || '?';
 }
 
 const HOW_IT_WORKS = [
@@ -28,16 +33,49 @@ export default function CollaboratePage() {
     { ini: 'AT', name: 'Aunt Teresa', meta: 'Joined yesterday · writing in Spanish', status: 'Writing', bg: '#D4EDDA', fg: '#1A6B38' },
   ]);
   const [invite, setInvite] = useState('');
+  const [familyId, setFamilyId] = useState<string | null>(null);
+
+  // Load real members + pending invites from the database when signed in.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const ctx = await getFamilyContext();
+      if (!ctx || !active) return;
+      setFamilyId(ctx.familyId);
+      const [mem, inv] = await Promise.all([loadMembers(), loadInvites()]);
+      if (!active) return;
+      const rows: Member[] = [
+        ...mem.map((p) => ({
+          ini: initialsOf(p.full_name),
+          name: p.full_name || 'A family member',
+          meta: p.is_admin ? 'Admin · owner' : 'Contributor',
+          status: 'Complete' as const,
+        })),
+        ...inv.map((iv) => ({
+          ini: initialsOf(iv.contact),
+          name: iv.contact || 'Invited',
+          meta: 'Invite sent · reminder on their birthday',
+          status: 'Pending' as const,
+          bg: 'var(--paper2)',
+          fg: 'var(--ink3)',
+        })),
+      ];
+      if (rows.length) setMembers(rows);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   function addMember() {
     const v = invite.trim();
     if (!v) return;
-    const i = v.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase() || '?';
     setMembers((m) => [
       ...m,
-      { ini: i, name: v, meta: 'Invite sent just now · reminder on their birthday', status: 'Pending', bg: 'var(--paper2)', fg: 'var(--ink3)' },
+      { ini: initialsOf(v), name: v, meta: 'Invite sent just now · reminder on their birthday', status: 'Pending', bg: 'var(--paper2)', fg: 'var(--ink3)' },
     ]);
     setInvite('');
+    if (familyId) void addInvite(familyId, v);
   }
 
   return (

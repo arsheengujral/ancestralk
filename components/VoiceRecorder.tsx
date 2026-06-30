@@ -2,21 +2,24 @@
 
 import { useRef, useState } from 'react';
 import VoicePlayback from './VoicePlayback';
+import { putAudio } from '@/lib/voiceBuffer';
 
 /**
  * Voice input for any question. Tap to record; the transcript streams into the
- * bound field live, then a playback bar appears.
+ * bound field, then a playback bar appears.
  *
- * In Phase 1 / degraded mode this simulates near-live transcription (mirroring
- * the prototype) using `demoText`, so the experience is complete offline. When
- * Whisper is wired (Phase 3), the same component will stream real MediaRecorder
- * audio to /api/voice/transcribe; the props are already shaped for that.
+ * When `captureAudio` is set and the browser allows microphone access, this
+ * captures REAL audio via MediaRecorder and buffers it (lib/voiceBuffer) to be
+ * uploaded to private storage when the member is saved. The transcript itself is
+ * still streamed from `demoText` until a Whisper key is configured (transcription
+ * then replaces it). With no mic / permission, it degrades to text-only.
  */
 export default function VoiceRecorder({
   id,
   label = 'Speak',
   iconOnly = false,
   demoText,
+  captureAudio = false,
   onTranscript,
   onComplete,
 }: {
@@ -24,6 +27,7 @@ export default function VoiceRecorder({
   label?: string;
   iconOnly?: boolean;
   demoText?: string;
+  captureAudio?: boolean;
   onTranscript: (text: string) => void;
   onComplete?: () => void;
 }) {
@@ -31,14 +35,50 @@ export default function VoiceRecorder({
   const [status, setStatus] = useState('');
   const [done, setDone] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const recorder = useRef<MediaRecorder | null>(null);
+  const chunks = useRef<Blob[]>([]);
+
+  function stopMic() {
+    const mr = recorder.current;
+    if (mr && mr.state !== 'inactive') {
+      try {
+        mr.stop();
+      } catch {
+        /* ignore */
+      }
+    }
+    recorder.current = null;
+  }
 
   function finish() {
     if (timer.current) clearInterval(timer.current);
     timer.current = null;
+    stopMic();
     setRecording(false);
     setStatus('Saved ✓');
     setDone(true);
     onComplete?.();
+  }
+
+  async function startMic() {
+    if (!captureAudio || typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mr = new MediaRecorder(stream);
+      chunks.current = [];
+      mr.ondataavailable = (e) => {
+        if (e.data.size) chunks.current.push(e.data);
+      };
+      mr.onstop = () => {
+        const blob = new Blob(chunks.current, { type: mr.mimeType || 'audio/webm' });
+        if (blob.size) putAudio(id, blob);
+        stream.getTracks().forEach((t) => t.stop());
+      };
+      mr.start();
+      recorder.current = mr;
+    } catch {
+      /* mic denied / unsupported — fall back to transcript only */
+    }
   }
 
   function toggle() {
@@ -48,6 +88,7 @@ export default function VoiceRecorder({
     }
     setRecording(true);
     setStatus('Listening…');
+    void startMic();
 
     const words = (demoText || 'A remarkable person who shaped everyone around them').split(' ');
     let i = 0;

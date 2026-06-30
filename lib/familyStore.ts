@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client';
 import type { FlowState, ChapterResult } from '@/components/FlowProvider';
 import type { TraditionItem } from '@/lib/traditions';
 import type { MapPlace, PlaceType } from '@/lib/mapPlaces';
+import { takeAllAudio } from '@/lib/voiceBuffer';
 
 /**
  * Client-side data layer connecting the screens to Supabase. When the user is
@@ -117,6 +118,24 @@ export async function saveMember(state: FlowState, familyId: string): Promise<st
     }));
     const { error: tlErr } = await supabase.from('timeline_events').insert(events);
     if (tlErr) console.error('saveMember: timeline insert failed', tlErr);
+  }
+
+  // Upload any REAL voice recordings captured during onboarding (lib/voiceBuffer).
+  const transcripts: Record<string, string> = {
+    known: state.known, q1: state.q1, q2: state.q2, q3: state.q3, q4: state.q4,
+  };
+  for (const [qid, blob] of takeAllAudio()) {
+    const path = await uploadMedia('voice-recordings', familyId, blob, extFromType(blob.type));
+    if (path) {
+      await supabase.from('voice_recordings').insert({
+        family_id: familyId,
+        profile_id: profile.id,
+        question_id: qid,
+        storage_path: path,
+        transcript: transcripts[qid] ?? null,
+        language: state.language || 'en',
+      });
+    }
   }
 
   return profile.id;

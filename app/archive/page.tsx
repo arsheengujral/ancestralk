@@ -37,6 +37,7 @@ interface Member {
 const QUICK_ACTIONS = [
   { href: '/ask', icon: 'ti-message-circle-search', t: 'Ask your family', d: 'Answers from your archive' },
   { href: '/begin', icon: 'ti-user-plus', t: 'Add family member', d: 'Everyone gets a chapter' },
+  { href: '/tree/build', icon: 'ti-git-fork', t: 'Build family tree', d: 'Add relatives step by step' },
   { href: '/album', icon: 'ti-photos', t: 'Photos & videos', d: 'Scan, upload, organise' },
   { href: '/future', icon: 'ti-clock', t: 'Future messages', d: 'Letters across time' },
   { href: '/collaborate', icon: 'ti-users', t: 'Invite family', d: 'Every voice matters' },

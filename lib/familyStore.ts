@@ -620,3 +620,30 @@ export async function updateContribution(id: string, body: string): Promise<void
   if (!supabase) return;
   await supabase.from('contributions').update({ body }).eq('id', id);
 }
+
+// ── Quick add a relative (step-by-step family-tree builder) ───────────────────
+export async function quickAddMember(
+  familyId: string,
+  opts: { name: string; relationship: string; birthYear?: string; photo?: File | null },
+): Promise<string | null> {
+  const supabase = sb();
+  if (!supabase) return null;
+  let photoPath: string | null = null;
+  if (opts.photo) {
+    photoPath = await uploadMedia('photos', familyId, opts.photo, extFromType(opts.photo.type));
+  }
+  const { data, error } = await supabase
+    .from('profiles')
+    .insert({
+      family_id: familyId,
+      full_name: opts.name,
+      relationship: opts.relationship,
+      birth_year: opts.birthYear || null,
+      photo_url: photoPath,
+      role: 'contributor',
+    })
+    .select('id')
+    .single();
+  if (error) console.error('quickAddMember failed', error);
+  return data?.id ?? null;
+}

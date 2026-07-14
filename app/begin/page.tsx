@@ -363,6 +363,7 @@ export default function BeginPage() {
               </div>
               <VoiceRecorder
                 captureAudio
+                language={state.language}
                 id="known"
                 label="Speak"
                 iconOnly
@@ -447,6 +448,7 @@ export default function BeginPage() {
               <label className="fl">What did they do, and what were they proud of?</label>
               <VoiceRecorder
                 captureAudio
+                language={state.language}
                 id="q1"
                 label="Speak your answer"
                 demoText={DEMO.q1}
@@ -487,6 +489,7 @@ export default function BeginPage() {
                 <label className="fl">{label}</label>
                 <VoiceRecorder
                 captureAudio
+                language={state.language}
                   id={key}
                   label="Speak"
                   demoText={demo}

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useFlow } from '@/components/FlowProvider';
 import VoicePlayback from '@/components/VoicePlayback';
 import { BIO_VERSIONS, type BioVersionId, type BioContent } from '@/lib/bioVersions';
@@ -22,7 +22,17 @@ type VersionStore = Partial<Record<BioVersionId, BioContent>>;
 const KEY = 'ank-bio-versions';
 
 export default function ProfilePage() {
+  return (
+    <Suspense fallback={<div className="fw">…</div>}>
+      <ProfileInner />
+    </Suspense>
+  );
+}
+
+function ProfileInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const idParam = searchParams.get('id');
   const { state, ini } = useFlow();
 
   const [chapterType, setChapterType] = useState<'personal' | 'professional'>('personal');
@@ -57,16 +67,18 @@ export default function ProfilePage() {
     }
   }, []);
 
-  // Load the active saved member + their stored versions from the database.
+  // Load the selected member + their stored versions. Re-runs when the ?id in
+  // the URL changes, so opening a different person shows THAT person (Bug 2).
   useEffect(() => {
     let active = true;
     (async () => {
-      let id = '';
-      try {
-        id = new URLSearchParams(window.location.search).get('id')
-          || sessionStorage.getItem('ank-active-member') || '';
-      } catch {
-        /* ignore */
+      let id = idParam ?? '';
+      if (!id) {
+        try {
+          id = sessionStorage.getItem('ank-active-member') || '';
+        } catch {
+          /* ignore */
+        }
       }
       if (!id) return;
       const ctx = await getFamilyContext();
@@ -76,14 +88,16 @@ export default function ProfilePage() {
       setDbMember(loaded.member);
       setDbCtx({ familyId: ctx.familyId, profileId: id });
       setDbRaw((loaded.story?.raw_answers as Record<string, string>) ?? null);
-      if (loaded.story?.versions && Object.keys(loaded.story.versions).length) {
-        setStore(loaded.story.versions as VersionStore);
-      }
+      setStore(
+        loaded.story?.versions && Object.keys(loaded.story.versions).length
+          ? (loaded.story.versions as VersionStore)
+          : {},
+      );
     })();
     return () => {
       active = false;
     };
-  }, []);
+  }, [idParam]);
 
   function persist(next: VersionStore) {
     setStore(next);

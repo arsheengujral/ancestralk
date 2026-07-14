@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFlow, type ChapterResult } from '@/components/FlowProvider';
 import { useUser } from '@/lib/useUser';
@@ -14,11 +14,14 @@ type Step = 'region' | 'who' | 'basics' | 'story' | 'gen' | 'chapter';
 
 const WHO_OPTIONS = [
   { v: 'myself', icon: 'ti-user', t: 'Myself', s: 'Record my own story for my family' },
-  { v: 'parent_self', icon: 'ti-hearth', t: "A parent — they'll fill it", s: 'Your parent answers themselves' },
-  { v: 'parent_you', icon: 'ti-heart', t: "A parent — I'll fill it", s: 'You answer from what you know' },
-  { v: 'both', icon: 'ti-users', t: 'Both parents', s: 'Separate profiles for Mum and Dad' },
+  { v: 'parent_you', icon: 'ti-heart', t: 'A parent', s: 'Mother or father' },
+  { v: 'sibling', icon: 'ti-users', t: 'A sibling', s: 'Brother or sister' },
   { v: 'grandparent', icon: 'ti-star', t: 'A grandparent', s: 'Before the stories are lost' },
-  { v: 'someone', icon: 'ti-friends', t: 'Someone else', s: 'Any family member' },
+  { v: 'spouse', icon: 'ti-heart-handshake', t: 'Spouse or partner', s: 'Your husband, wife, or partner' },
+  { v: 'child', icon: 'ti-baby-carriage', t: 'A child', s: 'Your son or daughter' },
+  { v: 'aunt_uncle', icon: 'ti-users-group', t: 'Aunt or uncle', s: "A parent's sibling" },
+  { v: 'cousin', icon: 'ti-friends', t: 'A cousin', s: 'Extended family' },
+  { v: 'someone', icon: 'ti-user-plus', t: 'Someone else', s: 'Any family member' },
 ];
 
 const KNOWN_SUGGESTIONS = [
@@ -56,14 +59,43 @@ function PROG({ active }: { active: number }) {
   );
 }
 
+const STEP_KEY = 'ank-begin-step';
+
 export default function BeginPage() {
   const router = useRouter();
-  const { state, ini, set } = useFlow();
-  const { user, configured } = useUser();
-  const [step, setStep] = useState<Step>('region');
+  const { state, ini, set, reset } = useFlow();
+  const { user, configured, loading } = useUser();
+  const [step, setStepRaw] = useState<Step>('region');
   const [saving, setSaving] = useState(false);
   const [chapterTab, setChapterTab] = useState<'w' | 'r' | 't'>('w');
   const [genMsg, setGenMsg] = useState('Reading their story…');
+
+  // Persist the current step so navigating away (e.g. to sign in) and back
+  // resumes exactly where you were — no re-asking, no lost answers (Bug 1).
+  function setStep(s: Step) {
+    setStepRaw(s);
+    try {
+      // 'gen' is transient — never resume into the loading screen.
+      sessionStorage.setItem(STEP_KEY, s === 'gen' ? 'story' : s);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(STEP_KEY) as Step | null;
+      if (saved && saved !== 'gen') setStepRaw(saved);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  // Require an account before starting, so every answer is saved and can be
+  // continued later (Bug 6). Middleware also enforces this server-side.
+  useEffect(() => {
+    if (!loading && configured && !user) router.replace('/auth?next=/begin');
+  }, [loading, configured, user, router]);
 
   const hasVoice = Object.keys(state.recs).length > 0;
 
@@ -259,12 +291,6 @@ export default function BeginPage() {
                 </div>
               ))}
             </div>
-            {state.who === 'both' && (
-              <div className="ibox">
-                <i className="ti ti-info-circle" /> Two separate profiles — one per parent.
-                First one now, second right after.
-              </div>
-            )}
             <div
               className="ibox"
               style={{ background: 'var(--paper2)', borderColor: 'var(--paper3)', color: 'var(--ink3)' }}
@@ -644,7 +670,19 @@ export default function BeginPage() {
         </>
       )}
 
-      <SaveCeremony open={saving} onClose={() => router.push('/archive')} />
+      <SaveCeremony
+        open={saving}
+        onClose={() => {
+          // Clear the flow so the next member starts fresh (no leftover answers).
+          reset();
+          try {
+            sessionStorage.removeItem(STEP_KEY);
+          } catch {
+            /* ignore */
+          }
+          router.push('/archive');
+        }}
+      />
     </div>
   );
 }

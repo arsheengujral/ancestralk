@@ -24,9 +24,15 @@ function levelFor(relationship: string | null): number {
     case 'parent_self':
     case 'parent_you':
     case 'both':
+    case 'aunt_uncle':
       return 1;
     case 'myself':
+    case 'sibling':
+    case 'spouse':
+    case 'cousin':
       return 2;
+    case 'child':
+      return 3;
     default:
       return 2; // "someone else" / unknown sits with the present generation
   }
@@ -58,6 +64,9 @@ export default function FamilyTree({
       } catch {
         /* ignore */
       }
+      // Carry the id in the URL so each node opens exactly that person (Bug 2).
+      router.push(`/profile?id=${id}`);
+      return;
     }
     router.push('/profile');
   };

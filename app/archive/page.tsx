@@ -19,8 +19,9 @@ function initialsOf(name: string | null | undefined): string {
 }
 
 const REL_LABEL: Record<string, string> = {
-  myself: 'Themselves', parent_self: 'Parent', parent_you: 'Parent',
-  both: 'Parent', grandparent: 'Grandparent', someone: 'Family member',
+  myself: 'Themselves', parent_self: 'Parent', parent_you: 'Parent', both: 'Parent',
+  sibling: 'Sibling', grandparent: 'Grandparent', spouse: 'Spouse / partner',
+  child: 'Child', aunt_uncle: 'Aunt / uncle', cousin: 'Cousin', someone: 'Family member',
 };
 
 interface Member {

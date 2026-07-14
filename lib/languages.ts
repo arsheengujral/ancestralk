@@ -69,7 +69,6 @@ export interface Region {
 
 export const REGIONS: Region[] = [
   { id: 'india', label: 'India', flag: '🇮🇳', suggests: ['hi', 'hinglish', 'en', 'pa', 'ta', 'te', 'gu', 'bn', 'mr', 'kn', 'ml', 'ur'] },
-  { id: 'pakistan', label: 'Pakistan', flag: '🇵🇰', suggests: ['ur', 'pa', 'en'] },
   { id: 'bangladesh', label: 'Bangladesh', flag: '🇧🇩', suggests: ['bn', 'en'] },
   { id: 'gulf', label: 'Middle East / Gulf', flag: '🌍', suggests: ['ar', 'ur', 'hi', 'en'] },
   { id: 'uk', label: 'UK / Europe', flag: '🇬🇧', suggests: ['en', 'fr', 'es', 'gu', 'pa'] },

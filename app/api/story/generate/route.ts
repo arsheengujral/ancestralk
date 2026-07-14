@@ -67,7 +67,7 @@ function systemPrompt(version: GenerationTask, language: string): string {
     language === 'hinglish'
       ? 'Hinglish (romanised Hindi-English mix, the way urban/NRI Indians speak)'
       : englishName(language);
-  const base = `You are a warm literary biographer for Ancestralk, a private family legacy platform. Respond entirely in ${lang}.`;
+  const base = `You are a warm literary biographer for Ancestralk, a private family legacy platform. Respond entirely in ${lang}. The source answers may contain typos or be written in another language or a mix of languages — understand them, silently correct ALL spelling and grammar, and write in ${lang}. Preserve the exact meaning of what was shared; never invent facts that are not in the answers.`;
   const tail = ` Then on their own lines output: TAGS: 4-5 single-word values separated by commas. QUOTE: one portrait-caption sentence. TIMELINE: any dated life events as "year|title" separated by semicolons.`;
 
   switch (version) {

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useFlow, type ChapterResult } from '@/components/FlowProvider';
 import { useUser } from '@/lib/useUser';
 import { getFamilyContext, saveMember } from '@/lib/familyStore';
-import { LANGUAGES, REGIONS } from '@/lib/languages';
+import { LANGUAGES, REGIONS, englishName } from '@/lib/languages';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import VoicePlayback from '@/components/VoicePlayback';
 import SaveCeremony from '@/components/SaveCeremony';
@@ -174,6 +174,39 @@ export default function BeginPage() {
   const firstName = (state.name || 'this person').split(' ')[0];
 
   const suggested = REGIONS.find((r) => r.id === state.region)?.suggests ?? ['en'];
+
+  // ── Refine the chapter: fix grammar, translate, or change tone (AI writing) ─
+  const [polishBusy, setPolishBusy] = useState('');
+  const [polishPreview, setPolishPreview] = useState<string | null>(null);
+  async function polishChapter(mode: 'fix' | 'translate' | 'rewrite', tone?: string) {
+    if (!ch) return;
+    setPolishBusy(tone || mode);
+    setPolishPreview(null);
+    try {
+      const res = await fetch('/api/text/polish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: ch.bodyParagraphs.join('\n\n'),
+          mode,
+          tone,
+          targetLanguage: mode === 'translate' ? 'English' : englishName(state.language || 'en'),
+        }),
+      });
+      const data = await res.json();
+      setPolishPreview(data.text || '');
+    } catch {
+      setPolishPreview(null);
+    } finally {
+      setPolishBusy('');
+    }
+  }
+  function approvePolish() {
+    if (polishPreview && ch) {
+      set('chapter', { ...ch, bodyParagraphs: polishPreview.split(/\n\n+/).filter(Boolean) });
+    }
+    setPolishPreview(null);
+  }
 
   async function requestSave() {
     // Account required to save and protect private family data (must-have #4).
@@ -643,6 +676,54 @@ export default function BeginPage() {
                         Add life events in the story step to build the timeline.
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Refine: fix grammar, translate to English, or change the tone. */}
+            <div className="tout" style={{ padding: 14, marginBottom: 14 }}>
+              <div className="slbl" style={{ marginTop: 0 }}>Refine this chapter</div>
+              <div className="sug-c" style={{ marginBottom: 10 }}>
+                <button className="schip" onClick={() => polishChapter('fix')} disabled={!!polishBusy}>
+                  Fix grammar
+                </button>
+                <button className="schip" onClick={() => polishChapter('translate')} disabled={!!polishBusy}>
+                  Translate to English
+                </button>
+              </div>
+              <div className="fl">Change the tone</div>
+              <div className="sug-c">
+                {(['formal', 'emotional', 'storytelling', 'humorous', 'concise'] as const).map((t) => (
+                  <button
+                    key={t}
+                    className="schip"
+                    onClick={() => polishChapter('rewrite', t)}
+                    disabled={!!polishBusy}
+                  >
+                    {t[0].toUpperCase() + t.slice(1)}
+                  </button>
+                ))}
+              </div>
+              {polishBusy && <div className="vstat" style={{ marginTop: 8 }}>Rewriting…</div>}
+              {polishPreview && (
+                <div className="sug show" style={{ display: 'block', marginTop: 10 }}>
+                  <div className="sug-l">
+                    <i className="ti ti-sparkles" style={{ fontSize: 12 }} /> Preview — nothing changes
+                    until you approve
+                  </div>
+                  <div className="sbody" style={{ padding: 0, fontSize: 14 }}>
+                    {polishPreview.split(/\n\n+/).map((p, i) => (
+                      <p key={i}>{p}</p>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                    <button className="ibtn" onClick={approvePolish}>
+                      Use this ✓
+                    </button>
+                    <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={() => setPolishPreview(null)}>
+                      Discard
+                    </button>
                   </div>
                 </div>
               )}

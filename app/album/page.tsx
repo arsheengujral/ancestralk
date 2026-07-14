@@ -11,6 +11,7 @@ import {
   loadVideos,
   type LoadedVideo,
 } from '@/lib/familyStore';
+import { VIDEO_PROMPTS } from '@/lib/videoPrompts';
 
 type Tab = 'all' | 'person' | 'decade' | 'video' | 'book';
 
@@ -243,20 +244,49 @@ export default function AlbumPage() {
             </div>
             <button className="ibtn">Preview video album</button>
           </div>
+          {/* Guided prompts before recording (per feedback). */}
+          <div className="slbl">Not sure what to say? Try one of these</div>
+          <div style={{ display: 'grid', gap: 8, marginBottom: 12 }}>
+            {VIDEO_PROMPTS.map((p) => (
+              <div
+                key={p.text}
+                className="tout"
+                style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 0 }}
+              >
+                <div className="fi-icon" style={{ margin: 0, width: 32, height: 32, flexShrink: 0 }}>
+                  <i className={`ti ${p.icon}`} />
+                </div>
+                <div style={{ fontSize: 13 }}>{p.text}</div>
+              </div>
+            ))}
+          </div>
+
           <div className="pdrop" onClick={() => fileRef.current?.click()}>
             <div style={{ fontSize: 22, color: 'var(--paper3)' }}>
               <i className="ti ti-video" />
             </div>
             <div style={{ fontSize: 12, color: 'var(--ink3)', fontWeight: 300, marginTop: 4 }}>
-              Upload short family videos — linked to people &amp; events
+              Record on your phone and upload here — or upload one you already have
             </div>
           </div>
+          <div className="enote" style={{ marginTop: 8 }}>
+            <i className="ti ti-pencil" style={{ color: 'var(--g)' }} /> Prefer not to be on camera?
+            Answer these in writing on the person&apos;s profile instead.
+          </div>
+
           {videos.length > 0 && (
-            <div className="ag" style={{ gridTemplateColumns: '1fr 1fr', marginTop: 12 }}>
-              {videos.map((v) => (
-                <video key={v.id} src={v.url} controls style={{ width: '100%', borderRadius: 9, background: '#000' }} />
-              ))}
-            </div>
+            <>
+              <div className="slbl">This family&apos;s videos</div>
+              <div className="ag" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                {videos.map((v) => (
+                  <video key={v.id} src={v.url} controls style={{ width: '100%', borderRadius: 9, background: '#000' }} />
+                ))}
+              </div>
+              <div className="ibox" style={{ marginTop: 10 }}>
+                <i className="ti ti-movie" /> Later, all of a person&apos;s videos can be merged into a
+                single biography video.
+              </div>
+            </>
           )}
         </div>
       )}

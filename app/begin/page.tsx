@@ -6,6 +6,7 @@ import { useFlow, type ChapterResult } from '@/components/FlowProvider';
 import { useUser } from '@/lib/useUser';
 import { getFamilyContext, saveMember } from '@/lib/familyStore';
 import { LANGUAGES, REGIONS, englishName } from '@/lib/languages';
+import { QUESTIONS, MILESTONE_TYPES } from '@/lib/questions';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import VoicePlayback from '@/components/VoicePlayback';
 import SaveCeremony from '@/components/SaveCeremony';
@@ -120,6 +121,36 @@ export default function BeginPage() {
     set('q1', state.q1 + (state.q1.trim() ? '\n' : '') + text);
   }
 
+  // ── New questionnaire helpers ─────────────────────────────────────────────
+  function setAnswer(id: string, value: string) {
+    set('answers', { ...state.answers, [id]: value });
+  }
+  function toggleChoice(id: string, option: string, multi: boolean) {
+    const current = (state.answers[id] ?? '').split('|').filter(Boolean);
+    let next: string[];
+    if (multi) {
+      next = current.includes(option) ? current.filter((o) => o !== option) : [...current, option];
+    } else {
+      next = current.includes(option) ? [] : [option];
+    }
+    setAnswer(id, next.join('|'));
+  }
+  const isChosen = (id: string, option: string) =>
+    (state.answers[id] ?? '').split('|').includes(option);
+
+  // ── Timeline milestone form ───────────────────────────────────────────────
+  const [ms, setMs] = useState<{ type: string; year: string; detail: string }>({
+    type: MILESTONE_TYPES[0], year: '', detail: '',
+  });
+  function addMilestone() {
+    if (!ms.year.trim() && !ms.detail.trim()) return;
+    set('milestones', [...state.milestones, ms].sort((a, b) => Number(a.year) - Number(b.year)));
+    setMs({ type: MILESTONE_TYPES[0], year: '', detail: '' });
+  }
+  function removeMilestone(i: number) {
+    set('milestones', state.milestones.filter((_, j) => j !== i));
+  }
+
   // ── Photo upload (mock: data URL) ─────────────────────────────────────────
   const [faceMsg, setFaceMsg] = useState('');
   function onPhoto(e: React.ChangeEvent<HTMLInputElement>) {
@@ -153,7 +184,7 @@ export default function BeginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: state.name, year: state.year, town: state.town, known: state.known,
-          q1: state.q1, q2: state.q2, q3: state.q3, q4: state.q4, q5: state.q5,
+          answers: state.answers, milestones: state.milestones,
           who: state.who, language: state.language || 'en', version: 'full',
         }),
       });
@@ -472,93 +503,127 @@ export default function BeginPage() {
           <PROG active={3} />
           <div className="fw">
             <div className="fey">STEP 3 OF 5</div>
-            <div className="ftit serif">Their story</div>
+            <div className="ftit serif">A few quick questions</div>
             <div className="fsub">
-              Even a few words is enough. Speak if typing feels hard. Add more any time.
+              Tap an answer — or type your own. Each one takes seconds, and together they become their
+              story.
             </div>
 
-            <div className="field">
-              <label className="fl">What did they do, and what were they proud of?</label>
-              <VoiceRecorder
-                captureAudio
-                language={state.language}
-                id="q1"
-                label="Speak your answer"
-                demoText={DEMO.q1}
-                onTranscript={(txt) => set('q1', txt)}
-              />
-              <textarea
-                className="fta"
-                rows={3}
-                placeholder="e.g. She ran a bakery from her kitchen and was known across the village for her bread…"
-                value={state.q1}
-                onChange={(e) => set('q1', e.target.value)}
-              />
-              {q1SugVisible && (
-                <div className="sug show">
-                  <div className="sug-l">
-                    <i className="ti ti-sparkles" style={{ fontSize: 12 }} /> Based on what you
-                    shared — go deeper:
-                  </div>
-                  <div className="sug-c">
-                    {q1Set.map((x) => (
-                      <button className="schip" key={x} onClick={() => appendQ1(x)}>
-                        {x}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            {QUESTIONS.map((q) => (
+              <div className="field" key={q.id}>
+                <label className="fl">
+                  {q.label}
+                  {q.hint && (
+                    <span style={{ textTransform: 'none', letterSpacing: 0, color: 'var(--ink4)' }}>
+                      {' '}· {q.hint}
+                    </span>
+                  )}
+                </label>
 
-            {(
-              [
-                ['q2', 'What values did they live by?', DEMO.q2, 'A belief, a phrase they always said, how they treated people…'],
-                ['q3', 'One memory you never want to forget', DEMO.q3, 'A moment, a smell, a sound, a feeling…'],
-                ['q4', 'What should future generations know about them?', DEMO.q4, 'What they carried quietly. What made them who they were.'],
-              ] as const
-            ).map(([key, label, demo, ph]) => (
-              <div className="field" key={key}>
-                <label className="fl">{label}</label>
-                <VoiceRecorder
-                captureAudio
-                language={state.language}
-                  id={key}
-                  label="Speak"
-                  demoText={demo}
-                  onTranscript={(txt) => set(key, txt)}
-                />
-                <textarea
-                  className="fta"
-                  rows={3}
-                  placeholder={ph}
-                  value={state[key]}
-                  onChange={(e) => set(key, e.target.value)}
-                />
+                {q.type === 'choice' ? (
+                  <>
+                    <div className="sug-c" style={{ marginBottom: 8 }}>
+                      {q.options!.map((opt) => (
+                        <button
+                          key={opt}
+                          className="schip"
+                          onClick={() => toggleChoice(q.id, opt, Boolean(q.multi))}
+                          style={
+                            isChosen(q.id, opt)
+                              ? { borderColor: 'var(--g)', background: 'var(--g5)', color: 'var(--g3)', fontWeight: 500 }
+                              : undefined
+                          }
+                        >
+                          {isChosen(q.id, opt) && <i className="ti ti-check" style={{ fontSize: 10, marginRight: 4 }} />}
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                    <input
+                      className="fi2"
+                      placeholder="…or type your own"
+                      defaultValue={
+                        (state.answers[q.id] ?? '')
+                          .split('|')
+                          .filter((v) => !q.options!.includes(v))
+                          .join(', ')
+                      }
+                      onBlur={(e) => {
+                        const own = e.target.value.trim();
+                        const chosen = (state.answers[q.id] ?? '').split('|').filter((v) => q.options!.includes(v));
+                        setAnswer(q.id, [...chosen, ...(own ? [own] : [])].join('|'));
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    {q.voice && (
+                      <VoiceRecorder
+                        captureAudio
+                        language={state.language}
+                        id={q.id}
+                        label="Speak your answer"
+                        demoText={DEMO.q1}
+                        onTranscript={(txt) => setAnswer(q.id, txt)}
+                      />
+                    )}
+                    <textarea
+                      className="fta"
+                      rows={3}
+                      placeholder={q.placeholder}
+                      value={state.answers[q.id] ?? ''}
+                      onChange={(e) => setAnswer(q.id, e.target.value)}
+                    />
+                  </>
+                )}
               </div>
             ))}
 
-            <div className="field">
-              <label className="fl">
-                Key life events{' '}
-                <span style={{ fontSize: 10, color: 'var(--ink4)', textTransform: 'none' }}>
-                  (for their timeline — optional)
-                </span>
-              </label>
-              <textarea
-                className="fta"
-                rows={2}
-                placeholder="e.g. Moved to London 1965. Married 1968. Opened the shop 1974. First grandchild 1995."
-                value={state.q5}
-                onChange={(e) => set('q5', e.target.value)}
-              />
+            {/* Timeline milestones — specific life events, not just dates. */}
+            <div className="slbl">Life milestones (optional)</div>
+            <div className="fsub" style={{ marginBottom: 12 }}>
+              Add the moments that mattered — birth, school, marriage, career, awards, and more.
             </div>
+            {state.milestones.length > 0 && (
+              <div className="tl" style={{ marginBottom: 12 }}>
+                {state.milestones.map((m, i) => (
+                  <div className="tli" key={i}>
+                    <div className="tly">{m.year || '—'}</div>
+                    <div className="tlt">
+                      {m.type}
+                      {m.detail ? ` · ${m.detail}` : ''}
+                      <button
+                        className="bb"
+                        style={{ padding: '2px 8px', fontSize: 10, marginLeft: 8 }}
+                        onClick={() => removeMilestone(i)}
+                      >
+                        remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 70px', gap: 8 }}>
+              <select className="fi2" value={ms.type} onChange={(e) => setMs({ ...ms, type: e.target.value })}>
+                {MILESTONE_TYPES.map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
+              </select>
+              <input className="fi2" placeholder="Year" value={ms.year} onChange={(e) => setMs({ ...ms, year: e.target.value })} />
+            </div>
+            <input
+              className="fi2"
+              style={{ marginTop: 8 }}
+              placeholder="A detail (optional) — e.g. married in Delhi"
+              value={ms.detail}
+              onChange={(e) => setMs({ ...ms, detail: e.target.value })}
+            />
+            <button className="bb" style={{ marginTop: 8 }} onClick={addMilestone}>
+              + Add milestone
+            </button>
 
-            <div className="ibox">
-              <i className="ti ti-plus" /> Want to go deeper? After saving, the full interview offers
-              20+ more questions across 7 life dimensions.
-            </div>
-            <div className="brow">
+            <div className="brow" style={{ marginTop: 20 }}>
               <button className="bb" onClick={() => setStep('basics')}>
                 Back
               </button>
@@ -650,12 +715,10 @@ export default function BeginPage() {
 
               {chapterTab === 'r' && (
                 <div className="sraw">
-                  {[
-                    state.q1 && `What they did:\n${state.q1}`,
-                    state.q2 && `Values:\n${state.q2}`,
-                    state.q3 && `A memory:\n${state.q3}`,
-                    state.q4 && `For the future:\n${state.q4}`,
-                  ]
+                  {QUESTIONS.map((q) => {
+                    const v = (state.answers[q.id] ?? '').split('|').filter(Boolean).join(', ');
+                    return v ? `${q.label}\n${v}` : '';
+                  })
                     .filter(Boolean)
                     .join('\n\n') || 'Your own words appear here.'}
                 </div>

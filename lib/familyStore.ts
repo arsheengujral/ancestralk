@@ -101,7 +101,7 @@ export async function saveMember(state: FlowState, familyId: string): Promise<st
     family_id: familyId,
     profile_id: profile.id,
     written_version: chapter?.bodyParagraphs.join('\n\n') ?? null,
-    raw_answers: { q1: state.q1, q2: state.q2, q3: state.q3, q4: state.q4, q5: state.q5, known: state.known },
+    raw_answers: { answers: state.answers, milestones: state.milestones, known: state.known },
     tags: chapter?.tags ?? [],
     portrait_quote: chapter?.quote ?? null,
     language: state.language || 'en',
@@ -122,9 +122,7 @@ export async function saveMember(state: FlowState, familyId: string): Promise<st
   }
 
   // Upload any REAL voice recordings captured during onboarding (lib/voiceBuffer).
-  const transcripts: Record<string, string> = {
-    known: state.known, q1: state.q1, q2: state.q2, q3: state.q3, q4: state.q4,
-  };
+  const transcripts: Record<string, string> = { known: state.known, ...state.answers };
   for (const [qid, blob] of takeAllAudio()) {
     const path = await uploadMedia('voice-recordings', familyId, blob, extFromType(blob.type));
     if (path) {

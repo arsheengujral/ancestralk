@@ -125,8 +125,8 @@ function ProfileInner() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: subjName, year: subjYear, town: subjTown, known: subjKnown,
-          q1: dbRaw?.q1 ?? state.q1, q2: dbRaw?.q2 ?? state.q2, q3: dbRaw?.q3 ?? state.q3,
-          q4: dbRaw?.q4 ?? state.q4, q5: dbRaw?.q5 ?? state.q5,
+          answers: (dbRaw as any)?.answers ?? state.answers,
+          milestones: (dbRaw as any)?.milestones ?? state.milestones,
           who: state.who, language, version: v,
         }),
       });

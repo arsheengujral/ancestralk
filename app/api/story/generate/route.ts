@@ -30,10 +30,25 @@ interface Body {
   q3?: string;
   q4?: string;
   q5?: string;
+  // New questionnaire (lib/questions): answers keyed by question id + milestones.
+  answers?: Record<string, string>;
+  milestones?: { type: string; year: string; detail: string }[];
   who?: string;
   language?: string;
   version?: GenerationTask;
 }
+
+// Human-readable labels for the questionnaire ids (keep in sync with lib/questions).
+const QUESTION_LABELS: Record<string, string> = {
+  oneword: 'In one word',
+  knownfor: 'Best known for',
+  work: 'What they did',
+  values: 'Values they lived by',
+  unique: 'What makes them unique',
+  proud: 'What people are most proud of',
+  achievement: 'Biggest achievement',
+  memory: 'A favourite memory',
+};
 
 interface ChapterPayload {
   bodyParagraphs: string[];
@@ -87,15 +102,37 @@ function systemPrompt(version: GenerationTask, language: string): string {
   }
 }
 
+/** Readable "Label: value" lines from the new questionnaire answers. */
+function answerLines(b: Body): string[] {
+  const lines: string[] = [];
+  for (const [id, raw] of Object.entries(b.answers ?? {})) {
+    const val = (raw ?? '').split('|').filter(Boolean).join(', ').trim();
+    if (val) lines.push(`${QUESTION_LABELS[id] ?? id}: "${val}"`);
+  }
+  return lines;
+}
+
+function milestoneLines(b: Body): string[] {
+  return (b.milestones ?? [])
+    .filter((m) => m.year || m.detail)
+    .map((m) => `${m.year || '—'} — ${m.type}${m.detail ? `: ${m.detail}` : ''}`);
+}
+
 function userPrompt(b: Body): string {
   const name = b.name?.trim() || 'this person';
+  const answers = answerLines(b);
+  const milestones = milestoneLines(b);
   return [
     `Subject: ${name}${b.year ? `, born ${b.year}` : ''}${b.town ? `, from ${b.town}` : ''}.`,
     b.known ? `Known for: ${b.known}.` : '',
-    `Work/pride: "${b.q1 || '—'}"`,
-    `Values: "${b.q2 || '—'}"`,
-    `A memory: "${b.q3 || '—'}"`,
-    `For future generations: "${b.q4 || '—'}"`,
+    // Legacy free-text fields (kept for compatibility).
+    b.q1 ? `Work/pride: "${b.q1}"` : '',
+    b.q2 ? `Values: "${b.q2}"` : '',
+    b.q3 ? `A memory: "${b.q3}"` : '',
+    b.q4 ? `For future generations: "${b.q4}"` : '',
+    // New questionnaire answers.
+    ...answers,
+    milestones.length ? `Life milestones:\n${milestones.join('\n')}` : '',
     b.q5 ? `Life events: "${b.q5}"` : '',
   ]
     .filter(Boolean)
@@ -139,39 +176,67 @@ function parse(text: string): ChapterPayload {
 function compose(b: Body): ChapterPayload {
   const name = b.name?.trim() || 'This person';
   const first = name.split(' ')[0];
+  const a = b.answers ?? {};
+  const val = (id: string) => (a[id] ?? '').split('|').filter(Boolean).join(', ').trim();
   const paras: string[] = [];
 
   const origin = [
     b.year ? `born in ${b.year}` : '',
     b.town ? `in ${b.town}` : '',
   ].filter(Boolean).join(' ');
+  const descriptor = val('oneword');
+  const knownFor = val('knownfor') || b.known || '';
   paras.push(
     `${name}${origin ? `, ${origin},` : ''} carried a life worth remembering.` +
-      (b.known ? ` In the family, ${first} was known for ${b.known.replace(/\.$/, '')}.` : ''),
+      (descriptor ? ` Those who knew ${first} would call them ${descriptor.toLowerCase()}.` : '') +
+      (knownFor ? ` In the family, ${first} was known for ${knownFor.replace(/\.$/, '').toLowerCase()}.` : ''),
   );
-  if (b.q1) paras.push(b.q1.trim());
-  const tail = [b.q3, b.q2, b.q4].filter(Boolean).join(' ').trim();
-  if (tail) paras.push(tail);
+  const work = val('work');
+  const values = val('values');
+  const midParts = [
+    work ? `${first} spent their life as ${work.toLowerCase()}.` : '',
+    values ? `Above all, ${first} lived by ${values.toLowerCase()}.` : '',
+    val('unique') ? `What made ${first} unique: ${val('unique').toLowerCase()}.` : '',
+    b.q1, b.q2,
+  ].filter(Boolean).join(' ').trim();
+  if (midParts) paras.push(midParts);
+  const closeParts = [
+    val('proud') ? `The family is most proud that ${val('proud').replace(/\.$/, '')}.` : '',
+    val('achievement') ? `Their greatest achievement: ${val('achievement').replace(/\.$/, '')}.` : '',
+    val('memory') ? `A favourite memory: ${val('memory').replace(/\.$/, '')}.` : '',
+    b.q3, b.q4,
+  ].filter(Boolean).join(' ').trim();
+  if (closeParts) paras.push(closeParts);
   if (paras.length < 2) {
     paras.push(`There is more of ${first}'s story still to be told — every answer added here becomes part of it.`);
   }
 
+  const timeline = buildTimeline(b);
+
+  const tagPool = [descriptor, ...values.split(', ')].map((t) => t.trim().toLowerCase()).filter(Boolean);
+  return {
+    bodyParagraphs: paras,
+    tags: (tagPool.length ? tagPool : ['devoted', 'warm', 'remembered', 'steadfast']).slice(0, 5),
+    quote: knownFor ? `${knownFor.replace(/\.$/, '')}.` : `${first}, kept and carried forward.`,
+    timeline,
+    source: 'composed',
+  };
+}
+
+/** Build a timeline from structured milestones (authoritative) + birth + free text. */
+function buildTimeline(b: Body): { year: string; title: string }[] {
   const timeline: { year: string; title: string }[] = [];
   if (b.year) timeline.push({ year: b.year, title: `Born${b.town ? ` in ${b.town}` : ''}` });
+  for (const m of b.milestones ?? []) {
+    if (m.year || m.detail) timeline.push({ year: m.year || '—', title: m.detail ? `${m.type}: ${m.detail}` : m.type });
+  }
   if (b.q5) {
     for (const ev of b.q5.split('.').map((s) => s.trim()).filter(Boolean)) {
       const ym = ev.match(/\d{4}/);
       timeline.push({ year: ym ? ym[0] : '—', title: ev });
     }
   }
-
-  return {
-    bodyParagraphs: paras,
-    tags: ['devoted', 'warm', 'remembered', 'steadfast'],
-    quote: b.known ? `${b.known.replace(/\.$/, '')}.` : `${first}, kept and carried forward.`,
-    timeline,
-    source: 'composed',
-  };
+  return timeline.sort((x, y) => Number(x.year) - Number(y.year));
 }
 
 export async function POST(req: NextRequest) {
@@ -203,7 +268,11 @@ export async function POST(req: NextRequest) {
       .map((b) => b.text)
       .join('\n')
       .trim();
-    return NextResponse.json(parse(text));
+    const payload = parse(text);
+    // Structured milestones are authoritative for the timeline when provided.
+    const structured = buildTimeline(body);
+    if (structured.length) payload.timeline = structured;
+    return NextResponse.json(payload);
   } catch (err) {
     // Never break the family's flow on an upstream hiccup — fall back gracefully.
     console.error('story/generate failed, composing fallback:', err);

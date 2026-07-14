@@ -36,6 +36,10 @@ export interface FlowState {
   q3: string;
   q4: string;
   q5: string;
+  // New questionnaire (lib/questions): answers keyed by question id, plus
+  // structured timeline milestones.
+  answers: Record<string, string>;
+  milestones: { type: string; year: string; detail: string }[];
   photo: string; // data URL (mock) or signed URL (real)
   recs: Record<string, boolean>;
   chapter: ChapterResult | null;
@@ -45,6 +49,7 @@ const EMPTY: FlowState = {
   region: '', language: 'en',
   who: '', name: '', year: '', town: '', known: '',
   q1: '', q2: '', q3: '', q4: '', q5: '',
+  answers: {}, milestones: [],
   photo: '', recs: {}, chapter: null,
 };
 

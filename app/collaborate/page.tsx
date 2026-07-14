@@ -3,7 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFlow } from '@/components/FlowProvider';
-import { getFamilyContext, loadMembers, loadInvites, addInvite } from '@/lib/familyStore';
+import {
+  getFamilyContext,
+  loadMembers,
+  loadInvites,
+  addInvite,
+  loadContributions,
+  setContributionStatus,
+  updateContribution,
+  type Contribution,
+} from '@/lib/familyStore';
 
 interface Member {
   ini: string;
@@ -34,6 +43,26 @@ export default function CollaboratePage() {
   ]);
   const [invite, setInvite] = useState('');
   const [familyId, setFamilyId] = useState<string | null>(null);
+  const [pending, setPending] = useState<Contribution[]>([]);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
+
+  async function refreshPending() {
+    setPending(await loadContributions({ status: 'pending' }));
+  }
+  async function approve(id: string) {
+    await setContributionStatus(id, 'approved');
+    refreshPending();
+  }
+  async function reject(id: string) {
+    await setContributionStatus(id, 'rejected');
+    refreshPending();
+  }
+  async function saveEdit(id: string) {
+    await updateContribution(id, editText);
+    setEditId(null);
+    refreshPending();
+  }
 
   // Load real members + pending invites from the database when signed in.
   useEffect(() => {
@@ -42,8 +71,13 @@ export default function CollaboratePage() {
       const ctx = await getFamilyContext();
       if (!ctx || !active) return;
       setFamilyId(ctx.familyId);
-      const [mem, inv] = await Promise.all([loadMembers(), loadInvites()]);
+      const [mem, inv, pend] = await Promise.all([
+        loadMembers(),
+        loadInvites(),
+        loadContributions({ status: 'pending' }),
+      ]);
       if (!active) return;
+      setPending(pend);
       const rows: Member[] = [
         ...mem.map((p) => ({
           ini: initialsOf(p.full_name),
@@ -126,6 +160,49 @@ export default function CollaboratePage() {
         <i className="ti ti-shield" /> Every member controls their own chapter. They can mark parts
         private. Nobody else can edit their story — not even the admin.
       </div>
+
+      {/* Owner approval queue: testimonials/memories awaiting review. */}
+      {pending.length > 0 && (
+        <>
+          <div className="slbl">Awaiting your approval</div>
+          <div className="fsub" style={{ marginBottom: 12 }}>
+            Family members wrote these. Approve, edit, or decline before they appear on a profile.
+          </div>
+          {pending.map((c) => (
+            <div className="tout" key={c.id} style={{ padding: 16 }}>
+              <div style={{ fontSize: 11, color: 'var(--g3)', marginBottom: 6 }}>
+                {c.kind} · from {c.author_name || 'a family member'}
+              </div>
+              {editId === c.id ? (
+                <>
+                  <textarea className="fta" rows={3} value={editText} onChange={(e) => setEditText(e.target.value)} />
+                  <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                    <button className="ibtn" onClick={() => saveEdit(c.id)}>Save &amp; keep pending</button>
+                    <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={() => setEditId(null)}>Cancel</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: 13, color: 'var(--ink2)', lineHeight: 1.7, fontWeight: 300 }}>
+                    {c.body}
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+                    <button className="ibtn" onClick={() => approve(c.id)}>
+                      <i className="ti ti-check" /> Approve
+                    </button>
+                    <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={() => { setEditId(c.id); setEditText(c.body ?? ''); }}>
+                      Edit
+                    </button>
+                    <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={() => reject(c.id)}>
+                      Decline
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+        </>
+      )}
 
       <div className="slbl">How it works</div>
       <div className="tout">

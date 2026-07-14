@@ -6,7 +6,15 @@ import { useFlow } from '@/components/FlowProvider';
 import VoicePlayback from '@/components/VoicePlayback';
 import { BIO_VERSIONS, type BioVersionId, type BioContent } from '@/lib/bioVersions';
 import { LANGUAGES } from '@/lib/languages';
-import { getFamilyContext, loadMemberWithStory, saveVersion, type SavedMember } from '@/lib/familyStore';
+import {
+  getFamilyContext,
+  loadMemberWithStory,
+  saveVersion,
+  loadContributions,
+  addContribution,
+  type SavedMember,
+  type Contribution,
+} from '@/lib/familyStore';
 
 function initials(name: string | null | undefined): string {
   return (name ?? '').trim().split(' ').filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase() || '?';
@@ -46,6 +54,10 @@ function ProfileInner() {
   const [dbMember, setDbMember] = useState<SavedMember | null>(null);
   const [dbRaw, setDbRaw] = useState<Record<string, string> | null>(null);
   const [dbCtx, setDbCtx] = useState<{ familyId: string; profileId: string } | null>(null);
+  const [testimonials, setTestimonials] = useState<Contribution[]>([]);
+  const [tAuthor, setTAuthor] = useState('');
+  const [tBody, setTBody] = useState('');
+  const [tSent, setTSent] = useState(false);
 
   // Subject of the page: the saved member when present, else the in-flow person.
   const subjName = dbMember?.full_name || state.name;
@@ -88,6 +100,7 @@ function ProfileInner() {
       setDbMember(loaded.member);
       setDbCtx({ familyId: ctx.familyId, profileId: id });
       setDbRaw((loaded.story?.raw_answers as Record<string, string>) ?? null);
+      loadContributions({ status: 'approved', profileId: id }).then((c) => active && setTestimonials(c));
       setStore(
         loaded.story?.versions && Object.keys(loaded.story.versions).length
           ? (loaded.story.versions as VersionStore)
@@ -336,6 +349,60 @@ function ProfileInner() {
             <i className="ti ti-pencil" style={{ color: 'var(--g)' }} /> Each version is independently
             editable and regenerates on demand. Nothing is changed without your permission.
           </div>
+
+          {/* Testimonials — family write about this person; owner approves first. */}
+          {dbCtx && (
+            <>
+              <div className="slbl">Testimonials</div>
+              {testimonials.length > 0 ? (
+                testimonials.map((c) => (
+                  <div className="tout" key={c.id} style={{ padding: 16 }}>
+                    <div className="serif" style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--ink2)', fontStyle: 'italic' }}>
+                      “{c.body}”
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--g3)', marginTop: 6 }}>— {c.author_name || 'A family member'}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="fsub" style={{ marginBottom: 12 }}>
+                  No testimonials yet. Be the first to share what {firstName} means to you.
+                </div>
+              )}
+
+              <div className="tout" style={{ padding: 18 }}>
+                <div className="slbl" style={{ marginTop: 0 }}>Write a testimonial</div>
+                {tSent ? (
+                  <div className="enote" style={{ color: 'var(--g3)' }}>
+                    <i className="ti ti-check" style={{ color: 'var(--g)' }} /> Sent — it will appear
+                    once the family owner approves it.
+                  </div>
+                ) : (
+                  <>
+                    <input className="fi2" placeholder="Your name" value={tAuthor} onChange={(e) => setTAuthor(e.target.value)} style={{ marginBottom: 8 }} />
+                    <textarea className="fta" rows={3} placeholder={`What ${firstName} means to you…`} value={tBody} onChange={(e) => setTBody(e.target.value)} />
+                    <button
+                      className="bp"
+                      style={{ marginTop: 8 }}
+                      disabled={!tBody.trim()}
+                      onClick={async () => {
+                        if (!tBody.trim()) return;
+                        await addContribution(dbCtx.familyId, {
+                          profileId: dbCtx.profileId,
+                          authorName: tAuthor.trim() || undefined,
+                          kind: 'testimonial',
+                          body: tBody.trim(),
+                        });
+                        setTSent(true);
+                        setTBody('');
+                      }}
+                    >
+                      Submit for approval ✦
+                    </button>
+                  </>
+                )}
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

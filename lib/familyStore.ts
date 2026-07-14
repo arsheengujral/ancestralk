@@ -553,3 +553,70 @@ export async function commitImport(
     if (error) console.error('commitImport: events failed', error);
   }
 }
+
+// ── Contributions & testimonials (collaboration with approval) ────────────────
+export interface Contribution {
+  id: string;
+  profile_id: string | null;
+  author_name: string | null;
+  kind: 'testimonial' | 'memory' | 'story';
+  body: string | null;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+}
+
+/** Add a testimonial/memory about a member (starts as pending for approval). */
+export async function addContribution(
+  familyId: string,
+  input: { profileId?: string | null; authorName?: string; kind?: Contribution['kind']; body: string },
+): Promise<string | null> {
+  const supabase = sb();
+  if (!supabase) return null;
+  const { data: auth } = await supabase.auth.getUser();
+  const { data, error } = await supabase
+    .from('contributions')
+    .insert({
+      family_id: familyId,
+      profile_id: input.profileId ?? null,
+      author_name: input.authorName ?? null,
+      author_user: auth.user?.id ?? null,
+      kind: input.kind ?? 'testimonial',
+      body: input.body,
+      status: 'pending',
+    })
+    .select('id')
+    .single();
+  if (error) console.error('addContribution failed', error);
+  return data?.id ?? null;
+}
+
+/** All contributions for the family, optionally filtered by status or profile. */
+export async function loadContributions(opts?: {
+  status?: Contribution['status'];
+  profileId?: string;
+}): Promise<Contribution[]> {
+  const supabase = sb();
+  if (!supabase) return [];
+  let q = supabase
+    .from('contributions')
+    .select('id, profile_id, author_name, kind, body, status, created_at')
+    .order('created_at', { ascending: false });
+  if (opts?.status) q = q.eq('status', opts.status);
+  if (opts?.profileId) q = q.eq('profile_id', opts.profileId);
+  const { data } = await q;
+  return (data ?? []) as Contribution[];
+}
+
+/** Owner action: approve / reject a contribution. */
+export async function setContributionStatus(id: string, status: Contribution['status']): Promise<void> {
+  const supabase = sb();
+  if (!supabase) return;
+  await supabase.from('contributions').update({ status }).eq('id', id);
+}
+
+/** Owner action: edit a contribution's text before publishing. */
+export async function updateContribution(id: string, body: string): Promise<void> {
+  const supabase = sb();
+  if (!supabase) return;
+  await supabase.from('contributions').update({ body }).eq('id', id);
+}

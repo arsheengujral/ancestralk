@@ -12,6 +12,8 @@ import {
   saveVersion,
   loadContributions,
   addContribution,
+  updateMember,
+  deleteMember,
   type SavedMember,
   type Contribution,
 } from '@/lib/familyStore';
@@ -58,6 +60,30 @@ function ProfileInner() {
   const [tAuthor, setTAuthor] = useState('');
   const [tBody, setTBody] = useState('');
   const [tSent, setTSent] = useState(false);
+  // Edit / delete member (account management).
+  const [editingMember, setEditingMember] = useState(false);
+  const [edit, setEdit] = useState({ full_name: '', birth_year: '', hometown: '' });
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  function openEdit() {
+    setEdit({
+      full_name: dbMember?.full_name ?? '',
+      birth_year: dbMember?.birth_year ?? '',
+      hometown: dbMember?.hometown ?? '',
+    });
+    setEditingMember(true);
+  }
+  async function saveEditMember() {
+    if (!dbCtx) return;
+    await updateMember(dbCtx.profileId, edit);
+    setDbMember((m) => (m ? { ...m, ...edit } : m));
+    setEditingMember(false);
+  }
+  async function removeMember() {
+    if (!dbCtx) return;
+    await deleteMember(dbCtx.profileId);
+    router.push('/archive');
+  }
 
   // Subject of the page: the saved member when present, else the in-flow person.
   const subjName = dbMember?.full_name || state.name;
@@ -212,6 +238,55 @@ function ProfileInner() {
           <VoicePlayback variant="dark" label={`${subjName}'s voice`} bars={20} />
         )}
       </div>
+
+      {/* Manage this member (edit details / delete) — for saved members. */}
+      {dbMember && (
+        <div style={{ marginBottom: 14 }}>
+          {editingMember ? (
+            <div className="tout" style={{ padding: 18 }}>
+              <div className="slbl" style={{ marginTop: 0 }}>Edit details</div>
+              <div className="field">
+                <label className="fl">Full name</label>
+                <input className="fi2" value={edit.full_name} onChange={(e) => setEdit({ ...edit, full_name: e.target.value })} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="field">
+                  <label className="fl">Birth year</label>
+                  <input className="fi2" value={edit.birth_year} onChange={(e) => setEdit({ ...edit, birth_year: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="fl">Hometown</label>
+                  <input className="fi2" value={edit.hometown} onChange={(e) => setEdit({ ...edit, hometown: e.target.value })} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button className="ibtn" onClick={saveEditMember}>Save</button>
+                <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={() => setEditingMember(false)}>Cancel</button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={openEdit}>
+                <i className="ti ti-pencil" /> Edit details
+              </button>
+              {confirmDelete ? (
+                <>
+                  <button className="bb" style={{ padding: '8px 14px', fontSize: 12, borderColor: '#D0483C', color: '#D0483C' }} onClick={removeMember}>
+                    Confirm delete
+                  </button>
+                  <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={() => setConfirmDelete(false)}>
+                    Keep
+                  </button>
+                </>
+              ) : (
+                <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={() => setConfirmDelete(true)}>
+                  <i className="ti ti-trash" /> Delete
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {chapterType === 'professional' ? (
         <div className="tout" style={{ padding: 20 }}>

@@ -647,3 +647,20 @@ export async function quickAddMember(
   if (error) console.error('quickAddMember failed', error);
   return data?.id ?? null;
 }
+
+// ── Edit / delete a family member (accounts: manage saved data) ───────────────
+export async function updateMember(
+  profileId: string,
+  fields: { full_name?: string; birth_year?: string; hometown?: string; known_for?: string },
+): Promise<void> {
+  const supabase = sb();
+  if (!supabase) return;
+  await supabase.from('profiles').update(fields).eq('id', profileId);
+}
+
+export async function deleteMember(profileId: string): Promise<void> {
+  const supabase = sb();
+  if (!supabase) return;
+  // Cascades remove the member's stories, timeline, media rows (FK on delete cascade).
+  await supabase.from('profiles').delete().eq('id', profileId);
+}

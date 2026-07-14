@@ -24,6 +24,8 @@ function AuthContent() {
   const configured = Boolean(supabase);
 
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [mode, setMode] = useState<'signup' | 'signin'>('signup');
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -33,6 +35,37 @@ function AuthContent() {
       ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
       : undefined;
 
+  // Primary path: email + password (no email link needed to get started).
+  async function submitPassword() {
+    if (!supabase || !email.trim() || password.length < 6) {
+      setError('Enter your email and a password of at least 6 characters.');
+      return;
+    }
+    setBusy(true);
+    setError('');
+    if (mode === 'signup') {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { emailRedirectTo: redirectTo },
+      });
+      setBusy(false);
+      if (error) {
+        setError(error.message);
+      } else if (data.session) {
+        window.location.href = next; // signed in immediately (email confirmation off)
+      } else {
+        setSent(true); // confirmation required — email sent
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      setBusy(false);
+      if (error) setError(error.message);
+      else window.location.href = next;
+    }
+  }
+
+  // Secondary: passwordless magic link.
   async function emailLink() {
     if (!supabase || !email.trim()) return;
     setBusy(true);
@@ -99,9 +132,42 @@ function AuthContent() {
               disabled={!configured}
             />
           </div>
-          <button className="bp" onClick={emailLink} disabled={busy || !configured || !email.trim()}>
-            {busy ? '…' : t('sendLink')}
+          <div className="field">
+            <label className="fl">Password</label>
+            <input
+              className="fi2"
+              type="password"
+              placeholder="At least 6 characters"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && submitPassword()}
+              disabled={!configured}
+            />
+          </div>
+          <button className="bp" onClick={submitPassword} disabled={busy || !configured}>
+            {busy ? '…' : mode === 'signup' ? 'Create my account ✦' : 'Sign in'}
           </button>
+
+          <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--ink3)', marginTop: 12 }}>
+            {mode === 'signup' ? 'Already have an account?' : 'New here?'}{' '}
+            <button
+              onClick={() => { setMode(mode === 'signup' ? 'signin' : 'signup'); setError(''); }}
+              style={{ background: 'none', border: 'none', color: 'var(--g3)', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', fontSize: 12 }}
+            >
+              {mode === 'signup' ? 'Sign in' : 'Create an account'}
+            </button>
+          </div>
+
+          {configured && (
+            <div style={{ textAlign: 'center', color: 'var(--ink4)', fontSize: 12, margin: '14px 0 8px' }}>
+              — {t('or')} —
+            </div>
+          )}
+          {configured && (
+            <button className="bb" style={{ width: '100%' }} onClick={emailLink} disabled={busy || !email.trim()}>
+              <i className="ti ti-mail" /> Email me a sign-in link instead
+            </button>
+          )}
 
           {!configured && (
             <div className="ibox" style={{ marginTop: 16 }}>

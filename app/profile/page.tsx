@@ -14,6 +14,8 @@ import {
   addContribution,
   updateMember,
   deleteMember,
+  getMyProfile,
+  setMemberAdmin,
   type SavedMember,
   type Contribution,
 } from '@/lib/familyStore';
@@ -60,10 +62,16 @@ function ProfileInner() {
   const [tAuthor, setTAuthor] = useState('');
   const [tBody, setTBody] = useState('');
   const [tSent, setTSent] = useState(false);
-  // Edit / delete member (account management).
+  // Edit / delete member (account management). Delete is admin-only + guarded.
   const [editingMember, setEditingMember] = useState(false);
   const [edit, setEdit] = useState({ full_name: '', birth_year: '', hometown: '' });
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteTyped, setDeleteTyped] = useState('');
+  const [iAmAdmin, setIAmAdmin] = useState(false);
+
+  useEffect(() => {
+    getMyProfile().then((p) => setIAmAdmin(Boolean(p && (p.is_admin || p.role === 'owner' || p.role === 'keeper'))));
+  }, []);
 
   function openEdit() {
     setEdit({
@@ -79,10 +87,17 @@ function ProfileInner() {
     setDbMember((m) => (m ? { ...m, ...edit } : m));
     setEditingMember(false);
   }
+  const deleteMatches = deleteTyped.trim().toLowerCase() === (dbMember?.full_name ?? '').trim().toLowerCase();
   async function removeMember() {
-    if (!dbCtx) return;
+    if (!dbCtx || !iAmAdmin || !deleteMatches) return;
     await deleteMember(dbCtx.profileId);
     router.push('/archive');
+  }
+  async function toggleAdmin() {
+    if (!dbCtx || !dbMember) return;
+    const next = !dbMember.is_admin;
+    await setMemberAdmin(dbCtx.profileId, next);
+    setDbMember((m) => (m ? { ...m, is_admin: next, role: next ? 'keeper' : 'contributor' } : m));
   }
 
   // Subject of the page: the saved member when present, else the in-flow person.
@@ -239,7 +254,9 @@ function ProfileInner() {
         )}
       </div>
 
-      {/* Manage this member (edit details / delete) — for saved members. */}
+      {/* Manage this member — editing is open to the family; DELETE is admin-only
+          and guarded (type the name to confirm), so no one can remove a person
+          by accident. */}
       {dbMember && (
         <div style={{ marginBottom: 14 }}>
           {editingMember ? (
@@ -265,24 +282,71 @@ function ProfileInner() {
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={openEdit}>
                 <i className="ti ti-pencil" /> Edit details
               </button>
-              {confirmDelete ? (
+
+              {/* Admin-only controls */}
+              {iAmAdmin ? (
                 <>
-                  <button className="bb" style={{ padding: '8px 14px', fontSize: 12, borderColor: '#D0483C', color: '#D0483C' }} onClick={removeMember}>
-                    Confirm delete
+                  <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={toggleAdmin}>
+                    <i className="ti ti-shield-star" />{' '}
+                    {dbMember.is_admin ? 'Remove as admin' : 'Make admin'}
                   </button>
-                  <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={() => setConfirmDelete(false)}>
-                    Keep
-                  </button>
+                  {!confirmDelete ? (
+                    <button
+                      className="bb"
+                      style={{ padding: '8px 14px', fontSize: 12 }}
+                      onClick={() => { setConfirmDelete(true); setDeleteTyped(''); }}
+                    >
+                      <i className="ti ti-trash" /> Delete
+                    </button>
+                  ) : null}
                 </>
               ) : (
-                <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={() => setConfirmDelete(true)}>
-                  <i className="ti ti-trash" /> Delete
-                </button>
+                <span style={{ fontSize: 11, color: 'var(--ink4)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <i className="ti ti-lock" /> Only an admin can delete a member
+                </span>
               )}
+
+              {dbMember.is_admin && (
+                <span className="stag" style={{ background: 'var(--g5)', color: 'var(--g3)' }}>
+                  <i className="ti ti-shield-star" style={{ fontSize: 11, marginRight: 3 }} /> Admin
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Guarded delete: an admin must type the person's full name. */}
+          {confirmDelete && iAmAdmin && !editingMember && (
+            <div className="tout" style={{ padding: 18, marginTop: 10, borderColor: '#E7B7B0' }}>
+              <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 4 }}>
+                Delete {dbMember.full_name}?
+              </div>
+              <div className="fsub" style={{ marginBottom: 10 }}>
+                This permanently removes their chapter, timeline, photos, and voice recordings. This
+                cannot be undone. To confirm, type their full name below.
+              </div>
+              <input
+                className="fi2"
+                placeholder={dbMember.full_name ?? 'Full name'}
+                value={deleteTyped}
+                onChange={(e) => setDeleteTyped(e.target.value)}
+              />
+              <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                <button
+                  className="bp"
+                  style={{ background: '#C0392B', flex: 1 }}
+                  disabled={!deleteMatches}
+                  onClick={removeMember}
+                >
+                  Permanently delete
+                </button>
+                <button className="bb" onClick={() => setConfirmDelete(false)}>
+                  Keep
+                </button>
+              </div>
             </div>
           )}
         </div>

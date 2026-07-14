@@ -664,3 +664,27 @@ export async function deleteMember(profileId: string): Promise<void> {
   // Cascades remove the member's stories, timeline, media rows (FK on delete cascade).
   await supabase.from('profiles').delete().eq('id', profileId);
 }
+
+// ── My own profile (role) + admin management ─────────────────────────────────
+export async function getMyProfile(): Promise<{ id: string; role: string; is_admin: boolean } | null> {
+  const supabase = sb();
+  if (!supabase) return null;
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return null;
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, role, is_admin')
+    .eq('user_id', auth.user.id)
+    .maybeSingle();
+  return data ?? null;
+}
+
+/** Promote/demote a member as an admin (keeper). Supports multiple admins. */
+export async function setMemberAdmin(profileId: string, makeAdmin: boolean): Promise<void> {
+  const supabase = sb();
+  if (!supabase) return;
+  await supabase
+    .from('profiles')
+    .update({ is_admin: makeAdmin, role: makeAdmin ? 'keeper' : 'contributor' })
+    .eq('id', profileId);
+}

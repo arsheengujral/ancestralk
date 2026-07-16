@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createAdminSupabase } from '@/lib/supabase/admin';
 import { unseal } from '@/lib/crypto';
+import { isCronAuthorized } from '@/lib/apiAuth';
 
 /**
  * GET/POST /api/future-messages/deliver — delivery cron (Phase 4).
@@ -12,14 +13,20 @@ import { unseal } from '@/lib/crypto';
  */
 export const runtime = 'nodejs';
 
-export async function POST() {
-  return run();
+export async function POST(req: NextRequest) {
+  return run(req);
 }
-export async function GET() {
-  return run();
+export async function GET(req: NextRequest) {
+  return run(req);
 }
 
-async function run() {
+async function run(req: NextRequest) {
+  // Cron-only: this is the sole path that decrypts sealed letters — fail closed
+  // unless the request carries CRON_SECRET (AUDIT H1).
+  if (!isCronAuthorized(req)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const admin = createAdminSupabase();
   if (!admin) {
     return NextResponse.json({ ok: true, configured: false, delivered: 0 });

@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createAdminSupabase } from '@/lib/supabase/admin';
+import { isCronAuthorized } from '@/lib/apiAuth';
 
 /**
  * GET/POST /api/legacy/check-inactivity — daily cron (Feature Set B, Mode 1).
@@ -15,14 +16,18 @@ import { createAdminSupabase } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 
-export async function POST() {
-  return run();
+export async function POST(req: NextRequest) {
+  return run(req);
 }
-export async function GET() {
-  return run();
+export async function GET(req: NextRequest) {
+  return run(req);
 }
 
-async function run() {
+async function run(req: NextRequest) {
+  // Cron-only: fail closed unless the request carries CRON_SECRET (AUDIT H1).
+  if (!isCronAuthorized(req)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const admin = createAdminSupabase();
   if (!admin) {
     return NextResponse.json({ ok: true, configured: false, checked: 0, note: 'Supabase not configured — no-op.' });

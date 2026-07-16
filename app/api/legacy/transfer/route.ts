@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminSupabase } from '@/lib/supabase/admin';
+import { isCronAuthorized, requireCaller } from '@/lib/apiAuth';
 
 /**
  * POST /api/legacy/transfer — promote a successor to keep the archive
@@ -30,6 +31,15 @@ export async function POST(req: NextRequest) {
   const { familyId, successorProfileId } = body;
   if (!familyId || !successorProfileId) {
     return NextResponse.json({ error: 'familyId and successorProfileId are required' }, { status: 400 });
+  }
+
+  // Authorize: either the automated cron (shared secret) or a signed-in
+  // owner/keeper of THIS family. Everyone else is rejected (see AUDIT C2).
+  if (!isCronAuthorized(req)) {
+    const caller = await requireCaller('keeper', familyId);
+    if (!caller) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
   }
 
   const admin = createAdminSupabase();

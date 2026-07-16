@@ -19,6 +19,36 @@ export interface CorpusItem {
   href: string;
 }
 
+// Narrow shapes for what this module actually reads from sessionStorage — the
+// writers own the full types (FlowProvider, values page, business page).
+interface StoredFlow {
+  name?: string;
+  year?: string;
+  town?: string;
+  known?: string;
+  q1?: string; q2?: string; q3?: string; q4?: string; q5?: string;
+  chapter?: { bodyParagraphs?: string[] } | null;
+}
+interface StoredTradition {
+  id: string;
+  type?: string;
+  title?: string;
+  body?: string;
+  author?: string;
+  tags?: string[];
+  ingredients?: string;
+  method?: string;
+}
+interface StoredBusiness {
+  name?: string;
+  foundedYear?: string;
+  founder?: string;
+  founderStory?: string;
+  values?: string[];
+  lessons?: string[];
+  decisions?: { title?: string; thinking?: string }[];
+}
+
 function read<T>(key: string): T | null {
   try {
     const raw = sessionStorage.getItem(key);
@@ -32,7 +62,7 @@ export function buildCorpus(): CorpusItem[] {
   const items: CorpusItem[] = [];
 
   // ── Person / chapter (from the onboarding flow) ───────────────────────────
-  const flow = read<any>('ank-flow');
+  const flow = read<StoredFlow>('ank-flow');
   if (flow?.name) {
     const parts = [
       flow.known && `Known for: ${flow.known}`,
@@ -49,25 +79,25 @@ export function buildCorpus(): CorpusItem[] {
   }
 
   // ── Traditions / values ───────────────────────────────────────────────────
-  const traditions = read<any[]>('ank-traditions') ?? [];
+  const traditions = read<StoredTradition[]>('ank-traditions') ?? [];
   for (const t of traditions) {
     items.push({
       id: `tradition-${t.id}`,
       type: 'tradition',
-      title: t.title,
+      title: t.title ?? 'Tradition',
       text: `${t.type}: ${t.title}. ${t.body ?? ''} ${t.ingredients ?? ''} ${t.method ?? ''} — ${t.author ?? ''} ${(t.tags ?? []).join(' ')}`,
       href: '/values',
     });
   }
 
   // ── Business ──────────────────────────────────────────────────────────────
-  const biz = read<any>('ank-business');
+  const biz = read<StoredBusiness>('ank-business');
   if (biz?.name) {
     items.push({
       id: 'business-founder',
       type: 'business',
       title: biz.name,
-      text: `${biz.name}, founded ${biz.foundedYear} by ${biz.founder}. ${biz.founderStory ?? ''} Values: ${(biz.values ?? []).join(', ')}. Lessons: ${(biz.lessons ?? []).join(' ')}. Decisions: ${(biz.decisions ?? []).map((d: any) => `${d.title} — ${d.thinking}`).join(' ')}`,
+      text: `${biz.name}, founded ${biz.foundedYear} by ${biz.founder}. ${biz.founderStory ?? ''} Values: ${(biz.values ?? []).join(', ')}. Lessons: ${(biz.lessons ?? []).join(' ')}. Decisions: ${(biz.decisions ?? []).map((d) => `${d.title} — ${d.thinking}`).join(' ')}`,
       href: '/business',
     });
   }

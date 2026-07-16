@@ -60,8 +60,8 @@ const isoOf = (v: unknown): string | undefined => {
   return Number.isNaN(t) ? undefined : new Date(t).toISOString();
 };
 
-function findJson(files: Files, ...needles: string[]): any[] {
-  const out: any[] = [];
+function findJson(files: Files, ...needles: string[]): unknown[] {
+  const out: unknown[] = [];
   for (const [name, bytes] of Object.entries(files)) {
     const lower = name.toLowerCase();
     if (lower.endsWith('.json') && needles.some((n) => lower.includes(n))) {
@@ -73,6 +73,27 @@ function findJson(files: Files, ...needles: string[]): any[] {
     }
   }
   return out;
+}
+
+// ── Declared shapes for the third-party exports we probe ─────────────────────
+// Every field is optional: this data is untrusted and varies between export
+// versions, so runtime optional-chaining stays the real guard.
+interface IgMedia { title?: string; caption?: string; creation_timestamp?: number }
+interface IgItem extends IgMedia { media?: IgMedia | IgMedia[] }
+interface FbPostData { post?: string }
+interface FbItem {
+  timestamp?: number;
+  title?: string;
+  data?: FbPostData[];
+  attachments?: { data?: { media?: { title?: string } }[] }[];
+}
+interface FbLifeEvent { timestamp?: number; start_timestamp?: number; title?: string; name?: string }
+interface FbDoc {
+  status_updates?: unknown[];
+  photos?: unknown[];
+  profile_v2?: { name?: unknown };
+  life_events?: FbLifeEvent[];
+  profile_information?: { life_events?: FbLifeEvent[] };
 }
 
 // Minimal CSV parser (handles quoted fields + escaped quotes).
@@ -109,8 +130,10 @@ function csvByName(files: Files, needle: string): string[][] | null {
 function parseInstagram(files: Files): ImportPreview {
   const photos: ImportedPhoto[] = [];
   for (const doc of findJson(files, 'media', 'posts', 'content')) {
-    const arrays = Array.isArray(doc) ? doc : Object.values(doc).filter(Array.isArray).flat();
-    for (const item of arrays as any[]) {
+    const arrays = Array.isArray(doc)
+      ? doc
+      : Object.values((doc ?? {}) as Record<string, unknown>).filter(Array.isArray).flat();
+    for (const item of arrays as IgItem[]) {
       const media = item?.media ?? item;
       const entries = Array.isArray(media) ? media : [media];
       for (const m of entries) {
@@ -130,10 +153,11 @@ function parseFacebook(files: Files): ImportPreview {
   const events: ImportedEvent[] = [];
   const memories: ImportedMemory[] = [];
   for (const doc of findJson(files, 'posts', 'your_posts', 'photos_and_videos')) {
-    const arr = Array.isArray(doc) ? doc : (doc?.status_updates ?? doc?.photos ?? []);
-    for (const item of arr as any[]) {
+    const fbDoc = (doc ?? {}) as FbDoc;
+    const arr = Array.isArray(doc) ? doc : (fbDoc.status_updates ?? fbDoc.photos ?? []);
+    for (const item of arr as FbItem[]) {
       const ts = item?.timestamp;
-      const post = item?.data?.find?.((d: any) => d?.post)?.post ?? item?.title;
+      const post = item?.data?.find?.((d) => d?.post)?.post ?? item?.title;
       if (post) memories.push({ text: String(post), source: 'facebook' });
       const attach = item?.attachments?.[0]?.data?.[0]?.media;
       if (attach) photos.push({ caption: String(attach.title ?? post ?? ''), timestamp: isoOf(ts), source: 'facebook' });
@@ -141,8 +165,9 @@ function parseFacebook(files: Files): ImportPreview {
   }
   // Life events → timeline.
   for (const doc of findJson(files, 'profile_information', 'profile_update')) {
-    const lifeEvents = doc?.profile_v2?.name ? [] : (doc?.life_events ?? doc?.profile_information?.life_events ?? []);
-    for (const e of lifeEvents as any[]) {
+    const fbDoc = (doc ?? {}) as FbDoc;
+    const lifeEvents = fbDoc.profile_v2?.name ? [] : (fbDoc.life_events ?? fbDoc.profile_information?.life_events ?? []);
+    for (const e of lifeEvents) {
       events.push({ year: yearOf(e?.timestamp ?? e?.start_timestamp), title: String(e?.title ?? e?.name ?? 'Life event'), source: 'facebook' });
     }
   }

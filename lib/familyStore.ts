@@ -31,9 +31,16 @@ export interface SavedMember {
   is_admin: boolean;
 }
 
+/** Shape of stories.raw_answers as written by saveMember. */
+export interface StoredRawAnswers {
+  answers?: Record<string, string>;
+  milestones?: { type: string; year: string; detail: string }[];
+  known?: string;
+}
+
 export interface SavedStory {
   written_version: string | null;
-  raw_answers: Record<string, string> | null;
+  raw_answers: StoredRawAnswers | null;
   tags: string[] | null;
   portrait_quote: string | null;
   language: string | null;

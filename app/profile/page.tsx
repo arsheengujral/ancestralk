@@ -18,6 +18,7 @@ import {
   setMemberAdmin,
   type SavedMember,
   type Contribution,
+  type StoredRawAnswers,
 } from '@/lib/familyStore';
 
 function initials(name: string | null | undefined): string {
@@ -56,7 +57,7 @@ function ProfileInner() {
 
   // When signed in, the profile is loaded from the database for a saved member.
   const [dbMember, setDbMember] = useState<SavedMember | null>(null);
-  const [dbRaw, setDbRaw] = useState<Record<string, string> | null>(null);
+  const [dbRaw, setDbRaw] = useState<StoredRawAnswers | null>(null);
   const [dbCtx, setDbCtx] = useState<{ familyId: string; profileId: string } | null>(null);
   const [testimonials, setTestimonials] = useState<Contribution[]>([]);
   const [tAuthor, setTAuthor] = useState('');
@@ -142,7 +143,7 @@ function ProfileInner() {
       if (!active || !loaded) return;
       setDbMember(loaded.member);
       setDbCtx({ familyId: ctx.familyId, profileId: id });
-      setDbRaw((loaded.story?.raw_answers as Record<string, string>) ?? null);
+      setDbRaw(loaded.story?.raw_answers ?? null);
       loadContributions({ status: 'approved', profileId: id }).then((c) => active && setTestimonials(c));
       setStore(
         loaded.story?.versions && Object.keys(loaded.story.versions).length
@@ -181,8 +182,8 @@ function ProfileInner() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: subjName, year: subjYear, town: subjTown, known: subjKnown,
-          answers: (dbRaw as any)?.answers ?? state.answers,
-          milestones: (dbRaw as any)?.milestones ?? state.milestones,
+          answers: dbRaw?.answers ?? state.answers,
+          milestones: dbRaw?.milestones ?? state.milestones,
           who: state.who, language, version: v,
         }),
       });

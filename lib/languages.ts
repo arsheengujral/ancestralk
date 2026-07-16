@@ -38,18 +38,10 @@ export const LANGUAGES: Language[] = [
 
 export const LANGUAGE_CODES = LANGUAGES.map((l) => l.code);
 
-/** Locales that the UI is fully translated for (rest fall back to English). */
-export const UI_LOCALES = ['en', 'hi', 'ar', 'hinglish', 'ur', 'bn', 'ta', 'es', 'fr', 'zh'] as const;
-
 export const RTL_CODES = LANGUAGES.filter((l) => l.rtl).map((l) => l.code); // ['ur','ar']
 
 export function isRtl(code: string): boolean {
   return RTL_CODES.includes(code);
-}
-
-export function languageLabel(code: string): string {
-  const l = LANGUAGES.find((x) => x.code === code);
-  return l ? l.native : code;
 }
 
 export function englishName(code: string): string {

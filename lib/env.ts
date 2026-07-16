@@ -12,7 +12,6 @@ export const env = {
   // Public — safe to expose to the browser.
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
   supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-  mapboxToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? '',
   appUrl: process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
 
   // Server-only secrets.
@@ -20,7 +19,6 @@ export const env = {
   anthropicKey: process.env.ANTHROPIC_API_KEY ?? '',
   openaiKey: process.env.OPENAI_API_KEY ?? '',
   stripeKey: process.env.STRIPE_SECRET_KEY ?? '',
-  resendKey: process.env.RESEND_API_KEY ?? '',
 };
 
 export const isSupabaseConfigured = (): boolean =>
@@ -28,4 +26,3 @@ export const isSupabaseConfigured = (): boolean =>
 
 export const isAnthropicConfigured = (): boolean => Boolean(env.anthropicKey);
 export const isWhisperConfigured = (): boolean => Boolean(env.openaiKey);
-export const isMapboxConfigured = (): boolean => Boolean(env.mapboxToken);

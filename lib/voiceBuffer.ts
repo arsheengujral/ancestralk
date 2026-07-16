@@ -17,7 +17,3 @@ export function takeAllAudio(): [string, Blob][] {
   buffer.clear();
   return entries;
 }
-
-export function clearAudio(): void {
-  buffer.clear();
-}

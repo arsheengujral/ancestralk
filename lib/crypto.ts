@@ -1,6 +1,5 @@
 import 'server-only';
 import crypto from 'crypto';
-import { env } from '@/lib/env';
 
 /**
  * Sealing for future messages (Phase 4 security).
@@ -14,10 +13,6 @@ import { env } from '@/lib/env';
  * The key comes from FUTURE_MESSAGE_KEY (32 bytes, base64). When it isn't set,
  * sealing is reported as unavailable rather than silently storing plaintext.
  */
-
-export function sealingConfigured(): boolean {
-  return Boolean(env.resendKey || process.env.FUTURE_MESSAGE_KEY);
-}
 
 function key(): Buffer {
   const raw = process.env.FUTURE_MESSAGE_KEY;

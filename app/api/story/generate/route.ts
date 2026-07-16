@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { env, isAnthropicConfigured } from '@/lib/env';
 import { modelFor, MAX_TOKENS, type GenerationTask } from '@/lib/models';
 import { englishName } from '@/lib/languages';
+import { allowedToSpend } from '@/lib/apiAuth';
 
 /**
  * POST /api/story/generate
@@ -242,12 +243,20 @@ function buildTimeline(b: Body): { year: string; title: string }[] {
   return timeline.sort((x, y) => Number(x.year) - Number(y.year));
 }
 
+const MAX_INPUT_CHARS = 20_000; // bound the prompt to control LLM cost (AUDIT H4)
+
 export async function POST(req: NextRequest) {
+  if (!(await allowedToSpend())) {
+    return NextResponse.json({ error: 'Sign in to generate a chapter.' }, { status: 401 });
+  }
   let body: Body;
   try {
     body = (await req.json()) as Body;
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+  if (JSON.stringify(body).length > MAX_INPUT_CHARS) {
+    return NextResponse.json({ error: 'Input too large.' }, { status: 413 });
   }
 
   const task = taskFor(body.version);

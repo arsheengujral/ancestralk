@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import { createServerSupabase } from '@/lib/supabase/server';
 import { getCaller, hasRole, type Caller } from '@/lib/authz';
 import type { Role } from '@/lib/legacy';
+import { isSupabaseConfigured } from '@/lib/env';
 
 /**
  * Shared authorization guards for route handlers (see docs/AUDIT.md — C2/H1/H4).
@@ -44,4 +45,14 @@ export async function requireCaller(
   if (!caller || !hasRole(caller, min)) return null;
   if (familyId && caller.familyId !== familyId) return null;
   return caller;
+}
+
+/**
+ * Guard for money-spending routes (LLM / transcription — AUDIT H4). In degraded
+ * demo mode (Supabase unconfigured) there is no real spend and no sessions, so
+ * allow it; otherwise require any signed-in user. Prevents anonymous cost abuse.
+ */
+export async function allowedToSpend(): Promise<boolean> {
+  if (!isSupabaseConfigured()) return true;
+  return Boolean(await currentCaller());
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { env, isAnthropicConfigured } from '@/lib/env';
 import { modelFor, MAX_TOKENS } from '@/lib/models';
+import { allowedToSpend } from '@/lib/apiAuth';
 
 /**
  * POST /api/text/polish — the writing helper behind the "review & approve" flow.
@@ -56,6 +57,9 @@ function systemFor(mode: Mode, tone: Tone, target: string): string {
 }
 
 export async function POST(req: NextRequest) {
+  if (!(await allowedToSpend())) {
+    return NextResponse.json({ error: 'Sign in to use the writing helper.' }, { status: 401 });
+  }
   const body = (await req.json().catch(() => ({}))) as Body;
   const text = (body.text ?? '').trim();
   const mode: Mode = body.mode ?? 'fix';
@@ -63,6 +67,7 @@ export async function POST(req: NextRequest) {
   const target = body.targetLanguage || 'English';
 
   if (!text) return NextResponse.json({ error: 'Nothing to work with' }, { status: 400 });
+  if (text.length > 20_000) return NextResponse.json({ error: 'Text too long.' }, { status: 413 });
 
   // No model configured — hand back the original so the flow still works.
   if (!isAnthropicConfigured()) {

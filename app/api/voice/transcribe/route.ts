@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { env, isWhisperConfigured } from '@/lib/env';
+import { allowedToSpend } from '@/lib/apiAuth';
+
+const MAX_AUDIO_BYTES = 25 * 1024 * 1024; // Whisper's 25 MB limit (AUDIT H4)
 
 /**
  * POST /api/voice/transcribe — turn a recorded audio clip into text.
@@ -20,6 +23,9 @@ export async function POST(req: NextRequest) {
   if (!isWhisperConfigured()) {
     return NextResponse.json({ configured: false, transcript: '' });
   }
+  if (!(await allowedToSpend())) {
+    return NextResponse.json({ error: 'Sign in to transcribe audio.' }, { status: 401 });
+  }
 
   const form = await req.formData().catch(() => null);
   const audio = form?.get('audio');
@@ -27,6 +33,9 @@ export async function POST(req: NextRequest) {
 
   if (!(audio instanceof File) || audio.size === 0) {
     return NextResponse.json({ error: 'No audio provided' }, { status: 400 });
+  }
+  if (audio.size > MAX_AUDIO_BYTES) {
+    return NextResponse.json({ error: 'Audio too large (max 25 MB).' }, { status: 413 });
   }
 
   try {

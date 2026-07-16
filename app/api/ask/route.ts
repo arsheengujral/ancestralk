@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { env, isAnthropicConfigured } from '@/lib/env';
 import { modelFor, MAX_TOKENS } from '@/lib/models';
+import { allowedToSpend } from '@/lib/apiAuth';
 
 /**
  * POST /api/ask  — "Ask your family archive" (Feature Set G).
@@ -90,6 +91,9 @@ const NOT_FOUND =
   "I looked through your family's archive and couldn't find anything about that yet. As more stories, photos, and memories are added, I'll be able to answer. I only ever answer from what your family has saved — I'll never make something up.";
 
 export async function POST(req: NextRequest) {
+  if (!(await allowedToSpend())) {
+    return NextResponse.json({ error: 'Sign in to ask your family.' }, { status: 401 });
+  }
   let body: Body;
   try {
     body = (await req.json()) as Body;
@@ -97,8 +101,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const question = (body.question ?? '').trim();
-  const corpus = body.corpus ?? [];
+  const question = (body.question ?? '').trim().slice(0, 1_000);
+  // Bound the corpus so a client can't force a huge (costly) Opus prompt.
+  const corpus = (body.corpus ?? []).slice(0, 400);
   if (!question) return NextResponse.json({ error: 'Missing question' }, { status: 400 });
 
   const hits = retrieve(question, corpus);

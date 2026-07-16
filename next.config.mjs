@@ -11,10 +11,6 @@ const nextConfig = {
       { protocol: 'https', hostname: '**.supabase.co' },
     ],
   },
-  // @react-pdf/renderer pulls in some node-targeted deps; keep it out of the client bundle.
-  experimental: {
-    serverComponentsExternalPackages: ['@react-pdf/renderer'],
-  },
 };
 
 export default withNextIntl(nextConfig);

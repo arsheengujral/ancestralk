@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const QUESTIONS = [
@@ -27,6 +27,13 @@ export default function ElderlyPage() {
   const [hint, setHint] = useState('Tap and speak. Take your time.');
   const [answered, setAnswered] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Stop the simulated-dictation interval if the user leaves mid-recording.
+  useEffect(() => {
+    return () => {
+      if (timer.current) clearInterval(timer.current);
+    };
+  }, []);
 
   function record() {
     if (recording) return;

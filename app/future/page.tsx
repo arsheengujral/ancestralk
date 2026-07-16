@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import { getFamilyContext } from '@/lib/familyStore';
@@ -29,6 +29,15 @@ export default function FuturePage() {
   const [when, setWhen] = useState('');
   const [msg, setMsg] = useState('');
   const [sealed, setSealed] = useState(false);
+  const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancel the pending redirect if the user navigates away themselves —
+  // otherwise a stale timeout would yank them to /archive.
+  useEffect(() => {
+    return () => {
+      if (redirectTimer.current) clearTimeout(redirectTimer.current);
+    };
+  }, []);
 
   const ready = Boolean(to.trim() && when && msg.trim().length > 10);
 
@@ -53,7 +62,7 @@ export default function FuturePage() {
         body: JSON.stringify({ recipientDescription: to, unlockCondition: when, messageText: msg }),
       }).catch(() => {});
     })();
-    setTimeout(() => router.push('/archive'), 1600);
+    redirectTimer.current = setTimeout(() => router.push('/archive'), 1600);
   }
 
   return (

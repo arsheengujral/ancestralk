@@ -237,7 +237,22 @@ function extFromType(type: string): string {
   return 'jpg';
 }
 
-/** Upload a Blob/File to a private, family-scoped path; returns the storage path. */
+// Per-bucket MIME allow-lists + size caps (AUDIT M3). The stored content-type is
+// always one of these — a client-supplied type like text/html is refused, so a
+// signed URL can never serve active content into the family origin.
+const MEDIA_RULES: Record<
+  'photos' | 'videos' | 'voice-recordings',
+  { types: RegExp; maxBytes: number }
+> = {
+  photos: { types: /^image\/(jpeg|png|webp|gif|heic|heif)$/, maxBytes: 15 * 1024 * 1024 },
+  videos: { types: /^video\/(mp4|webm|quicktime)$/, maxBytes: 200 * 1024 * 1024 },
+  'voice-recordings': { types: /^audio\/(webm|ogg|mp4|mpeg|wav|x-m4a|aac)(;.*)?$/, maxBytes: 25 * 1024 * 1024 },
+};
+
+/**
+ * Upload a Blob/File to a private, family-scoped path; returns the storage path.
+ * Enforces the bucket's MIME allow-list and size cap; refuses anything else.
+ */
 export async function uploadMedia(
   bucket: 'photos' | 'videos' | 'voice-recordings',
   familyId: string,
@@ -246,9 +261,21 @@ export async function uploadMedia(
 ): Promise<string | null> {
   const supabase = sb();
   if (!supabase) return null;
+
+  const rules = MEDIA_RULES[bucket];
+  const type = (body.type || '').toLowerCase();
+  if (!rules.types.test(type)) {
+    console.error(`uploadMedia: refused type "${type}" for bucket ${bucket}`);
+    return null;
+  }
+  if (body.size === 0 || body.size > rules.maxBytes) {
+    console.error(`uploadMedia: refused size ${body.size} for bucket ${bucket}`);
+    return null;
+  }
+
   const id = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.round(Math.random() * 1e9)}`);
   const path = `${familyId}/${id}.${ext}`;
-  const { error } = await supabase.storage.from(bucket).upload(path, body, { contentType: body.type || undefined, upsert: false });
+  const { error } = await supabase.storage.from(bucket).upload(path, body, { contentType: type, upsert: false });
   if (error) {
     console.error('uploadMedia failed', error);
     return null;

@@ -131,3 +131,17 @@ Each step: **why**, **files**, **expected result**. Fix → verify (typecheck + 
 ---
 
 *Generated as the pre-fix baseline. No product features are removed by this plan; difficult features (legacy transfer, contributions, uploads) are secured, not deleted.*
+
+---
+
+## Post-repair status (updated after the fix pass)
+
+**Fixed & verified:** C1, C2 (require migration 0005 + CRON_SECRET — both applied by the owner), H1, H2, H3, H4, M1, M2, M3, M4, M5, L2 (timing-safe compare; familyId now session-derived), L3 (VoiceRecorder mic stream, elderly interval, future redirect), L4 (storage.ts deleted; dead exports pruned; authz.ts wired in), L5, L6 (shared lib/anthropic.ts), L8 (zero `any` remain), L9 (.env.example), L10 (sealingConfigured removed), L11 (/join pruned).
+
+**Final verification:** typecheck 0 errors · lint 0 errors · production build clean · all 20 pages load with zero console/page errors · begin→chapter flow passes · transfer 403 / crons 401 / oversized inputs 413 / demo mode 200 confirmed live.
+
+**Accepted technical debt (documented decisions, not TODOs):**
+- L7 file splits (begin 835 / familyStore 690 / profile 549 lines) — behaviour-preserving refactor deferred; modules are large but cohesive, typed, and green. Split plan is in §6C above when the team wants it.
+- In-memory rate limiter is per-instance (serverless); swap for a shared store if abuse appears.
+- lib/env.ts single-object env access kept (verified no secret reaches the client bundle).
+- Three harmless one-shot UI setTimeouts (album/ask/begin) set state that React 18 safely discards post-unmount.

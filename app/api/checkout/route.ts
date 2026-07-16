@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { env } from '@/lib/env';
+import { env, isSupabaseConfigured } from '@/lib/env';
 import { PRICING, providerFor, type Provider } from '@/lib/plans';
+import { currentCaller } from '@/lib/apiAuth';
 
 /**
  * POST /api/checkout — start an upgrade to Family Legacy.
@@ -22,6 +23,13 @@ interface Body {
 
 export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => ({}))) as Body;
+  // Derive familyId from the session, never trust the client body (M4). Require
+  // a signed-in caller whenever Supabase is configured.
+  const caller = await currentCaller();
+  if (isSupabaseConfigured() && !caller) {
+    return NextResponse.json({ error: 'Sign in to upgrade.' }, { status: 401 });
+  }
+  const familyId = caller?.familyId ?? '';
   const provider: Provider = providerFor(body);
   const price = PRICING[provider];
   const origin = req.headers.get('origin') ?? env.appUrl;
@@ -45,7 +53,7 @@ export async function POST(req: NextRequest) {
       ],
       success_url: `${origin}/settings?upgraded=1`,
       cancel_url: `${origin}/settings`,
-      metadata: { familyId: body.familyId ?? '' },
+      metadata: { familyId },
     });
     return NextResponse.json({ configured: true, provider, url: session.url });
   }
@@ -63,7 +71,7 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify({
       amount: price.amount,
       currency: price.currency,
-      notes: { familyId: body.familyId ?? '' },
+      notes: { familyId },
     }),
   });
   const order = await res.json();

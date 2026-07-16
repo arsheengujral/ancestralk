@@ -18,7 +18,10 @@ import { createClient } from '@/lib/supabase/client';
 function AuthContent() {
   const t = useTranslations('auth');
   const params = useSearchParams();
-  const next = params.get('next') || '/archive';
+  // Only accept a same-origin relative path (leading single "/"), never an
+  // absolute or protocol-relative URL — prevents post-login open redirect (M1).
+  const rawNext = params.get('next') || '/archive';
+  const next = /^\/(?!\/)/.test(rawNext) ? rawNext : '/archive';
 
   const supabase = createClient();
   const configured = Boolean(supabase);

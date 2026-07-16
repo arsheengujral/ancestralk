@@ -44,19 +44,24 @@ function AuthContent() {
     setBusy(true);
     setError('');
     if (mode === 'signup') {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: { emailRedirectTo: redirectTo },
+      // Create an already-confirmed account server-side, then sign in — no
+      // confirmation email needed.
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password }),
       });
-      setBusy(false);
-      if (error) {
-        setError(error.message);
-      } else if (data.session) {
-        window.location.href = next; // signed in immediately (email confirmation off)
-      } else {
-        setSent(true); // confirmation required — email sent
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setBusy(false);
+        if (data.code === 'exists') setMode('signin');
+        setError(data.error ?? 'Could not create your account.');
+        return;
       }
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      setBusy(false);
+      if (error) setError(error.message);
+      else window.location.href = next;
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       setBusy(false);

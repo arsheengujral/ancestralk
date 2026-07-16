@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
-import { env, isAnthropicConfigured } from '@/lib/env';
-import { modelFor, MAX_TOKENS } from '@/lib/models';
+import { isAnthropicConfigured } from '@/lib/env';
+import { modelFor } from '@/lib/models';
+import { generateText } from '@/lib/anthropic';
 import { allowedToSpend } from '@/lib/apiAuth';
 
 /**
@@ -75,20 +75,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const client = new Anthropic({ apiKey: env.anthropicKey });
     // Emotional rewrites and help-writing use the richer model; fixes use Sonnet.
     const model = mode === 'rewrite' || mode === 'help' ? modelFor('bioPremium') : modelFor('bioFull');
-    const msg = await client.messages.create({
-      model,
-      max_tokens: MAX_TOKENS,
-      system: systemFor(mode, tone, target),
-      messages: [{ role: 'user', content: text }],
-    });
-    const out = msg.content
-      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-      .map((b) => b.text)
-      .join('\n')
-      .trim();
+    const out = await generateText({ model, system: systemFor(mode, tone, target), user: text });
     return NextResponse.json({ configured: true, text: out || text });
   } catch (err) {
     console.error('polish failed:', err);

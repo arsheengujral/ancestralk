@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
-import { env, isAnthropicConfigured } from '@/lib/env';
-import { modelFor, MAX_TOKENS } from '@/lib/models';
+import { isAnthropicConfigured } from '@/lib/env';
+import { modelFor } from '@/lib/models';
+import { generateText } from '@/lib/anthropic';
 import { allowedToSpend } from '@/lib/apiAuth';
 
 /**
@@ -138,18 +138,7 @@ EXCERPTS:
 ${context}`;
 
   try {
-    const client = new Anthropic({ apiKey: env.anthropicKey });
-    const msg = await client.messages.create({
-      model: modelFor('askArchive'),
-      max_tokens: MAX_TOKENS,
-      system,
-      messages: [{ role: 'user', content: question }],
-    });
-    const answer = msg.content
-      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-      .map((b) => b.text)
-      .join('\n')
-      .trim();
+    const answer = await generateText({ model: modelFor('askArchive'), system, user: question });
     return NextResponse.json({ answer, citations, grounded: true });
   } catch (err) {
     console.error('ask synthesis failed, returning extractive answer:', err);

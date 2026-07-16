@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
-import { env, isAnthropicConfigured } from '@/lib/env';
-import { modelFor, MAX_TOKENS, type GenerationTask } from '@/lib/models';
+import { isAnthropicConfigured } from '@/lib/env';
+import { modelFor, type GenerationTask } from '@/lib/models';
 import { englishName } from '@/lib/languages';
 import { allowedToSpend } from '@/lib/apiAuth';
+import { generateText } from '@/lib/anthropic';
 
 /**
  * POST /api/story/generate
@@ -268,18 +268,11 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const client = new Anthropic({ apiKey: env.anthropicKey });
-    const msg = await client.messages.create({
+    const text = await generateText({
       model: modelFor(task),
-      max_tokens: MAX_TOKENS,
       system: systemPrompt(task, language),
-      messages: [{ role: 'user', content: userPrompt(body) }],
+      user: userPrompt(body),
     });
-    const text = msg.content
-      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-      .map((b) => b.text)
-      .join('\n')
-      .trim();
     const payload = parse(text);
     // Structured milestones are authoritative for the timeline when provided.
     const structured = buildTimeline(body);

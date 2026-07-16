@@ -57,7 +57,6 @@ function AuthContent() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setBusy(false);
-        if (data.code === 'exists') setMode('signin');
         setError(data.error ?? 'Could not create your account.');
         return;
       }

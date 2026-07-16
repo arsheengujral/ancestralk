@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminSupabase } from '@/lib/supabase/admin';
+import { rateLimit, clientIp } from '@/lib/rateLimit';
 
 /**
  * Create an email+password account that is already email-confirmed, so a new
@@ -8,6 +9,15 @@ import { createAdminSupabase } from '@/lib/supabase/admin';
  * role admin client. The client then signs in normally with the password.
  */
 export async function POST(req: NextRequest) {
+  // Throttle account creation per IP (AUDIT H2): blunts scripted mass-signup
+  // and makes email enumeration impractical at scale.
+  if (!rateLimit(`signup:${clientIp(req)}`, 5, 60 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: 'Too many attempts — please try again later.' },
+      { status: 429 },
+    );
+  }
+
   let body: { email?: string; password?: string };
   try {
     body = await req.json();
@@ -39,15 +49,11 @@ export async function POST(req: NextRequest) {
   });
 
   if (error) {
-    // Most common case: the email is already registered.
-    const already = /already|registered|exists/i.test(error.message);
+    // Non-distinguishing on purpose (AUDIT H2): the same message whether the
+    // email is registered or the create failed, so this endpoint can't be used
+    // to enumerate accounts. Legitimate owners are pointed to Sign in.
     return NextResponse.json(
-      {
-        error: already
-          ? 'That email already has an account — please use "Sign in" instead.'
-          : error.message,
-        code: already ? 'exists' : 'error',
-      },
+      { error: 'Could not create an account with that email. If you already have one, use "Sign in" instead.' },
       { status: 400 },
     );
   }

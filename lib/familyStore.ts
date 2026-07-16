@@ -531,9 +531,9 @@ export async function commitImport(
       family_id: familyId,
       caption: p.caption || null,
       decade: p.timestamp ? `${new Date(p.timestamp).getFullYear()}` : null,
-      source: p.source,
+      source: dbSource(p.source),
     })),
-    ...preview.memories.map((m) => ({ family_id: familyId, caption: m.text, source: m.source })),
+    ...preview.memories.map((m) => ({ family_id: familyId, caption: m.text, source: dbSource(m.source) })),
   ];
   if (photoRows.length) {
     const { error } = await supabase.from('photos').insert(photoRows);
@@ -547,11 +547,18 @@ export async function commitImport(
         profile_id: profileId,
         year: e.year,
         title: e.title,
-        source: e.source,
+        source: dbSource(e.source),
       })),
     );
     if (error) console.error('commitImport: events failed', error);
   }
+}
+
+// photos.source / timeline_events.source have a DB CHECK constraint; map any
+// value outside it (e.g. the 'generic' import) to 'manual' so inserts succeed.
+const ALLOWED_SOURCES = new Set(['manual', 'instagram', 'facebook', 'linkedin', 'google']);
+function dbSource(s: string | undefined): string {
+  return s && ALLOWED_SOURCES.has(s) ? s : 'manual';
 }
 
 // ── Contributions & testimonials (collaboration with approval) ────────────────

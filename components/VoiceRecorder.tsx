@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import VoicePlayback from './VoicePlayback';
 import { putAudio } from '@/lib/voiceBuffer';
 
@@ -42,6 +42,21 @@ export default function VoiceRecorder({
   const chunks = useRef<Blob[]>([]);
   const lastBlob = useRef<Blob | null>(null);
   const simTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  // Release the simulation timer and any live microphone stream on unmount, so
+  // navigating away mid-recording never leaves the mic open or a timer firing.
+  useEffect(() => {
+    return () => {
+      if (simTimer.current) clearInterval(simTimer.current);
+      try {
+        recorder.current?.state === 'recording' && recorder.current.stop();
+      } catch {
+        /* already stopped */
+      }
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
 
   // ── Simulated fallback (no mic / no transcription key) ────────────────────
   function runSimulation() {
@@ -69,6 +84,7 @@ export default function VoiceRecorder({
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
       const mr = new MediaRecorder(stream);
       chunks.current = [];
       mr.ondataavailable = (e) => {
@@ -76,6 +92,7 @@ export default function VoiceRecorder({
       };
       mr.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
         const blob = new Blob(chunks.current, { type: mr.mimeType || 'audio/webm' });
         lastBlob.current = blob;
         await transcribe(blob);

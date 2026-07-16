@@ -96,8 +96,10 @@ function ProfileInner() {
   async function toggleAdmin() {
     if (!dbCtx || !dbMember) return;
     const next = !dbMember.is_admin;
-    await setMemberAdmin(dbCtx.profileId, next);
-    setDbMember((m) => (m ? { ...m, is_admin: next, role: next ? 'keeper' : 'contributor' } : m));
+    const ok = await setMemberAdmin(dbCtx.profileId, next);
+    if (ok) {
+      setDbMember((m) => (m ? { ...m, is_admin: next, role: next ? 'keeper' : 'contributor' } : m));
+    }
   }
 
   // Subject of the page: the saved member when present, else the in-flow person.

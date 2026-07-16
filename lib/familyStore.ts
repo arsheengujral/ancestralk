@@ -679,12 +679,17 @@ export async function getMyProfile(): Promise<{ id: string; role: string; is_adm
   return data ?? null;
 }
 
-/** Promote/demote a member as an admin (keeper). Supports multiple admins. */
-export async function setMemberAdmin(profileId: string, makeAdmin: boolean): Promise<void> {
-  const supabase = sb();
-  if (!supabase) return;
-  await supabase
-    .from('profiles')
-    .update({ is_admin: makeAdmin, role: makeAdmin ? 'keeper' : 'contributor' })
-    .eq('id', profileId);
+/**
+ * Promote/demote a member as an admin (keeper). Supports multiple admins.
+ * role/is_admin are client-locked by RLS (migration 0005), so this goes through
+ * an authorized server route that verifies the caller is an owner/keeper.
+ * Returns true on success.
+ */
+export async function setMemberAdmin(profileId: string, makeAdmin: boolean): Promise<boolean> {
+  const res = await fetch('/api/member/admin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ profileId, makeAdmin }),
+  });
+  return res.ok;
 }

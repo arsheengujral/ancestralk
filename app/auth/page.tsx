@@ -84,12 +84,6 @@ function AuthContent() {
     else setSent(true);
   }
 
-  async function google() {
-    if (!supabase) return;
-    setBusy(true);
-    await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
-  }
-
   return (
     <div className="fw" style={{ maxWidth: 440, paddingTop: 50 }}>
       <div style={{ textAlign: 'center', marginBottom: 8 }}>
@@ -114,17 +108,6 @@ function AuthContent() {
         </div>
       ) : (
         <>
-          {configured && (
-            <button className="bp" style={{ marginBottom: 12 }} onClick={google} disabled={busy}>
-              <i className="ti ti-brand-google" /> {t('google')}
-            </button>
-          )}
-
-          {configured && (
-            <div style={{ textAlign: 'center', color: 'var(--ink4)', fontSize: 12, margin: '10px 0' }}>
-              — {t('or')} —
-            </div>
-          )}
 
           <div className="field">
             <label className="fl">{t('email')}</label>

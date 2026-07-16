@@ -200,8 +200,11 @@ function compose(b: Body): ChapterPayload {
     b.q1, b.q2,
   ].filter(Boolean).join(' ').trim();
   if (midParts) paras.push(midParts);
+  // Lowercase the first letter of a fragment embedded mid-sentence (e.g. after
+  // "…proud that "), so answers like "She raised…" don't produce "that She…".
+  const lcFirst = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : s);
   const closeParts = [
-    val('proud') ? `The family is most proud that ${val('proud').replace(/\.$/, '')}.` : '',
+    val('proud') ? `The family is most proud that ${lcFirst(val('proud').replace(/\.$/, ''))}.` : '',
     val('achievement') ? `Their greatest achievement: ${val('achievement').replace(/\.$/, '')}.` : '',
     val('memory') ? `A favourite memory: ${val('memory').replace(/\.$/, '')}.` : '',
     b.q3, b.q4,

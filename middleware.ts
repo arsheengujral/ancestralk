@@ -13,7 +13,7 @@ import { createServerClient } from '@supabase/ssr';
  * the whole app stays usable for local development and demos.
  */
 
-const PUBLIC_PREFIXES = ['/', '/auth', '/join', '/learn', '/designs', '/api'];
+const PUBLIC_PREFIXES = ['/', '/auth', '/join', '/learn', '/designs', '/attira', '/api'];
 const PUBLIC_EXACT = new Set(['/']);
 
 function isPublic(pathname: string): boolean {

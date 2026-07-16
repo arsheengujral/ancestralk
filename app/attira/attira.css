@@ -1,0 +1,359 @@
+/* ══════════════════════════════════════════════════════════════════════════
+ * ATTIRA — Skincare v2 · scoped styles
+ * Ported from the approved Claude Design handoff (ATTIRA Skincare v2.dc.html,
+ * screens 1a–1g + 2a–2d) and cross-checked against /design/design-system.md.
+ * Everything is scoped under `.att-root` so it never touches the ancestralk shell.
+ * Hex values are read from the imported design — the design wins over the
+ * written system where they differ (per the master brief, Part 6).
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.att-root {
+  /* Signature palette (ivory / lavender) — the default */
+  --att-ink: #453c50;
+  --att-ink-strong: #40394a;
+  --att-ink-soft: #8d8496;
+  --att-muted: #9a8fa8;
+  --att-lav: #8a76b4;
+  --att-lav-2: #a995cf;
+  --att-lav-3: #b9a8d9;
+  --att-lav-line: #ebe4f2;
+  --att-gold: #c9a96a;
+  --att-gold-2: #e9cfa4;
+  --att-gold-ink: #54430f;
+  --att-gold-ink-soft: #8a713f;
+  --att-teal: #55898d;
+  --att-teal-2: #7fa8ab;
+  --att-rose: #e0b7af;
+  --att-white: #fff;
+
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background:
+    radial-gradient(ellipse 80% 55% at 20% 0%, #efe6f4, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 90% 100%, #f6eee2, transparent 55%),
+    linear-gradient(160deg, #f1ece4 0%, #ece7df 55%, #efe9ef 100%);
+  background-color: #ece7df;
+  font-family: var(--font-figtree), Figtree, system-ui, sans-serif;
+  color: var(--att-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.att-serif {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+}
+
+/* ── Ambient stage that holds the phone ─────────────────────────────────── */
+.att-stage {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 28px 16px 40px;
+  box-sizing: border-box;
+}
+
+.att-brandbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--att-lav);
+}
+.att-brandbar .att-word {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 22px;
+  letter-spacing: 6px;
+  font-weight: 500;
+  color: #5c5168;
+}
+.att-brandbar .att-tag {
+  font-size: 10.5px;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: var(--att-muted);
+  font-weight: 600;
+}
+
+/* ── Device frame ───────────────────────────────────────────────────────── */
+.att-phone {
+  position: relative;
+  width: 402px;
+  max-width: 100%;
+  height: 844px;
+  max-height: calc(100dvh - 40px);
+  border-radius: 46px;
+  padding: 10px;
+  background: linear-gradient(160deg, #2c2733, #1c1922);
+  box-shadow:
+    0 40px 90px -30px rgba(60, 48, 78, 0.55),
+    0 4px 14px rgba(60, 48, 78, 0.28),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.06);
+  box-sizing: border-box;
+  flex: none;
+}
+.att-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 38px;
+  overflow: hidden;
+  background: #f2ece1;
+  isolation: isolate;
+}
+.att-notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 26px;
+  background: #1c1922;
+  border-radius: 0 0 16px 16px;
+  z-index: 40;
+  pointer-events: none;
+}
+
+/* The scrollable inner canvas of a screen */
+.att-canvas {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.att-canvas::-webkit-scrollbar {
+  display: none;
+}
+
+/* Full-bleed on real phones */
+@media (max-width: 460px) {
+  .att-stage {
+    padding: 0;
+    gap: 0;
+  }
+  .att-brandbar {
+    display: none;
+  }
+  .att-phone {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+  .att-screen {
+    border-radius: 0;
+  }
+  .att-notch {
+    display: none;
+  }
+}
+
+/* ── Bottom navigation ──────────────────────────────────────────────────── */
+.att-nav {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
+  height: 64px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(90, 75, 110, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  z-index: 30;
+}
+.att-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 4px;
+  position: relative;
+  color: inherit;
+  font-family: inherit;
+}
+.att-nav-item .att-nav-label {
+  font-size: 9.5px;
+  font-weight: 500;
+  color: var(--att-muted);
+  letter-spacing: 0.4px;
+}
+.att-nav-item[data-active='true'] .att-nav-label {
+  color: var(--att-lav);
+  font-weight: 700;
+}
+.att-nav-dot {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--att-gold);
+}
+
+/* ── Reusable bits ──────────────────────────────────────────────────────── */
+.att-eyebrow {
+  font-size: 11px;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: var(--att-muted);
+  font-weight: 600;
+}
+.att-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 22px;
+  box-shadow: 0 8px 24px rgba(90, 75, 110, 0.07);
+}
+.att-chip {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(64, 57, 74, 0.1);
+  background: rgba(64, 57, 74, 0.06);
+  color: #5c5168;
+}
+.att-cta {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  color: #f6f1fa;
+  background: linear-gradient(135deg, #a995cf, #8a76b4);
+  border-radius: 999px;
+  box-shadow: 0 8px 22px rgba(138, 118, 180, 0.35);
+}
+.att-back {
+  position: absolute;
+  top: 62px;
+  left: 16px;
+  z-index: 45;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  color: #5c5168;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-family: inherit;
+}
+.att-back[data-dark='true'] {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: #e6dcf2;
+}
+
+.att-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--att-lav);
+  font-weight: 600;
+}
+
+/* ── Keyframes — ported verbatim from the handoff ───────────────────────── */
+@keyframes attFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(16px, -20px) scale(1.08); }
+}
+@keyframes attFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-14px, 16px) scale(1.05); }
+}
+@keyframes attRing {
+  from { stroke-dashoffset: var(--c); }
+}
+@keyframes attSweep {
+  0% { left: -30%; }
+  100% { left: 110%; }
+}
+@keyframes attDrift {
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 0.9; }
+  85% { opacity: 0.9; }
+  100% { transform: translateY(-70px); opacity: 0; }
+}
+@keyframes attPulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.9; }
+}
+@keyframes attGlow {
+  0%, 100% { box-shadow: 0 8px 24px rgba(138, 118, 180, 0.14); }
+  50% { box-shadow: 0 8px 34px rgba(138, 118, 180, 0.4); }
+}
+@keyframes attRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes attBar {
+  from { width: 0; }
+}
+@keyframes attPop {
+  0% { transform: scale(0.6); opacity: 0; }
+  70% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes attFall {
+  0% { transform: translateY(-30px) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(760px) rotate(260deg); opacity: 0; }
+}
+@keyframes attBreathe {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(201, 169, 106, 0.45); }
+  50% { transform: scale(1.04); box-shadow: 0 0 0 16px rgba(201, 169, 106, 0); }
+}
+@keyframes attFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Screen crossfade when switching tabs */
+.att-screen-enter {
+  animation: attFade 0.35s ease both;
+}
+
+/* ── Accessibility: honour reduced motion ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .att-root *,
+  .att-root *::before,
+  .att-root *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  /* Keep rings/bars at their final value rather than empty */
+  .att-root [style*='attRing'] {
+    stroke-dashoffset: var(--att-final-offset, 0) !important;
+  }
+}
+
+.att-root :focus-visible {
+  outline: 2px solid var(--att-lav);
+  outline-offset: 2px;
+  border-radius: 6px;
+}

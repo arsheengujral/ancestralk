@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
-import { cormorant, jost } from '@/lib/fonts';
+import { cormorant, jost, figtree } from '@/lib/fonts';
 import { rtlLocales } from '@/i18n/request';
 import { FlowProvider } from '@/components/FlowProvider';
 import { DesignProvider } from '@/components/DesignProvider';
@@ -34,7 +34,7 @@ export default async function RootLayout({
   const dir = rtlLocales.includes(locale) ? 'rtl' : 'ltr';
 
   return (
-    <html lang={locale} dir={dir} className={`${cormorant.variable} ${jost.variable}`}>
+    <html lang={locale} dir={dir} className={`${cormorant.variable} ${jost.variable} ${figtree.variable}`}>
       <head>
         {/* Tabler icon webfont — matches the icon set used throughout the prototype. */}
         <link

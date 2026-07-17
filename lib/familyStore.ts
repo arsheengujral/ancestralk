@@ -298,6 +298,30 @@ export async function signedUrl(bucket: 'photos' | 'videos' | 'voice-recordings'
   return data?.signedUrl ?? null;
 }
 
+export interface LoadedVoiceRecording {
+  questionId: string;
+  transcript: string | null;
+  url: string | null;
+}
+
+/** A member's saved voice recordings (original audio + transcript), for playback/download. */
+export async function loadVoiceRecordings(profileId: string): Promise<LoadedVoiceRecording[]> {
+  const supabase = sb();
+  if (!supabase) return [];
+  const { data } = await supabase
+    .from('voice_recordings')
+    .select('question_id, transcript, storage_path')
+    .eq('profile_id', profileId);
+  const rows = data ?? [];
+  return Promise.all(
+    rows.map(async (r) => ({
+      questionId: r.question_id as string,
+      transcript: r.transcript as string | null,
+      url: await signedUrl('voice-recordings', r.storage_path as string),
+    })),
+  );
+}
+
 // ── Photos ───────────────────────────────────────────────────────────────────
 export interface LoadedPhoto { id: string; url: string; caption: string | null; decade: string | null; source: string }
 

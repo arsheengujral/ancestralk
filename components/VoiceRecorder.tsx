@@ -37,7 +37,12 @@ export default function VoiceRecorder({
 }) {
   const [phase, setPhase] = useState<Phase>('idle');
   const [status, setStatus] = useState('');
-  const [draft, setDraft] = useState(''); // transcript awaiting approval
+  const [draft, setDraft] = useState(''); // transcript awaiting approval — never auto-edited
+  const [suspect, setSuspect] = useState(false); // possible hallucination on a near-silent clip
+  const [suggestion, setSuggestion] = useState(''); // opt-in cleaned-up version, shown separately
+  const [suggesting, setSuggesting] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null); // for download / playback
+  const audioUrlRef = useRef<string | null>(null);
   const recorder = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
   const lastBlob = useRef<Blob | null>(null);
@@ -46,6 +51,7 @@ export default function VoiceRecorder({
 
   // Release the simulation timer and any live microphone stream on unmount, so
   // navigating away mid-recording never leaves the mic open or a timer firing.
+  // Also revoke the object URL used for downloading the original recording.
   useEffect(() => {
     return () => {
       if (simTimer.current) clearInterval(simTimer.current);
@@ -55,6 +61,7 @@ export default function VoiceRecorder({
         /* already stopped */
       }
       streamRef.current?.getTracks().forEach((t) => t.stop());
+      if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
     };
   }, []);
 
@@ -95,6 +102,10 @@ export default function VoiceRecorder({
         streamRef.current = null;
         const blob = new Blob(chunks.current, { type: mr.mimeType || 'audio/webm' });
         lastBlob.current = blob;
+        if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+        const url = URL.createObjectURL(blob);
+        audioUrlRef.current = url;
+        setAudioUrl(url);
         await transcribe(blob);
       };
       mr.start();
@@ -110,6 +121,7 @@ export default function VoiceRecorder({
   async function transcribe(blob: Blob) {
     setPhase('transcribing');
     setStatus('Turning your words into text…');
+    setSuggestion('');
     try {
       const fd = new FormData();
       fd.append('audio', blob, 'recording.webm');
@@ -123,12 +135,35 @@ export default function VoiceRecorder({
         runSimulation();
         return;
       }
+      // The transcript is shown EXACTLY as Whisper returned it — never rewritten.
       setDraft(data.transcript ?? '');
+      setSuspect(Boolean(data.suspect));
       setPhase('review');
       setStatus('Review your words, then approve.');
     } catch {
       setStatus('Could not transcribe — you can type instead.');
       setPhase('idle');
+    }
+  }
+
+  // Opt-in only: shows a suggested cleanup UNDERNEATH the original, never
+  // replaces it automatically.
+  async function suggestCleanup() {
+    if (!draft.trim()) return;
+    setSuggesting(true);
+    try {
+      const res = await fetch('/api/text/polish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: draft, mode: 'fix' }),
+      });
+      const data = await res.json();
+      const cleaned = (data.text ?? '').trim();
+      if (cleaned && cleaned !== draft.trim()) setSuggestion(cleaned);
+    } catch {
+      /* leave the original as-is */
+    } finally {
+      setSuggesting(false);
     }
   }
 
@@ -155,6 +190,8 @@ export default function VoiceRecorder({
       return;
     }
     setDraft('');
+    setSuggestion('');
+    setSuspect(false);
     void startRecording();
   }
 
@@ -180,8 +217,15 @@ export default function VoiceRecorder({
       {phase === 'review' && (
         <div className="sug show" style={{ display: 'block' }}>
           <div className="sug-l">
-            <i className="ti ti-check" style={{ fontSize: 12 }} /> Your recording — edit if needed, then approve
+            <i className="ti ti-check" style={{ fontSize: 12 }} /> Your recording, transcribed exactly — edit if
+            needed, then approve
           </div>
+          {suspect && (
+            <div className="enote" style={{ marginBottom: 8 }}>
+              <i className="ti ti-alert-triangle" style={{ color: 'var(--g)' }} /> This clip was very short — the
+              text below may not match what was said. Please check it, or tap Re-record.
+            </div>
+          )}
           <textarea
             className="fta"
             rows={3}
@@ -189,18 +233,67 @@ export default function VoiceRecorder({
             onChange={(e) => setDraft(e.target.value)}
             style={{ marginBottom: 8 }}
           />
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <button className="ibtn" onClick={approve}>
               Use this ✓
             </button>
             <button className="bb" style={{ padding: '8px 14px', fontSize: 12 }} onClick={toggle}>
               Re-record
             </button>
+            <button
+              className="bb"
+              style={{ padding: '8px 14px', fontSize: 12 }}
+              onClick={suggestCleanup}
+              disabled={suggesting || !draft.trim()}
+            >
+              {suggesting ? '…' : 'Suggest a cleaner version'}
+            </button>
+            {audioUrl && (
+              <a
+                className="bb"
+                style={{ padding: '8px 14px', fontSize: 12, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                href={audioUrl}
+                download={`${id}-recording.webm`}
+              >
+                <i className="ti ti-download" style={{ marginRight: 4 }} /> Original audio
+              </a>
+            )}
           </div>
+
+          {suggestion && (
+            <div className="sug show" style={{ display: 'block', marginTop: 10 }}>
+              <div className="sug-l">
+                <i className="ti ti-sparkles" style={{ fontSize: 12 }} /> Suggested cleanup — your original above is
+                unchanged unless you use this
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--ink2)', lineHeight: 1.6, marginBottom: 8 }}>{suggestion}</div>
+              <button
+                className="bb"
+                style={{ padding: '8px 14px', fontSize: 12 }}
+                onClick={() => { setDraft(suggestion); setSuggestion(''); }}
+              >
+                Use this instead
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {phase === 'done' && <VoicePlayback variant="light" label="Recorded" />}
+      {phase === 'done' && (
+        <>
+          <VoicePlayback variant="light" label="Recorded" />
+          {audioUrl && (
+            <a
+              className="bb"
+              style={{ padding: '6px 12px', fontSize: 11, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', marginTop: 6 }}
+              href={audioUrl}
+              download={`${id}-recording.webm`}
+            >
+              <i className="ti ti-download" style={{ marginRight: 4 }} /> Download original audio
+            </a>
+          )}
+        </>
+      )}
     </>
   );
 }

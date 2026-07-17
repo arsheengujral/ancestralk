@@ -16,10 +16,13 @@ import {
   deleteMember,
   getMyProfile,
   setMemberAdmin,
+  loadVoiceRecordings,
   type SavedMember,
   type Contribution,
   type StoredRawAnswers,
+  type LoadedVoiceRecording,
 } from '@/lib/familyStore';
+import { QUESTIONS } from '@/lib/questions';
 
 function initials(name: string | null | undefined): string {
   return (name ?? '').trim().split(' ').filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase() || '?';
@@ -60,6 +63,7 @@ function ProfileInner() {
   const [dbRaw, setDbRaw] = useState<StoredRawAnswers | null>(null);
   const [dbCtx, setDbCtx] = useState<{ familyId: string; profileId: string } | null>(null);
   const [testimonials, setTestimonials] = useState<Contribution[]>([]);
+  const [recordings, setRecordings] = useState<LoadedVoiceRecording[]>([]);
   const [tAuthor, setTAuthor] = useState('');
   const [tBody, setTBody] = useState('');
   const [tSent, setTSent] = useState(false);
@@ -145,6 +149,7 @@ function ProfileInner() {
       setDbCtx({ familyId: ctx.familyId, profileId: id });
       setDbRaw(loaded.story?.raw_answers ?? null);
       loadContributions({ status: 'approved', profileId: id }).then((c) => active && setTestimonials(c));
+      loadVoiceRecordings(id).then((r) => active && setRecordings(r));
       setStore(
         loaded.story?.versions && Object.keys(loaded.story.versions).length
           ? (loaded.story.versions as VersionStore)
@@ -491,6 +496,41 @@ function ProfileInner() {
             <i className="ti ti-pencil" style={{ color: 'var(--g)' }} /> Each version is independently
             editable and regenerates on demand. Nothing is changed without your permission.
           </div>
+
+          {/* Voice recordings — the exact original audio + transcript, downloadable. */}
+          {recordings.length > 0 && (
+            <>
+              <div className="slbl">Voice recordings</div>
+              {recordings.map((r) => {
+                const q = QUESTIONS.find((qq) => qq.id === r.questionId);
+                return (
+                  <div className="tout" key={r.questionId} style={{ padding: 16 }}>
+                    <div style={{ fontSize: 12, fontWeight: 500, marginBottom: 6 }}>
+                      {q?.label ?? r.questionId}
+                    </div>
+                    {r.transcript && (
+                      <div style={{ fontSize: 13, color: 'var(--ink2)', lineHeight: 1.6, marginBottom: 8 }}>
+                        {r.transcript}
+                      </div>
+                    )}
+                    {r.url && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                        <audio controls src={r.url} style={{ height: 32, maxWidth: 280 }} />
+                        <a
+                          className="bb"
+                          style={{ padding: '6px 12px', fontSize: 11, textDecoration: 'none' }}
+                          href={r.url}
+                          download
+                        >
+                          <i className="ti ti-download" /> Download original
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </>
+          )}
 
           {/* Testimonials — family write about this person; owner approves first. */}
           {dbCtx && (

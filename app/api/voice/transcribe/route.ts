@@ -46,8 +46,22 @@ export async function POST(req: NextRequest) {
       file: audio,
       model: 'whisper-1',
       language: whisperLang,
+      // temperature 0 keeps this literal (Whisper's default sampling can
+      // paraphrase or "clean up" wording); the prompt primes it with the kind
+      // of biographical vocabulary these questions produce, which measurably
+      // reduces hallucinated text on short or quiet clips.
+      temperature: 0,
+      prompt:
+        'This is a family member answering a biography question — a place name, ' +
+        'a school or occupation, a memory, or a short personal story.',
     });
-    return NextResponse.json({ configured: true, transcript: result.text ?? '' });
+    const transcript = (result.text ?? '').trim();
+    // Whisper is known to hallucinate stock phrases (e.g. "Thank you for
+    // watching") on near-silent clips. A transcript on a very short recording
+    // is the classic signature — flag it so the client can ask the person to
+    // try again instead of silently saving fabricated text.
+    const suspect = audio.size < 8_000 && transcript.length > 40;
+    return NextResponse.json({ configured: true, transcript, suspect });
   } catch (err) {
     console.error('transcribe failed:', err);
     return NextResponse.json({ error: 'Could not transcribe the recording.' }, { status: 502 });

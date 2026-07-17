@@ -30,8 +30,31 @@ export const QUESTIONS: Question[] = [
   {
     id: 'knownfor',
     label: 'What were they best known for in the family?',
+    hint: 'Choose any that fit',
     type: 'choice',
+    multi: true,
     options: ['Their cooking', 'Their stories', 'Always helping', 'Their advice', 'Their humour'],
+  },
+  {
+    id: 'birthplace',
+    label: 'Where were they born?',
+    type: 'text',
+    voice: true,
+    placeholder: 'Town, city, or village…',
+  },
+  {
+    id: 'grewup',
+    label: 'Where did they grow up?',
+    type: 'text',
+    voice: true,
+    placeholder: 'If different from where they were born…',
+  },
+  {
+    id: 'education',
+    label: 'What was their education or schooling?',
+    type: 'text',
+    voice: true,
+    placeholder: 'School, college, a trade they trained in…',
   },
   {
     id: 'work',
@@ -50,7 +73,9 @@ export const QUESTIONS: Question[] = [
   {
     id: 'unique',
     label: 'What makes them unique?',
+    hint: 'Choose any that fit',
     type: 'choice',
+    multi: true,
     options: ['Their humour', 'Their kindness', 'Their resilience', 'Their creativity', 'Their wisdom'],
   },
   {

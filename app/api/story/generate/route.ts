@@ -43,6 +43,9 @@ interface Body {
 const QUESTION_LABELS: Record<string, string> = {
   oneword: 'In one word',
   knownfor: 'Best known for',
+  birthplace: 'Born',
+  grewup: 'Grew up',
+  education: 'Education',
   work: 'What they did',
   values: 'Values they lived by',
   unique: 'What makes them unique',
@@ -183,7 +186,7 @@ function compose(b: Body): ChapterPayload {
 
   const origin = [
     b.year ? `born in ${b.year}` : '',
-    b.town ? `in ${b.town}` : '',
+    b.town || val('birthplace') ? `in ${b.town || val('birthplace')}` : '',
   ].filter(Boolean).join(' ');
   const descriptor = val('oneword');
   const knownFor = val('knownfor') || b.known || '';
@@ -192,9 +195,13 @@ function compose(b: Body): ChapterPayload {
       (descriptor ? ` Those who knew ${first} would call them ${descriptor.toLowerCase()}.` : '') +
       (knownFor ? ` In the family, ${first} was known for ${knownFor.replace(/\.$/, '').toLowerCase()}.` : ''),
   );
+  const grewUp = val('grewup');
+  const education = val('education');
   const work = val('work');
   const values = val('values');
   const midParts = [
+    grewUp ? `${first} grew up in ${grewUp.replace(/\.$/, '')}.` : '',
+    education ? `${first}'s education: ${education.replace(/\.$/, '')}.` : '',
     work ? `${first} spent their life as ${work.toLowerCase()}.` : '',
     values ? `Above all, ${first} lived by ${values.toLowerCase()}.` : '',
     val('unique') ? `What made ${first} unique: ${val('unique').toLowerCase()}.` : '',

@@ -7,6 +7,7 @@ import { useUser } from '@/lib/useUser';
 import { getFamilyContext, saveMember } from '@/lib/familyStore';
 import { LANGUAGES, REGIONS, englishName } from '@/lib/languages';
 import { QUESTIONS, MILESTONE_TYPES } from '@/lib/questions';
+import { regionPlaceholder, regionDemoText } from '@/lib/regionExamples';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import VoicePlayback from '@/components/VoicePlayback';
 import SaveCeremony from '@/components/SaveCeremony';
@@ -15,8 +16,10 @@ type Step = 'region' | 'who' | 'basics' | 'story' | 'gen' | 'chapter';
 
 const WHO_OPTIONS = [
   { v: 'myself', icon: 'ti-user', t: 'Myself', s: 'Record my own story for my family' },
-  { v: 'parent_you', icon: 'ti-heart', t: 'A parent', s: 'Mother or father' },
-  { v: 'sibling', icon: 'ti-users', t: 'A sibling', s: 'Brother or sister' },
+  { v: 'mother', icon: 'ti-heart', t: 'Mother', s: 'Your mother' },
+  { v: 'father', icon: 'ti-heart', t: 'Father', s: 'Your father' },
+  { v: 'sister', icon: 'ti-users', t: 'Sister', s: 'Your sister' },
+  { v: 'brother', icon: 'ti-users', t: 'Brother', s: 'Your brother' },
   { v: 'grandparent', icon: 'ti-star', t: 'A grandparent', s: 'Before the stories are lost' },
   { v: 'spouse', icon: 'ti-heart-handshake', t: 'Spouse or partner', s: 'Your husband, wife, or partner' },
   { v: 'child', icon: 'ti-baby-carriage', t: 'A child', s: 'Your son or daughter' },
@@ -24,6 +27,27 @@ const WHO_OPTIONS = [
   { v: 'cousin', icon: 'ti-friends', t: 'A cousin', s: 'Extended family' },
   { v: 'someone', icon: 'ti-user-plus', t: 'Someone else', s: 'Any family member' },
 ];
+
+// A pronoun set to tailor question wording to the person being remembered.
+function pronounFor(who: string): { subj: string; poss: string; obj: string } {
+  if (who === 'mother' || who === 'sister') return { subj: 'she', poss: 'her', obj: 'her' };
+  if (who === 'father' || who === 'brother') return { subj: 'he', poss: 'his', obj: 'him' };
+  if (who === 'myself') return { subj: 'you', poss: 'your', obj: 'you' };
+  return { subj: 'they', poss: 'their', obj: 'them' };
+}
+
+// Swap the generic they/their/them in a question label for the right pronoun
+// given who this chapter is for — "What did they mainly do?" becomes "What
+// did she mainly do?" for a mother, "What did you mainly do?" for yourself.
+function tailorLabel(label: string, who: string, id: string): string {
+  if (id === 'oneword' && who === 'myself') return 'In one word, how would you describe yourself?';
+  const p = pronounFor(who);
+  return label
+    .replace(/\bthey\b/g, p.subj)
+    .replace(/\btheir\b/g, p.poss)
+    .replace(/\bthem\b/g, p.obj)
+    .replace(/^./, (c) => c.toUpperCase());
+}
 
 const KNOWN_SUGGESTIONS = [
   'Always had a story for every moment',
@@ -512,7 +536,7 @@ export default function BeginPage() {
             {QUESTIONS.map((q) => (
               <div className="field" key={q.id}>
                 <label className="fl">
-                  {q.label}
+                  {tailorLabel(q.label, state.who, q.id)}
                   {q.hint && (
                     <span style={{ textTransform: 'none', letterSpacing: 0, color: 'var(--ink4)' }}>
                       {' '}· {q.hint}
@@ -563,14 +587,14 @@ export default function BeginPage() {
                         language={state.language}
                         id={q.id}
                         label="Speak your answer"
-                        demoText={DEMO.q1}
+                        demoText={regionDemoText(state.region, q.id, DEMO.q1)}
                         onTranscript={(txt) => setAnswer(q.id, txt)}
                       />
                     )}
                     <textarea
                       className="fta"
                       rows={3}
-                      placeholder={q.placeholder}
+                      placeholder={regionPlaceholder(state.region, q.id, q.placeholder)}
                       value={state.answers[q.id] ?? ''}
                       onChange={(e) => setAnswer(q.id, e.target.value)}
                     />
@@ -717,7 +741,7 @@ export default function BeginPage() {
                 <div className="sraw">
                   {QUESTIONS.map((q) => {
                     const v = (state.answers[q.id] ?? '').split('|').filter(Boolean).join(', ');
-                    return v ? `${q.label}\n${v}` : '';
+                    return v ? `${tailorLabel(q.label, state.who, q.id)}\n${v}` : '';
                   })
                     .filter(Boolean)
                     .join('\n\n') || 'Your own words appear here.'}

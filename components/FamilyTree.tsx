@@ -23,11 +23,15 @@ function levelFor(relationship: string | null): number {
       return 0;
     case 'parent_self':
     case 'parent_you':
+    case 'mother':
+    case 'father':
     case 'both':
     case 'aunt_uncle':
       return 1;
     case 'myself':
     case 'sibling':
+    case 'sister':
+    case 'brother':
     case 'spouse':
     case 'cousin':
       return 2;

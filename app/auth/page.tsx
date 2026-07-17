@@ -38,10 +38,28 @@ function AuthContent() {
       ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
       : undefined;
 
+  // Baseline password strength: 8+ chars, at least one letter and one number.
+  // Mirrored server-side in /api/auth/signup so it can't be bypassed.
+  function passwordProblem(pw: string): string | null {
+    if (pw.length < 8) return 'Password must be at least 8 characters.';
+    if (!/[a-zA-Z]/.test(pw) || !/[0-9]/.test(pw)) return 'Password must include a letter and a number.';
+    return null;
+  }
+
   // Primary path: email + password (no email link needed to get started).
   async function submitPassword() {
-    if (!supabase || !email.trim() || password.length < 6) {
-      setError('Enter your email and a password of at least 6 characters.');
+    if (!supabase || !email.trim()) {
+      setError('Enter your email and password.');
+      return;
+    }
+    if (mode === 'signup') {
+      const problem = passwordProblem(password);
+      if (problem) {
+        setError(problem);
+        return;
+      }
+    } else if (!password) {
+      setError('Enter your password.');
       return;
     }
     setBusy(true);
@@ -86,6 +104,19 @@ function AuthContent() {
     else setSent(true);
   }
 
+  async function google() {
+    if (!supabase) return;
+    setBusy(true);
+    setError('');
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
+    // On success this navigates away immediately; an error here means Google
+    // sign-in isn't set up yet in Supabase (Authentication -> Providers).
+    if (error) {
+      setBusy(false);
+      setError('Google sign-in isn’t set up yet — please use email + password for now.');
+    }
+  }
+
   return (
     <div className="fw" style={{ maxWidth: 440, paddingTop: 50 }}>
       <div style={{ textAlign: 'center', marginBottom: 8 }}>
@@ -127,7 +158,7 @@ function AuthContent() {
             <input
               className="fi2"
               type="password"
-              placeholder="At least 6 characters"
+              placeholder={mode === 'signup' ? 'At least 8 characters, with a letter and a number' : 'Your password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && submitPassword()}
@@ -137,6 +168,17 @@ function AuthContent() {
           <button className="bp" onClick={submitPassword} disabled={busy || !configured}>
             {busy ? '…' : mode === 'signup' ? 'Create my account ✦' : 'Sign in'}
           </button>
+
+          {configured && (
+            <div style={{ textAlign: 'center', color: 'var(--ink4)', fontSize: 12, margin: '14px 0 8px' }}>
+              — or —
+            </div>
+          )}
+          {configured && (
+            <button className="bb" style={{ width: '100%' }} onClick={google} disabled={busy}>
+              <i className="ti ti-brand-google" /> Continue with Google
+            </button>
+          )}
 
           <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--ink3)', marginTop: 12 }}>
             {mode === 'signup' ? 'Already have an account?' : 'New here?'}{' '}

@@ -30,8 +30,12 @@ export async function POST(req: NextRequest) {
   if (!email || !/.+@.+\..+/.test(email)) {
     return NextResponse.json({ error: 'Please enter a valid email.' }, { status: 400 });
   }
-  if (password.length < 6) {
-    return NextResponse.json({ error: 'Password must be at least 6 characters.' }, { status: 400 });
+  // Mirrors the client-side check in app/auth/page.tsx — never trust the client alone.
+  if (password.length < 8 || !/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+    return NextResponse.json(
+      { error: 'Password must be at least 8 characters and include a letter and a number.' },
+      { status: 400 },
+    );
   }
 
   const admin = createAdminSupabase();

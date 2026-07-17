@@ -31,7 +31,9 @@ export default function SettingsPage() {
         body: JSON.stringify({ region }),
       });
       const data = await res.json();
-      if (data.url) {
+      if (!res.ok) {
+        setUpgradeMsg(data.error === 'Sign in to upgrade.' ? 'Please sign in to upgrade.' : (data.error || 'Could not start checkout right now.'));
+      } else if (data.url) {
         window.location.href = data.url; // Stripe Checkout
       } else if (!data.configured) {
         setUpgradeMsg(

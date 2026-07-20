@@ -205,8 +205,17 @@ export default function BeginPage() {
           who: state.who, language: state.language || 'en', version: 'full',
         }),
       });
-      const data = (await res.json()) as ChapterResult;
-      set('chapter', data);
+      const data = await res.json();
+      if (!res.ok || !Array.isArray(data?.bodyParagraphs)) {
+        // Never trust an error body (e.g. {error:"..."}) as a finished chapter —
+        // that shape is missing tags/timeline and crashes the chapter view.
+        set('chapter', {
+          bodyParagraphs: [data?.error || 'Could not write the chapter right now. Please try again.'],
+          tags: [], quote: '', timeline: [],
+        });
+      } else {
+        set('chapter', data as ChapterResult);
+      }
     } catch {
       set('chapter', {
         bodyParagraphs: ['Could not connect — check your internet and try again.'],

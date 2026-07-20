@@ -33,6 +33,21 @@ export async function currentCaller(): Promise<Caller | null> {
 }
 
 /**
+ * True when there's a valid session — deliberately lighter than currentCaller():
+ * it does NOT require a profiles row to already exist. A brand-new user has a
+ * session but no profile/family until /api/family/ensure runs (on first save),
+ * so anything gating "are they signed in" must not require getCaller() to
+ * succeed, or first-time actions (like generating their first chapter, before
+ * they've saved anything) get wrongly rejected.
+ */
+export async function isSignedIn(): Promise<boolean> {
+  const supabase = createServerSupabase();
+  if (!supabase) return false;
+  const { data } = await supabase.auth.getUser();
+  return Boolean(data.user);
+}
+
+/**
  * Require a signed-in caller with at least `min` role, optionally scoped to a
  * specific family. Returns the caller on success, or null when the check fails
  * (the route should then return 401/403).
@@ -54,5 +69,5 @@ export async function requireCaller(
  */
 export async function allowedToSpend(): Promise<boolean> {
   if (!isSupabaseConfigured()) return true;
-  return Boolean(await currentCaller());
+  return isSignedIn();
 }

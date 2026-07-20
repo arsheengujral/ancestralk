@@ -192,12 +192,19 @@ function ProfileInner() {
           who: state.who, language, version: v,
         }),
       });
-      const data = (await res.json()) as BioContent;
-      persist({ ...store, [v]: data });
+      const data = await res.json();
+      if (!res.ok || !Array.isArray(data?.bodyParagraphs)) {
+        // Never persist an error body (e.g. {error:"..."}) as a version — it's
+        // missing tags/timeline and crashes wherever this version is rendered.
+        console.error('generate version failed:', data?.error ?? res.status);
+        return;
+      }
+      const content = data as BioContent;
+      persist({ ...store, [v]: content });
       // Save this version permanently when viewing a saved member.
       if (dbCtx) {
         try {
-          await saveVersion(dbCtx.profileId, dbCtx.familyId, v, data);
+          await saveVersion(dbCtx.profileId, dbCtx.familyId, v, content);
         } catch (err) {
           console.error('Saving version failed:', err);
         }

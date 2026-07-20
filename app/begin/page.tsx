@@ -7,7 +7,7 @@ import { useUser } from '@/lib/useUser';
 import { getFamilyContext, saveMember } from '@/lib/familyStore';
 import { LANGUAGES, REGIONS, englishName } from '@/lib/languages';
 import { QUESTIONS, MILESTONE_TYPES } from '@/lib/questions';
-import { regionPlaceholder, regionDemoText } from '@/lib/regionExamples';
+import { regionPlaceholder, regionDemoText, regionKnownSuggestions } from '@/lib/regionExamples';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import VoicePlayback from '@/components/VoicePlayback';
 import SaveCeremony from '@/components/SaveCeremony';
@@ -49,13 +49,6 @@ function tailorLabel(label: string, who: string, id: string): string {
     .replace(/^./, (c) => c.toUpperCase());
 }
 
-const KNOWN_SUGGESTIONS = [
-  'Always had a story for every moment',
-  'Made every room warmer',
-  'The one everyone called in a crisis',
-  'Fed people the way others say I love you',
-  'Never asked anything for themselves',
-];
 
 const Q1_FOLLOWUPS = {
   bake: ['How did they learn to bake?', 'Was there a recipe never written down?', 'Who taught them?'],
@@ -413,7 +406,7 @@ export default function BeginPage() {
               <label className="fl">Full name</label>
               <input
                 className="fi2"
-                placeholder="e.g. Margaret Ellis"
+                placeholder={regionPlaceholder(state.region, 'name', 'e.g. Margaret Ellis')}
                 value={state.name}
                 onChange={(e) => set('name', e.target.value)}
               />
@@ -432,11 +425,29 @@ export default function BeginPage() {
                 <label className="fl">Where they grew up</label>
                 <input
                   className="fi2"
-                  placeholder="e.g. Bristol, Nairobi…"
+                  placeholder={regionPlaceholder(state.region, 'town', 'e.g. Bristol, Nairobi…')}
                   value={state.town}
                   onChange={(e) => set('town', e.target.value)}
                 />
               </div>
+            </div>
+            <div className="field">
+              <label className="fl">
+                Relationship status{' '}
+                <span style={{ textTransform: 'none', letterSpacing: 0, color: 'var(--ink4)' }}>(optional)</span>
+              </label>
+              <select
+                className="fi2"
+                value={state.relationshipStatus}
+                onChange={(e) => set('relationshipStatus', e.target.value)}
+              >
+                <option value="">Prefer not to say</option>
+                <option>Single</option>
+                <option>In a relationship</option>
+                <option>Married</option>
+                <option>Divorced</option>
+                <option>Widowed</option>
+              </select>
             </div>
             <div className="field">
               <label className="fl">Known for in your family</label>
@@ -464,7 +475,7 @@ export default function BeginPage() {
                     <i className="ti ti-sparkles" style={{ fontSize: 12 }} /> Examples — tap to add
                   </div>
                   <div className="sug-c">
-                    {KNOWN_SUGGESTIONS.map((s) => (
+                    {regionKnownSuggestions(state.region).map((s) => (
                       <button className="schip" key={s} onClick={() => appendKnown(s)}>
                         {s}
                       </button>

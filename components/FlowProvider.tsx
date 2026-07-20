@@ -31,6 +31,7 @@ export interface FlowState {
   year: string;
   town: string;
   known: string;
+  relationshipStatus: string; // optional — Single/Married/etc. of the person filling the form
   q1: string;
   q2: string;
   q3: string;
@@ -47,7 +48,7 @@ export interface FlowState {
 
 const EMPTY: FlowState = {
   region: '', language: 'en',
-  who: '', name: '', year: '', town: '', known: '',
+  who: '', name: '', year: '', town: '', known: '', relationshipStatus: '',
   q1: '', q2: '', q3: '', q4: '', q5: '',
   answers: {}, milestones: [],
   photo: '', recs: {}, chapter: null,

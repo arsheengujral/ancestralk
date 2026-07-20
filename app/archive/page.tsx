@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFlow } from '@/components/FlowProvider';
-import { isDbActive, loadMembers, loadFutureMessages, type SavedMember, type FutureMessageRow } from '@/lib/familyStore';
+import { isDbActive, loadMembers, loadFutureMessages, loadFamilyName, type SavedMember, type FutureMessageRow } from '@/lib/familyStore';
 import FamilyTree from '@/components/FamilyTree';
 import Walkthrough from '@/components/Walkthrough';
+import SectionErrorBoundary from '@/components/SectionErrorBoundary';
 
 function initialsOf(name: string | null | undefined): string {
   return (name ?? '')
@@ -62,8 +63,18 @@ export default function ArchivePage() {
   const name = featured?.name || state.name || 'Margaret Ellis';
   const displayIni = featured?.ini || ini;
   const displayPhoto = featured?.photo || state.photo || undefined;
-  const surname = name.split(' ').slice(-1)[0];
   const hasChapter = loadedFromDb || Boolean(state.chapter);
+
+  // The family's own chosen name — never invented from a member's surname.
+  const [familyName, setFamilyName] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    loadFamilyName().then((n) => active && setFamilyName(n));
+    return () => {
+      active = false;
+    };
+  }, []);
+  const archiveTitle = familyName ? `${familyName} Archive` : 'Your Family Archive';
 
   const [members, setMembers] = useState<Member[]>([
     {
@@ -153,8 +164,22 @@ export default function ArchivePage() {
 
       <div className="dh">
         <div>
-          <div className="dname serif">The {surname} Family Archive</div>
-          <div className="dsub">Living legacy · Est. 2026 · English, हिन्दी, العربية</div>
+          <div className="dname serif">{archiveTitle}</div>
+          <div className="dsub">
+            {familyName ? (
+              'Living legacy · Est. 2026 · English, हिन्दी, العربية'
+            ) : (
+              <>
+                Living legacy · Est. 2026 —{' '}
+                <span
+                  style={{ cursor: 'pointer', color: 'var(--g3)', textDecoration: 'underline' }}
+                  onClick={() => router.push('/settings')}
+                >
+                  add your family name
+                </span>
+              </>
+            )}
+          </div>
         </div>
         <div className="dbadge">ACTIVE</div>
       </div>
@@ -168,7 +193,17 @@ export default function ArchivePage() {
           </button>
         </div>
         <div className="tsvg-w">
-          <FamilyTree name={name} ini={displayIni} photo={displayPhoto} members={rawMembers ?? undefined} />
+          <SectionErrorBoundary
+            fallback={
+              <div className="ibox">
+                <i className="ti ti-alert-triangle" /> The tree view couldn&apos;t render — your family
+                members are still saved. <a href="/begin" style={{ color: 'var(--g3)' }}>Add another</a> or
+                refresh this page.
+              </div>
+            }
+          >
+            <FamilyTree name={name} ini={displayIni} photo={displayPhoto} members={rawMembers ?? undefined} />
+          </SectionErrorBoundary>
         </div>
       </div>
 

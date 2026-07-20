@@ -25,6 +25,7 @@ export interface SavedMember {
   birth_year: string | null;
   hometown: string | null;
   known_for?: string | null;
+  relationship_status?: string | null;
   relationship: string | null;
   photo_url: string | null;
   role: string;
@@ -92,6 +93,7 @@ export async function saveMember(state: FlowState, familyId: string): Promise<st
       birth_year: state.year || null,
       hometown: state.town || null,
       known_for: state.known || null,
+      relationship_status: state.relationshipStatus || null,
       relationship: state.who || null,
       photo_url: photoPath,
       role: 'contributor',
@@ -179,7 +181,7 @@ export async function loadMemberWithStory(
   if (!supabase) return null;
   const { data: member } = await supabase
     .from('profiles')
-    .select('id, full_name, birth_year, hometown, known_for, relationship, photo_url, role, is_admin')
+    .select('id, full_name, birth_year, hometown, known_for, relationship_status, relationship, photo_url, role, is_admin')
     .eq('id', profileId)
     .maybeSingle();
   if (!member) return null;
@@ -381,6 +383,22 @@ export async function loadVideos(): Promise<LoadedVideo[]> {
     out.push({ id: r.id, url, caption: r.caption });
   }
   return out;
+}
+
+// ── Family name ──────────────────────────────────────────────────────────────
+/** The family's chosen display name, or null if never set (no invented default). */
+export async function loadFamilyName(): Promise<string | null> {
+  const supabase = sb();
+  if (!supabase) return null;
+  const { data } = await supabase.from('families').select('name').limit(1).maybeSingle();
+  return data?.name ?? null;
+}
+
+export async function saveFamilyName(name: string): Promise<void> {
+  const supabase = sb();
+  if (!supabase) return;
+  const { data: fam } = await supabase.from('families').select('id').limit(1).maybeSingle();
+  if (fam?.id) await supabase.from('families').update({ name: name.trim() || null }).eq('id', fam.id);
 }
 
 // ── Album design (Set A) ─────────────────────────────────────────────────────

@@ -43,10 +43,11 @@ export async function POST() {
     return NextResponse.json({ error: 'Service role not configured' }, { status: 500 });
   }
 
-  const surname = (user.email ?? 'Family').split('@')[0];
+  // No invented name — the family stays unnamed until the owner sets one in
+  // Settings; the UI shows a neutral placeholder rather than a fabricated name.
   const { data: fam, error: famErr } = await admin
     .from('families')
-    .insert({ name: `The ${surname} Family` })
+    .insert({ name: null })
     .select('id')
     .single();
   if (famErr || !fam) {

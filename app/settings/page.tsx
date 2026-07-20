@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { loadFamilyName, saveFamilyName } from '@/lib/familyStore';
 
 function Toggle({ initial = true }: { initial?: boolean }) {
   const [on, setOn] = useState(initial);
@@ -14,6 +15,22 @@ export default function SettingsPage() {
   const router = useRouter();
   const [upgradeMsg, setUpgradeMsg] = useState('');
   const [busy, setBusy] = useState(false);
+
+  // Family name — real, never invented. Blank until the owner sets it.
+  const [familyName, setFamilyName] = useState('');
+  const [nameSaved, setNameSaved] = useState(false);
+  const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    loadFamilyName().then((n) => setFamilyName(n ?? ''));
+    return () => {
+      if (savedTimer.current) clearTimeout(savedTimer.current);
+    };
+  }, []);
+  async function saveName() {
+    await saveFamilyName(familyName);
+    setNameSaved(true);
+    savedTimer.current = setTimeout(() => setNameSaved(false), 2000);
+  }
 
   async function upgrade() {
     setBusy(true);
@@ -56,6 +73,26 @@ export default function SettingsPage() {
       </button>
       <div className="ftit serif">Settings</div>
       <div className="fsub">Your family&apos;s plan, languages, privacy, and data.</div>
+
+      <div className="slbl">Family name</div>
+      <div className="tout" style={{ padding: 16 }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <input
+            className="fi2"
+            style={{ flex: 1, minWidth: 200 }}
+            placeholder="e.g. The Sharma Family"
+            value={familyName}
+            onChange={(e) => setFamilyName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && saveName()}
+          />
+          <button className="ibtn" onClick={saveName}>
+            {nameSaved ? 'Saved ✓' : 'Save'}
+          </button>
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--ink3)', marginTop: 8 }}>
+          Shown at the top of your archive. Leave blank and it stays generic.
+        </div>
+      </div>
 
       <div className="slbl">Subscription</div>
       <div className="tout">

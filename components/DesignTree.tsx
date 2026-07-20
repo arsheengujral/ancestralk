@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import { computePositions, curvedEdges, type LayoutNode } from '@/lib/treeLayout';
 import type { AlbumDesign } from '@/lib/albumDesigns';
 
@@ -49,6 +50,13 @@ export default function DesignTree({
   const curved = curvedEdges(treeLayout);
   const isStars = ornament === 'stars' || treeLayout === 'constellation';
 
+  // Unique per-instance ids so multiple trees on one page (gallery previews +
+  // the live dashboard tree) don't collide on the same gradient/filter def.
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const featured = nodes.find((n) => n.featured);
+  const featuredIdx = featured ? nodes.indexOf(featured) : -1;
+  const fp = featuredIdx >= 0 ? pts[featuredIdx] : undefined;
+
   return (
     <svg
       viewBox="0 0 100 100"
@@ -56,9 +64,30 @@ export default function DesignTree({
       height={height}
       role="img"
       aria-label={`Family tree — ${design.name}`}
-      style={{ background: palette.bg, borderRadius: preview ? 10 : 'var(--rl)', maxWidth: '100%' }}
+      style={{ borderRadius: preview ? 10 : 'var(--rl)', maxWidth: '100%' }}
       preserveAspectRatio="xMidYMid meet"
     >
+      <defs>
+        {/* A soft warm vignette instead of a flat fill — gives every design a
+            gentler, more inviting backdrop without changing its palette. */}
+        <radialGradient id={`bg${uid}`} cx="50%" cy="38%" r="75%">
+          <stop offset="0%" stopColor={palette.accent} stopOpacity={preview ? 0.14 : 0.1} />
+          <stop offset="55%" stopColor={palette.bg} stopOpacity={1} />
+          <stop offset="100%" stopColor={palette.bg} stopOpacity={1} />
+        </radialGradient>
+        {fp && (
+          <radialGradient id={`glow${uid}`} cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor={palette.accent} stopOpacity={0.35} />
+            <stop offset="100%" stopColor={palette.accent} stopOpacity={0} />
+          </radialGradient>
+        )}
+      </defs>
+
+      <rect x={0} y={0} width={100} height={100} fill={`url(#bg${uid})`} />
+
+      {/* A warm glow behind the person at the heart of the tree. */}
+      {fp && <circle cx={sx(fp.x)} cy={sy(fp.y)} r={(featR + 6) * 1.1} fill={`url(#glow${uid})`} />}
+
       {/* edges */}
       {edges.map(([a, b], i) => {
         const p1 = pts[a];
@@ -73,8 +102,9 @@ export default function DesignTree({
               d={`M ${sx(p1.x)} ${sy(p1.y)} Q ${sx(mx)} ${sy(my)} ${sx(p2.x)} ${sy(p2.y)}`}
               fill="none"
               stroke={palette.line}
-              strokeWidth={0.6}
-              opacity={0.7}
+              strokeWidth={0.7}
+              strokeLinecap="round"
+              opacity={0.75}
             />
           );
         }
@@ -86,8 +116,9 @@ export default function DesignTree({
             x2={sx(p2.x)}
             y2={sy(p2.y)}
             stroke={palette.line}
-            strokeWidth={isStars ? 0.3 : 0.6}
-            opacity={isStars ? 0.5 : 0.75}
+            strokeWidth={isStars ? 0.3 : 0.7}
+            strokeLinecap="round"
+            opacity={isStars ? 0.5 : 0.8}
             strokeDasharray={nodes[a]?.empty || nodes[b]?.empty ? '2 1.5' : undefined}
           />
         );
@@ -126,10 +157,12 @@ export default function DesignTree({
             <g key={i} {...common}>
               {crest}
               <defs>
-                <clipPath id={`dc${i}`}>
+                <clipPath id={`dc${uid}${i}`}>
                   <circle cx={cx} cy={cy} r={r} />
                 </clipPath>
               </defs>
+              {/* A soft double ring — a locket, not just a badge. */}
+              <circle cx={cx} cy={cy} r={r + 1.3} fill="none" stroke={palette.accent} strokeWidth={0.3} opacity={0.5} />
               <circle cx={cx} cy={cy} r={r + 0.8} fill={palette.accent} />
               <image
                 href={n.photo}
@@ -137,13 +170,18 @@ export default function DesignTree({
                 y={cy - r}
                 width={r * 2}
                 height={r * 2}
-                clipPath={`url(#dc${i})`}
+                clipPath={`url(#dc${uid}${i})`}
                 preserveAspectRatio="xMidYMid slice"
               />
               {!preview && (
-                <text x={cx} y={cy + r + 4} textAnchor="middle" fontSize={3} fill={palette.text} fontWeight={600}>
-                  {n.label.length > 14 ? n.label.slice(0, 13) + '…' : n.label}
-                </text>
+                <>
+                  <text x={cx} y={cy - r - 3.5} textAnchor="middle" fontSize={3.4} fill={palette.accent}>
+                    ✦
+                  </text>
+                  <text x={cx} y={cy + r + 4} textAnchor="middle" fontSize={3} fill={palette.text} fontWeight={600}>
+                    {n.label.length > 14 ? n.label.slice(0, 13) + '…' : n.label}
+                  </text>
+                </>
               )}
             </g>
           );
@@ -157,15 +195,25 @@ export default function DesignTree({
                 <animate attributeName="opacity" values="0.5;1;0.5" dur="2.4s" repeatCount="indefinite" />
               </circle>
             ) : (
-              <circle
-                cx={cx}
-                cy={cy}
-                r={r}
-                fill={n.empty ? 'transparent' : n.featured ? palette.accent : palette.bg}
-                stroke={n.featured ? palette.accent : palette.line}
-                strokeWidth={n.featured ? 1 : 0.6}
-                strokeDasharray={n.empty ? '1.5 1.2' : undefined}
-              />
+              <>
+                {n.featured && (
+                  <circle cx={cx} cy={cy} r={r + 1.3} fill="none" stroke={palette.accent} strokeWidth={0.3} opacity={0.5} />
+                )}
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={r}
+                  fill={n.empty ? 'transparent' : n.featured ? palette.accent : palette.bg}
+                  stroke={n.featured ? palette.accent : palette.line}
+                  strokeWidth={n.featured ? 1 : 0.6}
+                  strokeDasharray={n.empty ? '1.5 1.2' : undefined}
+                />
+                {n.featured && !preview && (
+                  <text x={cx} y={cy - r - 3.5} textAnchor="middle" fontSize={3.4} fill={palette.accent}>
+                    ✦
+                  </text>
+                )}
+              </>
             )}
             {!n.empty && !isStars && (
               <text
